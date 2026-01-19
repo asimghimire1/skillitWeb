@@ -5,12 +5,18 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { apiService } from '../../services/apiService';
+import Toast from '../../components/Toast';
 
 const registerSchema = z.object({
   fullname: z.string().min(3, 'Full name must be at least 3 characters'),
   email: z.string().email('Invalid email address'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
-  role: z.enum(['learner', 'mentor'])
+  password: z.string()
+    .min(8, 'Password must be at least 8 characters')
+    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter (A-Z)')
+    .regex(/[a-z]/, 'Password must contain at least one lowercase letter (a-z)')
+    .regex(/[0-9]/, 'Password must contain at least one number (0-9)')
+    .regex(/[!@#$%^&*]/, 'Password must contain at least one special character (!@#$%^&*)'),
+  role: z.enum(['learner', 'mentor'], { errorMap: () => ({ message: 'Please select a role' }) })
 });
 
 const Register = () => {
@@ -21,8 +27,16 @@ const Register = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [registrationError, setRegistrationError] = useState('');
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState('info');
   const [isLoading, setIsLoading] = useState(false);
   const role = watch('role');
+  const password = watch('password');
+
+  const showToast = (message, type = 'info') => {
+    setToastMessage(message);
+    setToastType(type);
+  };
 
   const handleRegistrationSubmit = async (data) => {
     setRegistrationError('');
@@ -39,13 +53,22 @@ const Register = () => {
 
       if (result.success) {
         console.log('User registered:', result.user);
+        // Store user data for dashboard redirection
+        localStorage.setItem('user', JSON.stringify(result.user));
+        showToast('Account created successfully! Redirecting to login...', 'success');
         // Redirect to login page
-        navigate('/login');
+        setTimeout(() => {
+          navigate('/login');
+        }, 1500);
       } else {
-        setRegistrationError(result.message || 'Registration failed');
+        const errorMsg = result.message || 'Registration failed';
+        setRegistrationError(errorMsg);
+        showToast(errorMsg, 'error');
       }
     } catch (error) {
-      setRegistrationError('An error occurred during registration');
+      const errorMsg = 'An error occurred during registration';
+      setRegistrationError(errorMsg);
+      showToast(errorMsg, 'error');
       console.error('Registration error:', error);
     } finally {
       setIsLoading(false);
@@ -74,16 +97,22 @@ const Register = () => {
       </div>
 
       <div className="auth-content">
+        <button onClick={() => navigate('/')} className="back-btn">
+          <span className="material-symbols-outlined">arrow_back</span>
+          Back to Home
+        </button>
         <div className="auth-card">
           <div className="auth-header">
-            <div className="logo-icon">
-              <span className="material-symbols-outlined">handshake</span>
-            </div>
+            <img 
+              src="http://localhost:5000/uploads/images/logo.png" 
+              alt="Skillit Logo" 
+              className="auth-logo"
+            />
             <h1 className="brand-title">Skillit</h1>
             <p className="brand-subtitle">Create your account</p>
           </div>
 
-          <form className="auth-form-login" onSubmit={handleSubmit}>
+          <form className="auth-form-login" onSubmit={handleSubmit(handleRegistrationSubmit)}>
             {/* Registration Error Message */}
             {registrationError && (
               <div className="error-message" style={{ color: '#dc3545', marginBottom: '15px', padding: '10px', backgroundColor: '#f8d7da', borderRadius: '4px', textAlign: 'center' }}>
@@ -165,7 +194,34 @@ const Register = () => {
                   </span>
                 </button>
               </div>
-              {errors.password && <span className="error-text">{errors.password.message}</span>}
+              
+              {/* Password Requirements */}
+              {password && (
+                <div style={{ marginTop: '12px', fontSize: '12px' }}>
+                  <div style={{ color: password.length >= 8 ? '#07885d' : '#886364', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
+                    <span>{password.length >= 8 ? '✓' : '○'}</span>
+                    <span>At least 8 characters</span>
+                  </div>
+                  <div style={{ color: /[A-Z]/.test(password) ? '#07885d' : '#886364', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
+                    <span>{/[A-Z]/.test(password) ? '✓' : '○'}</span>
+                    <span>One uppercase letter (A-Z)</span>
+                  </div>
+                  <div style={{ color: /[a-z]/.test(password) ? '#07885d' : '#886364', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
+                    <span>{/[a-z]/.test(password) ? '✓' : '○'}</span>
+                    <span>One lowercase letter (a-z)</span>
+                  </div>
+                  <div style={{ color: /[0-9]/.test(password) ? '#07885d' : '#886364', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px' }}>
+                    <span>{/[0-9]/.test(password) ? '✓' : '○'}</span>
+                    <span>One number (0-9)</span>
+                  </div>
+                  <div style={{ color: /[!@#$%^&*]/.test(password) ? '#07885d' : '#886364', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span>{/[!@#$%^&*]/.test(password) ? '✓' : '○'}</span>
+                    <span>One special character (!@#$%^&*)</span>
+                  </div>
+                </div>
+              )}
+              
+              {errors.password && <span className="error-text" style={{ marginTop: '10px', display: 'block' }}>{errors.password.message}</span>}
             </div>
 
             {/* Submit */}
@@ -180,6 +236,16 @@ const Register = () => {
           </p>
         </div>
       </div>
+
+      {/* Toast Notification */}
+      {toastMessage && (
+        <Toast 
+          message={toastMessage} 
+          type={toastType} 
+          onClose={() => setToastMessage('')}
+          duration={5000}
+        />
+      )}
     </div>
   );
 };

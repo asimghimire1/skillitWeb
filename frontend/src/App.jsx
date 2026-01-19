@@ -5,6 +5,7 @@ import PublicRoute from './routes/publicRoute';
 
 const Home = lazy(() => import('./pages/private/Home.jsx'));
 const Product = lazy(() => import('./pages/private/Product.jsx'));
+const Teacher = lazy(() => import('./pages/private/Teacher.jsx'));
 const Login = lazy(() => import('./pages/public/Login.jsx'));
 const Register = lazy(() => import('./pages/public/Register.jsx'));
 
@@ -26,6 +27,7 @@ function App() {
           <Route element={<PrivateRoute />}>
             <Route path="/private/Home" element={<Product />} />
             <Route path="/private/Product" element={<Product />} />
+            <Route path="/private/Teacher" element={<Teacher />} />
           </Route>
 
           {/* Catch All */}

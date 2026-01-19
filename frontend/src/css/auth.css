@@ -102,11 +102,51 @@ body {
   position: relative;
   z-index: 10;
   display: flex;
+  flex-direction: column;
   min-height: 100vh;
   align-items: center;
   justify-content: center;
   padding: 1rem;
   animation: fadeIn 0.5s ease-out;
+}
+
+.back-btn {
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: white;
+  color: var(--primary);
+  border: 1px solid var(--border-light);
+  padding: 0.6rem 1.2rem;
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.back-btn:hover {
+  background-color: #f8f6f6;
+  border-color: var(--primary);
+  box-shadow: 0 4px 12px rgba(234, 42, 51, 0.15);
+  transform: translateX(-2px);
+}
+
+.back-btn .material-symbols-outlined {
+  font-size: 20px;
+}
+
+@media (max-width: 640px) {
+  .back-btn {
+    top: 1rem;
+    left: 1rem;
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+  }
 }
 
 @keyframes fadeIn {
@@ -138,6 +178,14 @@ body {
   flex-direction: column;
   align-items: center;
   margin-bottom: 2rem;
+}
+
+.auth-logo {
+  height: 3rem;
+  width: 3rem;
+  margin-bottom: 1rem;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 20px rgba(234, 42, 51, 0.3));
 }
 
 .logo-icon {

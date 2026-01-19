@@ -21,7 +21,13 @@ class User {
       fullname,
       password,
       role,
-      created_at: new Date().toISOString()
+      avatar: null,
+      bio: '',
+      verified: false,
+      phone: null,
+      location: null,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
     };
     data.users.push(newUser);
     writeData(data);
@@ -43,12 +49,15 @@ class User {
     return user;
   }
 
-  static async update(id, fullname, role) {
+  static async update(id, updateData) {
     const data = readData();
     const userIndex = data.users.findIndex(u => u.id === id);
     if (userIndex !== -1) {
-      data.users[userIndex].fullname = fullname;
-      data.users[userIndex].role = role;
+      data.users[userIndex] = {
+        ...data.users[userIndex],
+        ...updateData,
+        updated_at: new Date().toISOString()
+      };
       writeData(data);
       return data.users[userIndex];
     }

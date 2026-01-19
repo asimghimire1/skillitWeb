@@ -37,13 +37,20 @@ const Login = () => {
         return;
       }
 
-      // Store token and user data
+      // Store token and user data in localStorage
       localStorage.setItem('authToken', result.token);
       localStorage.setItem('userEmail', result.user.email);
       localStorage.setItem('userName', result.user.fullname);
+      localStorage.setItem('userRole', result.user.role);
+      localStorage.setItem('userId', result.user.id);
+      localStorage.setItem('user', JSON.stringify(result.user));
 
-      // Redirect to Home
-      navigate('/private/Home');
+      // Redirect to appropriate dashboard based on role
+      if (result.user.role === 'teacher' || result.user.role === 'mentor') {
+        navigate('/private/Teacher');
+      } else {
+        navigate('/private/Home');
+      }
     } catch (error) {
       console.error('Login error:', error);
       setLoginError('Login failed. Please try again.');
@@ -70,11 +77,17 @@ const Login = () => {
       </div>
 
       <div className="auth-content">
+        <button onClick={() => navigate('/')} className="back-btn">
+          <span className="material-symbols-outlined">arrow_back</span>
+          Back to Home
+        </button>
         <div className="auth-card">
           <div className="auth-header">
-            <div className="logo-icon">
-              <span className="material-symbols-outlined">handshake</span>
-            </div>
+            <img 
+              src="http://localhost:5000/uploads/images/logo.png" 
+              alt="Skillit Logo" 
+              className="auth-logo"
+            />
             <h1 className="brand-title">Skillit</h1>
             <p className="brand-subtitle">Log in to start swapping skills</p>
           </div>

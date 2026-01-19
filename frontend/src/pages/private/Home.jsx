@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../../HomePage.css';
+import '../../css/HomePage.css';
 
 const HomePage = () => {
   const [notificationCount, setNotificationCount] = useState(0);
@@ -90,8 +90,11 @@ const HomePage = () => {
         <div className="header-container">
           {/* Logo */}
           <div className="logo-section">
-            <div className="logo-icon">⚡</div>
-            <span className="logo-text">Skillit</span>
+            <img 
+              src="http://localhost:5000/uploads/images/logo.png" 
+              alt="Skillit Logo" 
+              className="logo-icon"
+            />
           </div>
 
           {/* Navigation */}
@@ -152,6 +155,7 @@ const HomePage = () => {
           <div className="logo-item">Amazon</div>
           <div className="logo-item">Apple</div>
           <div className="logo-item">Meta</div>
+          <div className="logo-item">Xoventra</div>
         </div>
       </section>
 
@@ -261,7 +265,7 @@ const HomePage = () => {
           </div>
         </div>
         <div className="footer-bottom">
-          <p>&copy; 2024 Skillit. All rights reserved.</p>
+          <p>&copy; 2026 Skillit. All rights reserved.</p>
         </div>
       </footer>
     </div>

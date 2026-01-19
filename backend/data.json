@@ -1,20 +1,11 @@
 {
-  "users": [
-    {
-      "id": 1,
-      "email": "ramram@gmail.com",
-      "fullname": "Jai Shree Ram",
-      "password": "$2a$10$V0YPautJX2zw.UDpEF5Pdu3i6vv3Rxuc2lsMUKwv6.wKb7wEyh2Me",
-      "role": "learner",
-      "created_at": "2026-01-09T02:17:45.852Z"
-    },
-    {
-      "id": 2,
-      "email": "bhandina@gmail.com",
-      "fullname": "Bhandina",
-      "password": "$2a$10$zHprm1oHcdpxk6gT45ccl.ra13HGxwzUpMJEMYbMm3qIN3hXIjXfy",
-      "role": "teacher",
-      "created_at": "2026-01-09T02:20:24.656Z"
-    }
-  ]
+  "users": [],
+  "skills": [],
+  "bids": [],
+  "sessions": [],
+  "messages": [],
+  "contents": [],
+  "reviews": [],
+  "notifications": [],
+  "transactions": []
 }

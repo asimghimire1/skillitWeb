@@ -13,7 +13,7 @@ const registerSchema = z.object({
   fullname: z.string().min(3, 'Full name must be at least 3 characters'),
   email: z.string().email('Invalid email address'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
-  role: z.enum(['learner', 'mentor'], { errorMap: () => ({ message: 'Role must be either learner or mentor' }) })
+  role: z.enum(['learner', 'mentor', 'teacher'], { errorMap: () => ({ message: 'Role must be either learner, mentor, or teacher' }) })
 });
 
 class AuthController {
@@ -22,7 +22,12 @@ class AuthController {
     try {
       // Validate input with Zod
       const validatedData = registerSchema.parse(req.body);
-      const { email, fullname, password, role } = validatedData;
+      let { email, fullname, password, role } = validatedData;
+
+      // Normalize role - mentor -> teacher
+      if (role === 'mentor') {
+        role = 'teacher';
+      }
 
       // Check if user already exists
       const existingUser = await User.findByEmail(email);

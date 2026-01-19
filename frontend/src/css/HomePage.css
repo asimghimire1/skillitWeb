@@ -90,13 +90,20 @@ body, .home-page {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 2rem;
-  height: 2rem;
+  width: 2.5rem;
+  height: 2.5rem;
   border-radius: 0.5rem;
-  background-color: var(--primary);
+  background-color: transparent;
   color: white;
   font-size: 1.25rem;
   font-weight: bold;
+}
+
+@media (min-width: 768px) {
+  .logo-icon {
+    width: 3rem;
+    height: 3rem;
+  }
 }
 
 .logo-text {
@@ -150,8 +157,8 @@ body, .home-page {
   background: none;
   border: 1px solid #e5e7eb;
   cursor: pointer;
-  padding: 0.6rem 1.2rem;
-  font-size: 0.95rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
   font-weight: 600;
   border-radius: 0.5rem;
   color: var(--text-main);
@@ -177,8 +184,8 @@ body, .home-page {
   background-color: var(--primary);
   border: none;
   cursor: pointer;
-  padding: 0.6rem 1.5rem;
-  font-size: 0.95rem;
+  padding: 0.5rem 1.2rem;
+  font-size: 0.85rem;
   font-weight: 600;
   border-radius: 0.5rem;
   color: white;
@@ -373,11 +380,13 @@ main {
   line-height: 1.25;
   color: var(--text-main);
   margin-bottom: 1.25rem;
+  text-align: center;
 }
 
 @media (min-width: 640px) {
   .hero-title {
     font-size: 2.5rem;
+    text-align: left;
   }
 }
 
@@ -406,11 +415,13 @@ main {
   line-height: 1.8;
   color: var(--text-muted);
   margin-bottom: 2rem;
+  text-align: center;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 640px) {
   .hero-description {
     font-size: 1.125rem;
+    text-align: left;
   }
 }
 
@@ -424,6 +435,13 @@ main {
   gap: 1rem;
   flex-wrap: wrap;
   margin-bottom: 2rem;
+  justify-content: center;
+}
+
+@media (min-width: 640px) {
+  .hero-buttons {
+    justify-content: flex-start;
+  }
 }
 
 .btn-primary {
@@ -708,6 +726,7 @@ main {
   font-weight: 800;
   letter-spacing: -0.02em;
   color: var(--text-main);
+  text-align: left;
 }
 
 @media (min-width: 768px) {
@@ -893,12 +912,18 @@ main {
 .teacher-card {
   border-radius: 1.25rem;
   background-color: white;
-  padding: 1.75rem;
+  padding: 1.25rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   border: 1px solid #e5e7eb;
   transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
+}
+
+@media (min-width: 768px) {
+  .teacher-card {
+    padding: 1.75rem;
+  }
 }
 
 .dark .teacher-card {
@@ -917,8 +942,14 @@ main {
   border-radius: 50%;
   background-size: cover;
   background-position: center;
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
   border: 2px solid var(--primary);
+}
+
+@media (min-width: 768px) {
+  .teacher-avatar {
+    margin-bottom: 1rem;
+  }
 }
 
 .teacher-name {
@@ -944,7 +975,13 @@ main {
   line-height: 1.6;
   color: var(--text-muted);
   flex: 1;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+@media (min-width: 768px) {
+  .teacher-bio {
+    margin-bottom: 1.5rem;
+  }
 }
 
 .dark .teacher-bio {
@@ -1054,9 +1091,10 @@ main {
   padding: 2rem 1rem;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
   height: 100%;
-  align-items: flex-start;
 }
 
 @media (min-width: 768px) {
@@ -1065,17 +1103,32 @@ main {
   }
 }
 
+.map-content > div:first-child {
+  text-align: center;
+  width: 100%;
+}
+
+.map-content .section-title {
+  text-align: center;
+}
+
+.map-content .section-subtitle {
+  text-align: center;
+}
+
 .search-bar {
   display: flex;
   gap: 0.5rem;
   margin-top: 2rem;
   width: 100%;
   max-width: 500px;
+  flex-direction: column;
 }
 
 @media (min-width: 768px) {
   .search-bar {
-    margin-top: 0;
+    margin-top: 1.5rem;
+    flex-direction: row;
   }
 }
 
@@ -1180,14 +1233,15 @@ footer {
   max-width: 1400px;
   margin: 0 auto;
   padding: 3rem 1rem;
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
   gap: 2rem;
 }
 
 @media (min-width: 640px) {
   .footer-content {
-    grid-template-columns: repeat(2, 1fr);
     padding: 4rem 2rem;
     gap: 2.5rem;
   }
@@ -1195,7 +1249,7 @@ footer {
 
 @media (min-width: 1024px) {
   .footer-content {
-    grid-template-columns: repeat(5, 1fr);
+    justify-content: space-between;
     gap: 3rem;
   }
 }
@@ -1203,19 +1257,30 @@ footer {
 .footer-column {
   display: flex;
   flex-direction: column;
+  flex: 1;
+  min-width: 150px;
+  text-align: center;
+}
+
+@media (min-width: 768px) {
+  .footer-column {
+    text-align: left;
+  }
 }
 
 .footer-column:first-child {
-  grid-column: 1 / -1;
+  flex: 1 1 100%;
   padding-bottom: 2rem;
   border-bottom: 1px solid #374151;
+  text-align: center;
 }
 
 @media (min-width: 1024px) {
   .footer-column:first-child {
-    grid-column: 1;
+    flex: 0 1 auto;
     padding-bottom: 0;
     border-bottom: none;
+    text-align: left;
   }
 }
 

@@ -22,6 +22,8 @@ export const apiService = {
         localStorage.setItem('userEmail', data.user.email);
         localStorage.setItem('userName', data.user.fullname);
         localStorage.setItem('userRole', data.user.role);
+        localStorage.setItem('userId', data.user.id);
+        localStorage.setItem('user', JSON.stringify(data.user));
       }
       
       return data;
@@ -50,6 +52,8 @@ export const apiService = {
         localStorage.setItem('userEmail', data.user.email);
         localStorage.setItem('userName', data.user.fullname);
         localStorage.setItem('userRole', data.user.role);
+        localStorage.setItem('userId', data.user.id);
+        localStorage.setItem('user', JSON.stringify(data.user));
       }
       
       return data;
