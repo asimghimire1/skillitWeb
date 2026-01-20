@@ -13,9 +13,9 @@ export const apiService = {
         },
         body: JSON.stringify({ email, fullname, password, role }),
       });
-      
+
       const data = await response.json();
-      
+
       if (data.success) {
         // Store token and user data
         localStorage.setItem('authToken', data.token);
@@ -25,7 +25,7 @@ export const apiService = {
         localStorage.setItem('userId', data.user.id);
         localStorage.setItem('user', JSON.stringify(data.user));
       }
-      
+
       return data;
     } catch (error) {
       console.error('Registration error:', error);
@@ -43,9 +43,9 @@ export const apiService = {
         },
         body: JSON.stringify({ email, password }),
       });
-      
+
       const data = await response.json();
-      
+
       if (data.success) {
         // Store token and user data
         localStorage.setItem('authToken', data.token);
@@ -55,7 +55,7 @@ export const apiService = {
         localStorage.setItem('userId', data.user.id);
         localStorage.setItem('user', JSON.stringify(data.user));
       }
-      
+
       return data;
     } catch (error) {
       console.error('Login error:', error);
@@ -77,7 +77,7 @@ export const apiService = {
           'Authorization': `Bearer ${token}`,
         },
       });
-      
+
       const data = await response.json();
       return data;
     } catch (error) {
@@ -92,6 +92,71 @@ export const apiService = {
     localStorage.removeItem('userEmail');
     localStorage.removeItem('userName');
     localStorage.removeItem('userRole');
+  },
+
+  // Stats
+  async getTeacherStats(teacherId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/stats/teacher/${teacherId}`);
+      return await response.json();
+    } catch (error) {
+      console.error('Get stats error:', error);
+      return null;
+    }
+  },
+
+  // Sessions
+  async getTeacherSessions(teacherId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/sessions/teacher/${teacherId}`);
+      return await response.json();
+    } catch (error) {
+      console.error('Get sessions error:', error);
+      return [];
+    }
+  },
+
+  async createSession(sessionData) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/sessions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(sessionData),
+      });
+      return await response.json();
+    } catch (error) {
+      console.error('Create session error:', error);
+      return null;
+    }
+  },
+
+  // Content
+  async getTeacherContent(teacherId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/content/teacher/${teacherId}`);
+      return await response.json();
+    } catch (error) {
+      console.error('Get content error:', error);
+      return [];
+    }
+  },
+
+  async uploadContent(contentData) {
+    try {
+      const isFormData = contentData instanceof FormData;
+      const headers = isFormData ? {} : { 'Content-Type': 'application/json' };
+      const body = isFormData ? contentData : JSON.stringify(contentData);
+
+      const response = await fetch(`${API_BASE_URL}/content`, {
+        method: 'POST',
+        headers: headers,
+        body: body,
+      });
+      return await response.json();
+    } catch (error) {
+      console.error('Upload content error:', error);
+      return null;
+    }
   },
 };
 

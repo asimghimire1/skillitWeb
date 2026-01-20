@@ -35,6 +35,7 @@
     opacity: 0;
     transform: scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
@@ -308,8 +309,7 @@
 .form-input:focus,
 .form-textarea:focus,
 .form-select:focus {
-  ring: 2px;
-  ring-color: #c91d2b;
+  box-shadow: 0 0 0 2px #c91d2b;
   border-color: #c91d2b;
 }
 
@@ -444,6 +444,7 @@
   color: #876467;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

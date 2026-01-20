@@ -5,7 +5,11 @@ const fs = require('fs');
 require('dotenv').config();
 
 
+
 const authRoutes = require('./routes/auth');
+const contentRoutes = require('./routes/content');
+const sessionRoutes = require('./routes/session');
+const statsRoutes = require('./routes/stats');
 
 
 const app = express();
@@ -23,19 +27,19 @@ const createUploadsFolder = () => {
     console.log('✓ Created /uploads directory');
   }
 
- 
+
   if (!fs.existsSync(imagesDir)) {
     fs.mkdirSync(imagesDir, { recursive: true });
     console.log('✓ Created /uploads/images directory');
   }
 
-  
+
   if (!fs.existsSync(avatarsDir)) {
     fs.mkdirSync(avatarsDir, { recursive: true });
     console.log('✓ Created /uploads/avatars directory');
   }
 
-  
+
   if (!fs.existsSync(skillsDir)) {
     fs.mkdirSync(skillsDir, { recursive: true });
     console.log('✓ Created /uploads/skills directory');
@@ -90,6 +94,9 @@ createUploadsFolder();
 
 // Auth Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/content', contentRoutes);
+app.use('/api/sessions', sessionRoutes);
+app.use('/api/stats', statsRoutes);
 
 // Health Check Route
 app.get('/api/health', (req, res) => {

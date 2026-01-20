@@ -6,19 +6,24 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
   const [thumbnail, setThumbnail] = useState(null);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [category, setCategory] = useState('Photography');
+  const [category, setCategory] = useState('Technology');
+  const [customCategory, setCustomCategory] = useState('');
   const [level, setLevel] = useState('Beginner');
   const [isDragging, setIsDragging] = useState(false);
   const [isThumbnailDragging, setIsThumbnailDragging] = useState(false);
+  const [trimStart, setTrimStart] = useState(0);
+  const [trimEnd, setTrimEnd] = useState(0);
+  const [videoDuration, setVideoDuration] = useState(0);
 
   const handleFileChange = (event) => {
     const selectedFile = event.target.files?.[0];
-    if (selectedFile) {
+    if (selectedFile && selectedFile.type.startsWith('video/')) {
       setFile(selectedFile);
-      // Auto-fill title from filename if not set
       if (!title) {
         setTitle(selectedFile.name.replace(/\.[^/.]+$/, ''));
       }
+    } else if (selectedFile) {
+      alert('Please select a video file.');
     }
   };
 
@@ -35,11 +40,13 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
     e.preventDefault();
     setIsDragging(false);
     const droppedFile = e.dataTransfer.files?.[0];
-    if (droppedFile) {
+    if (droppedFile && droppedFile.type.startsWith('video/')) {
       setFile(droppedFile);
       if (!title) {
         setTitle(droppedFile.name.replace(/\.[^/.]+$/, ''));
       }
+    } else if (droppedFile) {
+      alert('Please select a video file.');
     }
   };
 
@@ -68,24 +75,44 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
     }
   };
 
-  const handleContinue = () => {
-    if (file && title && thumbnail) {
-      const uploadData = {
-        title,
-        description,
-        category,
-        level,
-        thumbnail: URL.createObjectURL(thumbnail),
-        badge: 'published',
-        duration: '00:00',
-        views: '0',
-        date: 'Just now',
-        file,
-      };
-      onUpload(uploadData);
-      resetForm();
-      onClose();
+  const handleUpload = () => {
+    const formData = new FormData();
+    formData.append('title', title);
+    formData.append('description', description);
+    formData.append('category', category === 'Other' ? customCategory : category);
+    formData.append('level', level);
+    formData.append('status', 'published');
+    formData.append('trimStart', trimStart);
+    formData.append('trimEnd', trimEnd);
+
+    if (file) {
+      formData.append('file', file);
     }
+    if (thumbnail) { // Added thumbnail to FormData
+      formData.append('thumbnail', thumbnail);
+    }
+
+    // Pass FormData to parent handler
+    onUpload(formData);
+    onClose();
+
+    // Reset form
+    setFile(null);
+    setThumbnail(null);
+    setTitle('');
+    setDescription('');
+    setCategory('Technology');
+    setCustomCategory('');
+    setLevel('Beginner');
+    setTrimStart(0);
+    setTrimEnd(0);
+    setVideoDuration(0);
+  };
+
+  const handleVideoMetadata = (e) => {
+    const duration = Math.floor(e.target.duration);
+    setVideoDuration(duration);
+    setTrimEnd(duration);
   };
 
   const resetForm = () => {
@@ -148,28 +175,73 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
                   </div>
                   <div className="upload-text">
                     <p className="upload-title">Click to upload or drag and drop</p>
-                    <p className="upload-subtitle">MP4, MOV or High-res JPEG (Max 500MB)</p>
+                    <p className="upload-subtitle">MP4, MOV (Max 500MB)</p>
                   </div>
                   <button type="button" className="upload-button">
-                    Select File
+                    Select Video
                   </button>
                   <input
                     id="file-input"
                     type="file"
-                    accept="video/*,image/*"
+                    accept="video/*"
                     onChange={handleFileChange}
                   />
                 </div>
                 {file && (
-                  <p className="upload-subtitle" style={{ marginTop: '0.75rem', textAlign: 'center' }}>
-                    Selected: <strong>{file.name}</strong>
-                  </p>
+                  <div style={{ marginTop: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem' }}>
+                    <p className="upload-subtitle" style={{ margin: 0 }}>
+                      Selected: <strong>{file.name}</strong>
+                    </p>
+                    <button
+                      className="discard-btn"
+                      style={{ padding: '0.25rem 0.75rem', fontSize: '0.75rem' }}
+                      onClick={() => setFile(null)}
+                    >
+                      Re-upload
+                    </button>
+                  </div>
                 )}
               </div>
 
+              {/* Trimming Section */}
+              {file && (
+                <div className="form-section">
+                  <label className="upload-label">Step 2: Trim Video (Optional)</label>
+                  <div style={{ marginTop: '1rem', background: 'rgba(0,0,0,0.05)', padding: '1rem', borderRadius: '0.5rem' }}>
+                    <div className="form-grid">
+                      <div className="form-group">
+                        <label className="form-label">Start Time (sec)</label>
+                        <input
+                          type="number"
+                          className="form-input"
+                          min="0"
+                          max={trimEnd}
+                          value={trimStart}
+                          onChange={(e) => setTrimStart(parseInt(e.target.value) || 0)}
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">End Time (sec)</label>
+                        <input
+                          type="number"
+                          className="form-input"
+                          min={trimStart}
+                          max={videoDuration}
+                          value={trimEnd}
+                          onChange={(e) => setTrimEnd(parseInt(e.target.value) || 0)}
+                        />
+                      </div>
+                    </div>
+                    <p className="upload-subtitle" style={{ marginTop: '0.5rem' }}>
+                      Duration: {trimEnd - trimStart}s (Total: {videoDuration}s)
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {/* Details Section */}
               <div className={!file ? 'form-section-dimmed' : ''}>
-                <label className="upload-label">Step 2: Information</label>
+                <label className="upload-label">Step 3: Information</label>
                 <div className="form-group">
                   <label className="form-label">Content Title</label>
                   <input
@@ -194,20 +266,39 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
                 <div className="form-grid">
                   <div className="form-group">
                     <label className="form-label">Category</label>
-                    <select 
-                      className="form-select" 
+                    <select
+                      className="form-select"
                       value={category}
                       onChange={(e) => setCategory(e.target.value)}
                       disabled={!file}
                     >
-                      <option>Photography</option>
-                      <option>Culinary Arts</option>
+                      <option>Technology</option>
+                      <option>Business</option>
+                      <option>Marketing</option>
+                      <option>Health & Fitness</option>
                       <option>Design</option>
+                      <option>Culinary Arts</option>
+                      <option>Music</option>
+                      <option>Personal Development</option>
+                      <option>Other</option>
                     </select>
                   </div>
+                  {category === 'Other' && (
+                    <div className="form-group" style={{ gridColumn: 'span 2', marginTop: '-1.5rem' }}>
+                      <label className="form-label">Specify Category</label>
+                      <input
+                        type="text"
+                        className="form-input"
+                        placeholder="Type your category here..."
+                        value={customCategory}
+                        onChange={(e) => setCustomCategory(e.target.value)}
+                        required
+                      />
+                    </div>
+                  )}
                   <div className="form-group">
                     <label className="form-label">Level</label>
-                    <select 
+                    <select
                       className="form-select"
                       value={level}
                       onChange={(e) => setLevel(e.target.value)}
@@ -224,7 +315,7 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
               {/* Thumbnail Upload Section */}
               {file && (
                 <div>
-                  <label className="upload-label">Step 3: Thumbnail (Optional)</label>
+                  <label className="upload-label">Step 4: Thumbnail (Optional)</label>
                   <div
                     className={`drag-drop-zone ${isThumbnailDragging ? 'active' : ''}`}
                     onDragOver={handleThumbnailDragOver}
@@ -272,7 +363,12 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
                   <img src={URL.createObjectURL(thumbnail)} alt="preview" className="preview-image" />
                 ) : file ? (
                   file.type.startsWith('video/') ? (
-                    <video src={URL.createObjectURL(file)} className="preview-image" controls>
+                    <video
+                      src={URL.createObjectURL(file)}
+                      className="preview-image"
+                      controls
+                      onLoadedMetadata={handleVideoMetadata}
+                    >
                       Your browser does not support the video tag.
                     </video>
                   ) : (
@@ -292,6 +388,11 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
                 <h4 className="preview-content-title">
                   {title || 'Your Content Title'}
                 </h4>
+                <div className="preview-meta" style={{ fontSize: '0.75rem', color: '#876467', display: 'flex', gap: '0.5rem' }}>
+                  <span>{category === 'Other' ? customCategory || 'Other' : category}</span>
+                  <span>•</span>
+                  <span>{level}</span>
+                </div>
                 <p className="preview-description">
                   {description || 'Your content description will appear here'}
                 </p>
@@ -334,12 +435,12 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
             <button className="draft-btn" onClick={handleDiscard}>
               Save Draft
             </button>
-            <button 
-              className="continue-btn" 
-              onClick={handleContinue}
-              disabled={!file || !title || !thumbnail}
-              style={{ opacity: (file && title && thumbnail) ? 1 : 0.5, cursor: (file && title && thumbnail) ? 'pointer' : 'not-allowed' }}
-              title={!file ? 'Please upload a file first' : !title ? 'Please enter a title' : !thumbnail ? 'Please upload a thumbnail' : ''}
+            <button
+              className="continue-btn"
+              onClick={handleUpload}
+              disabled={!file || !title}
+              style={{ opacity: (file && title) ? 1 : 0.5, cursor: (file && title) ? 'pointer' : 'not-allowed' }}
+              title={!file ? 'Please upload a file first' : !title ? 'Please enter a title' : ''}
             >
               <span>Upload</span>
               <span className="material-symbols-outlined">arrow_forward</span>

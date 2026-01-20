@@ -29,6 +29,8 @@ class Content {
             tags: contentData.tags || [],
             status: contentData.status || 'draft', // draft, published, archived
             visibility: contentData.visibility || 'public', // public, private
+            trimStart: contentData.trimStart || 0,
+            trimEnd: contentData.trimEnd || 0,
             views: 0,
             likes: 0,
             created_at: new Date().toISOString(),
