@@ -309,8 +309,26 @@
 .form-input:focus,
 .form-textarea:focus,
 .form-select:focus {
-  box-shadow: 0 0 0 2px #c91d2b;
-  border-color: #c91d2b;
+  box-shadow: 0 0 0 2px rgba(234, 42, 51, 0.2);
+  border-color: #ea2a33;
+}
+
+.professional-input {
+  border: 1.5px solid #e5dcdd;
+  border-radius: 0.75rem;
+  transition: all 0.2s;
+}
+
+.professional-input:focus {
+  border-color: #ea2a33;
+  color: #ea2a33;
+}
+
+/* Custom Red Theme for Date/Time pickers */
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(24%) sepia(87%) saturate(2462%) hue-rotate(345deg) brightness(85%) contrast(100%);
+  cursor: pointer;
 }
 
 .form-textarea {
@@ -541,6 +559,20 @@
 .dark .modal-footer {
   background-color: #22262a;
   border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.rotating {
+  animation: rotate 1.5s linear infinite;
 }
 
 .discard-btn {

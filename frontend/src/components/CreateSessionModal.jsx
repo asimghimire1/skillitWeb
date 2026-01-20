@@ -82,7 +82,7 @@ export default function CreateSessionModal({ isOpen, onClose, onCreate }) {
                                 <label className="form-label">Date</label>
                                 <input
                                     type="date"
-                                    className="form-input"
+                                    className="form-input professional-input"
                                     name="scheduledDate"
                                     value={formData.scheduledDate}
                                     onChange={handleChange}
@@ -93,7 +93,7 @@ export default function CreateSessionModal({ isOpen, onClose, onCreate }) {
                                 <label className="form-label">Time</label>
                                 <input
                                     type="time"
-                                    className="form-input"
+                                    className="form-input professional-input"
                                     name="scheduledTime"
                                     value={formData.scheduledTime}
                                     onChange={handleChange}

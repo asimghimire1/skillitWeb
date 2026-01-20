@@ -101,11 +101,11 @@ const DashboardView = ({ stats, uploads, sessions, quickActions, onAction }) => 
               <div className="uploads-grid">
                 {recentUploads.slice(0, 2).map((upload, idx) => (
                   <div key={idx} className="upload-card">
-                    <div className="upload-thumbnail">
+                    <div className="upload-thumbnail" style={{ background: '#000' }}>
                       {upload.thumbnail ? (
-                        <div className="thumbnail-overlay" style={{ backgroundImage: `url('${upload.thumbnail.startsWith('http') ? upload.thumbnail : `http://localhost:5000${upload.thumbnail}`}')` }} />
+                        <div className="thumbnail-overlay" style={{ backgroundImage: `url('${upload.thumbnail.startsWith('http') ? upload.thumbnail : `http://localhost:5000${upload.thumbnail}`}')`, backgroundSize: 'contain', backgroundRepeat: 'no-repeat' }} />
                       ) : (
-                        <div className="thumbnail-overlay" style={{ backgroundImage: `url('https://via.placeholder.com/300?text=No+Thumbnail')` }} />
+                        <div className="thumbnail-overlay" style={{ backgroundImage: `url('https://via.placeholder.com/300?text=No+Thumbnail')`, backgroundSize: 'contain', backgroundRepeat: 'no-repeat' }} />
                       )}
                       {upload.type === 'video' && <span className="material-symbols-outlined" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: 'white', fontSize: '3rem' }}>play_circle</span>}
                       <div className={`upload-badge badge-${upload.status || 'published'}`}>{upload.status || 'Published'}</div>
@@ -163,47 +163,51 @@ const DashboardView = ({ stats, uploads, sessions, quickActions, onAction }) => 
   );
 };
 
-const ContentView = ({ uploads, onUpload }) => (
-  <div>
-    <div className="uploads-section-header">
-      <h2 className="section-title">My Content Library</h2>
-      <button className="continue-btn" onClick={onUpload} style={{ width: 'auto' }}>
-        <span className="material-symbols-outlined">add</span> Upload New
-      </button>
-    </div>
-    <div className="uploads-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))' }}>
-      {uploads.length === 0 ? (
-        <p>No content found.</p>
-      ) : (
-        uploads.map((upload, idx) => (
-          <div key={idx} className="upload-card">
-            <div className="upload-thumbnail">
-              {upload.videoUrl ? (
-                <video
-                  src={upload.videoUrl.startsWith('http') ? upload.videoUrl : `http://localhost:5000${upload.videoUrl}`}
-                  className="thumbnail-overlay"
-                  controls
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'relative' }}
-                />
-              ) : (
-                <div className="thumbnail-overlay" style={{ backgroundImage: `url('${upload.thumbnail ? (upload.thumbnail.startsWith('http') ? upload.thumbnail : `http://localhost:5000${upload.thumbnail}`) : 'https://via.placeholder.com/300'}')` }} />
-              )}
-              <div className={`upload-badge badge-${upload.status || 'published'}`}>{upload.status || 'Published'}</div>
-            </div>
-            <div className="upload-info">
-              <h4 className="upload-title">{upload.title}</h4>
-              <p style={{ fontSize: '0.8rem', color: '#666', marginBottom: '0.5rem' }}>{upload.description}</p>
-              <div className="upload-meta">
-                <span>{upload.views || 0} views</span>
-                <span>{new Date(upload.created_at).toLocaleDateString()}</span>
+const ContentView = ({ uploads, onUpload }) => {
+  const libraryContent = uploads.filter(u => u.category !== 'Announcements');
+
+  return (
+    <div>
+      <div className="uploads-section-header">
+        <h2 className="section-title">My Content Library</h2>
+        <button className="continue-btn" onClick={onUpload} style={{ width: 'auto' }}>
+          <span className="material-symbols-outlined">add</span> Upload New
+        </button>
+      </div>
+      <div className="uploads-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))' }}>
+        {libraryContent.length === 0 ? (
+          <p>No content found.</p>
+        ) : (
+          libraryContent.map((upload, idx) => (
+            <div key={idx} className="upload-card">
+              <div className="upload-thumbnail" style={{ background: '#000' }}>
+                {upload.videoUrl ? (
+                  <video
+                    src={upload.videoUrl.startsWith('http') ? upload.videoUrl : `http://localhost:5000${upload.videoUrl}`}
+                    className="thumbnail-overlay"
+                    controls
+                    style={{ width: '100%', height: '100%', objectFit: 'contain', position: 'relative' }}
+                  />
+                ) : (
+                  <div className="thumbnail-overlay" style={{ backgroundImage: `url('${upload.thumbnail ? (upload.thumbnail.startsWith('http') ? upload.thumbnail : `http://localhost:5000${upload.thumbnail}`) : 'https://via.placeholder.com/300'}')`, backgroundSize: 'contain', backgroundRepeat: 'no-repeat' }} />
+                )}
+                <div className={`upload-badge badge-${upload.status || 'published'}`}>{upload.status || 'Published'}</div>
+              </div>
+              <div className="upload-info">
+                <h4 className="upload-title">{upload.title}</h4>
+                <p style={{ fontSize: '0.8rem', color: '#666', marginBottom: '0.5rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{upload.description}</p>
+                <div className="upload-meta">
+                  <span>{upload.views || 0} views</span>
+                  <span>{new Date(upload.created_at).toLocaleDateString()}</span>
+                </div>
               </div>
             </div>
-          </div>
-        ))
-      )}
+          ))
+        )}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const SessionsView = ({ sessions, onCreate }) => (
   <div>
@@ -215,19 +219,31 @@ const SessionsView = ({ sessions, onCreate }) => (
     </div>
     <div className="sessions-list">
       {sessions.length === 0 ? <p>No sessions scheduled.</p> : sessions.map((session, idx) => (
-        <div key={idx} className="session-item" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
-          <div style={{ flex: 1 }}>
-            <h4 className="session-title" style={{ fontSize: '1.1rem' }}>{session.title}</h4>
-            <p className="session-time" style={{ fontSize: '0.9rem' }}>
-              {new Date(session.scheduledDate).toLocaleDateString()} • {session.scheduledTime} ({session.duration} mins)
-            </p>
-            {session.description && <p style={{ fontSize: '0.85rem', color: '#666', marginTop: '0.25rem' }}>{session.description}</p>}
-            <div style={{ marginTop: '0.5rem', fontWeight: 'bold', color: '#2e7d32' }}>NPR {session.price}</div>
+        <div key={idx} className="session-item-professional">
+          <div className="session-accent"></div>
+          <div className="session-main-info">
+            <div className="session-time-badge">
+              <span className="material-symbols-outlined">calendar_today</span>
+              {new Date(session.scheduledDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+              <span className="time-sep">•</span>
+              <span className="material-symbols-outlined">schedule</span>
+              {session.scheduledTime}
+            </div>
+            <h4 className="session-title-large">{session.title}</h4>
+            <div className="session-details-row">
+              <span className="detail-pill"><span className="material-symbols-outlined">timer</span> {session.duration} mins</span>
+              <span className="detail-pill pricing">NPR {session.price}</span>
+              <span className={`status-pill status-${session.status}`}>{session.status}</span>
+            </div>
+            {session.description && <p className="session-desc-text">{session.description}</p>}
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.5rem' }}>
-            <span className={`status-badge status-${session.status}`} style={{ textTransform: 'capitalize', padding: '0.25rem 0.75rem', borderRadius: '1rem', background: '#e0f2f1', color: '#00695c', fontSize: '0.8rem' }}>{session.status}</span>
-            {session.meetingLink && (
-              <a href={session.meetingLink} target="_blank" rel="noopener noreferrer" className="session-button" style={{ padding: '0.5rem 1rem', textDecoration: 'none', textAlign: 'center', minWidth: '120px' }}>Join Meeting</a>
+          <div className="session-actions-compact">
+            {session.meetingLink ? (
+              <a href={session.meetingLink} target="_blank" rel="noopener noreferrer" className="session-join-pill">
+                Join Meeting
+              </a>
+            ) : (
+              <button className="session-join-pill disabled" disabled>No Link</button>
             )}
           </div>
         </div>

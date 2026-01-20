@@ -11,9 +11,8 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
   const [level, setLevel] = useState('Beginner');
   const [isDragging, setIsDragging] = useState(false);
   const [isThumbnailDragging, setIsThumbnailDragging] = useState(false);
-  const [trimStart, setTrimStart] = useState(0);
-  const [trimEnd, setTrimEnd] = useState(0);
-  const [videoDuration, setVideoDuration] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   const handleFileChange = (event) => {
     const selectedFile = event.target.files?.[0];
@@ -75,44 +74,42 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
     }
   };
 
-  const handleUpload = () => {
-    const formData = new FormData();
-    formData.append('title', title);
-    formData.append('description', description);
-    formData.append('category', category === 'Other' ? customCategory : category);
-    formData.append('level', level);
-    formData.append('status', 'published');
-    formData.append('trimStart', trimStart);
-    formData.append('trimEnd', trimEnd);
+  const handleUpload = async () => {
+    setIsUploading(true);
+    setUploadProgress(0);
 
-    if (file) {
-      formData.append('file', file);
-    }
-    if (thumbnail) { // Added thumbnail to FormData
-      formData.append('thumbnail', thumbnail);
-    }
+    // Simulate upload timer (3 seconds)
+    const interval = setInterval(() => {
+      setUploadProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          return 100;
+        }
+        return prev + 10;
+      });
+    }, 250);
 
-    // Pass FormData to parent handler
-    onUpload(formData);
-    onClose();
+    setTimeout(() => {
+      const formData = new FormData();
+      formData.append('title', title);
+      formData.append('description', description);
+      formData.append('category', category === 'Other' ? customCategory : category);
+      formData.append('level', level);
+      formData.append('status', 'published');
+      formData.append('teacherId', JSON.parse(localStorage.getItem('user')).id);
 
-    // Reset form
-    setFile(null);
-    setThumbnail(null);
-    setTitle('');
-    setDescription('');
-    setCategory('Technology');
-    setCustomCategory('');
-    setLevel('Beginner');
-    setTrimStart(0);
-    setTrimEnd(0);
-    setVideoDuration(0);
-  };
+      if (file) {
+        formData.append('file', file);
+      }
+      if (thumbnail) {
+        formData.append('thumbnail', thumbnail);
+      }
 
-  const handleVideoMetadata = (e) => {
-    const duration = Math.floor(e.target.duration);
-    setVideoDuration(duration);
-    setTrimEnd(duration);
+      onUpload(formData);
+      setIsUploading(false);
+      onClose();
+      resetForm();
+    }, 3000);
   };
 
   const resetForm = () => {
@@ -120,8 +117,11 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
     setThumbnail(null);
     setTitle('');
     setDescription('');
-    setCategory('Photography');
+    setCategory('Technology');
+    setCustomCategory('');
     setLevel('Beginner');
+    setIsUploading(false);
+    setUploadProgress(0);
   };
 
   const handleDiscard = () => {
@@ -203,45 +203,9 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
                 )}
               </div>
 
-              {/* Trimming Section */}
-              {file && (
-                <div className="form-section">
-                  <label className="upload-label">Step 2: Trim Video (Optional)</label>
-                  <div style={{ marginTop: '1rem', background: 'rgba(0,0,0,0.05)', padding: '1rem', borderRadius: '0.5rem' }}>
-                    <div className="form-grid">
-                      <div className="form-group">
-                        <label className="form-label">Start Time (sec)</label>
-                        <input
-                          type="number"
-                          className="form-input"
-                          min="0"
-                          max={trimEnd}
-                          value={trimStart}
-                          onChange={(e) => setTrimStart(parseInt(e.target.value) || 0)}
-                        />
-                      </div>
-                      <div className="form-group">
-                        <label className="form-label">End Time (sec)</label>
-                        <input
-                          type="number"
-                          className="form-input"
-                          min={trimStart}
-                          max={videoDuration}
-                          value={trimEnd}
-                          onChange={(e) => setTrimEnd(parseInt(e.target.value) || 0)}
-                        />
-                      </div>
-                    </div>
-                    <p className="upload-subtitle" style={{ marginTop: '0.5rem' }}>
-                      Duration: {trimEnd - trimStart}s (Total: {videoDuration}s)
-                    </p>
-                  </div>
-                </div>
-              )}
-
               {/* Details Section */}
               <div className={!file ? 'form-section-dimmed' : ''}>
-                <label className="upload-label">Step 3: Information</label>
+                <label className="upload-label">Step 2: Information</label>
                 <div className="form-group">
                   <label className="form-label">Content Title</label>
                   <input
@@ -315,7 +279,7 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
               {/* Thumbnail Upload Section */}
               {file && (
                 <div>
-                  <label className="upload-label">Step 4: Thumbnail (Optional)</label>
+                  <label className="upload-label">Step 3: Thumbnail (Optional)</label>
                   <div
                     className={`drag-drop-zone ${isThumbnailDragging ? 'active' : ''}`}
                     onDragOver={handleThumbnailDragOver}
@@ -360,19 +324,19 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
             <div className="preview-card">
               <div className="preview-thumbnail">
                 {thumbnail ? (
-                  <img src={URL.createObjectURL(thumbnail)} alt="preview" className="preview-image" />
+                  <img src={URL.createObjectURL(thumbnail)} alt="preview" className="preview-image" style={{ objectFit: 'contain', opacity: 1 }} />
                 ) : file ? (
                   file.type.startsWith('video/') ? (
                     <video
                       src={URL.createObjectURL(file)}
                       className="preview-image"
                       controls
-                      onLoadedMetadata={handleVideoMetadata}
+                      style={{ objectFit: 'contain', opacity: 1 }}
                     >
                       Your browser does not support the video tag.
                     </video>
                   ) : (
-                    <img src={URL.createObjectURL(file)} alt="preview" className="preview-image" />
+                    <img src={URL.createObjectURL(file)} alt="preview" className="preview-image" style={{ objectFit: 'contain', opacity: 1 }} />
                   )
                 ) : (
                   <span className="material-symbols-outlined" style={{ fontSize: '3rem', opacity: 0.3 }}>image</span>
@@ -438,12 +402,21 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
             <button
               className="continue-btn"
               onClick={handleUpload}
-              disabled={!file || !title}
-              style={{ opacity: (file && title) ? 1 : 0.5, cursor: (file && title) ? 'pointer' : 'not-allowed' }}
+              disabled={!file || !title || isUploading}
+              style={{ opacity: (file && title && !isUploading) ? 1 : 0.5, cursor: (file && title && !isUploading) ? 'pointer' : 'not-allowed' }}
               title={!file ? 'Please upload a file first' : !title ? 'Please enter a title' : ''}
             >
-              <span>Upload</span>
-              <span className="material-symbols-outlined">arrow_forward</span>
+              {isUploading ? (
+                <>
+                  <span className="material-symbols-outlined rotating">sync</span>
+                  <span>Uploading {uploadProgress}%</span>
+                </>
+              ) : (
+                <>
+                  <span>Upload</span>
+                  <span className="material-symbols-outlined">arrow_forward</span>
+                </>
+              )}
             </button>
           </div>
         </div>
