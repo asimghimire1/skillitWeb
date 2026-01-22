@@ -325,10 +325,30 @@
 }
 
 /* Custom Red Theme for Date/Time pickers */
-input[type="date"]::-webkit-calendar-picker-indicator,
-input[type="time"]::-webkit-calendar-picker-indicator {
-  filter: invert(24%) sepia(87%) saturate(2462%) hue-rotate(345deg) brightness(85%) contrast(100%);
-  cursor: pointer;
+.professional-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.professional-input-wrapper .input-icon {
+  position: absolute;
+  left: 1rem;
+  color: #ea2a33;
+  pointer-events: none;
+  font-size: 1.25rem;
+}
+
+.professional-input-wrapper .professional-input {
+  padding-left: 3rem;
+  width: 100%;
+}
+
+/* Hide default indicators but keep clickable */
+.professional-input::-webkit-calendar-picker-indicator {
+  position: absolute;
+  right: 1rem;
+  opacity: 0.3;
 }
 
 .form-textarea {

@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
-import '../css/upload-modal.css'; // Reusing existing modal CSS
+import React, { useState, useEffect } from 'react';
 
-export default function CreateSessionModal({ isOpen, onClose, onCreate }) {
+export default function CreateSessionModal({ isOpen, onClose, onCreate, sessionToEdit = null }) {
     const [formData, setFormData] = useState({
         title: '',
         meetingLink: '',
@@ -9,9 +8,30 @@ export default function CreateSessionModal({ isOpen, onClose, onCreate }) {
         scheduledTime: '',
         duration: 60,
         price: 0,
+        paymentType: 'free',
         sessionType: 'online',
+        linkType: 'google_meet',
         description: ''
     });
+
+    useEffect(() => {
+        if (sessionToEdit) {
+            setFormData(sessionToEdit);
+        } else {
+            setFormData({
+                title: '',
+                meetingLink: '',
+                scheduledDate: '',
+                scheduledTime: '',
+                duration: 60,
+                price: 0,
+                paymentType: 'free',
+                sessionType: 'online',
+                linkType: 'google_meet',
+                description: ''
+            });
+        }
+    }, [sessionToEdit, isOpen]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -21,138 +41,227 @@ export default function CreateSessionModal({ isOpen, onClose, onCreate }) {
         }));
     };
 
+    const handleDurationChange = (value) => {
+        setFormData(prev => ({ ...prev, duration: parseInt(value) }));
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
         onCreate(formData);
         onClose();
-        // Reset form
-        setFormData({
-            title: '',
-            meetingLink: '',
-            scheduledDate: '',
-            scheduledTime: '',
-            duration: 60,
-            price: 0,
-            sessionType: 'online',
-            description: ''
-        });
     };
 
     if (!isOpen) return null;
 
     return (
-        <div className="upload-modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
-            <div className="upload-modal" style={{ maxWidth: '600px' }}>
-                <div className="modal-header">
-                    <h1 className="modal-title">Create New Session</h1>
-                    <button className="modal-close-btn" onClick={onClose}>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-md px-4" onClick={(e) => e.target === e.currentTarget && onClose()}>
+            <div
+                className="bg-white w-full max-w-2xl rounded-3xl border border-[#e5dcdd] shadow-2xl animate-fade-in flex flex-col max-h-[90vh]"
+                onClick={(e) => e.stopPropagation()}
+            >
+                {/* Header */}
+                <div className="p-8 border-b border-gray-100 flex items-center justify-between">
+                    <div>
+                        <h2 className="text-2xl font-black text-[#171112] tracking-tight">
+                            {sessionToEdit ? 'Edit Session' : 'New Session'}
+                        </h2>
+                        <p className="text-sm text-[#876467] font-medium mt-1">Fill in the details for your session</p>
+                    </div>
+                    <button
+                        onClick={onClose}
+                        className="p-2 rounded-full hover:bg-gray-100 transition-colors text-[#876467]"
+                    >
                         <span className="material-symbols-outlined">close</span>
                     </button>
                 </div>
 
-                <div className="modal-content" style={{ display: 'block', padding: '2rem' }}>
-                    <form onSubmit={handleSubmit}>
-                        <div className="form-group">
-                            <label className="form-label">Session Title</label>
+                {/* Scrollable Form Content */}
+                <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-8 space-y-8">
+                    {/* General Section */}
+                    <div className="space-y-6">
+                        <h3 className="text-xs font-black uppercase tracking-widest text-primary flex items-center gap-2">
+                            <span className="material-symbols-outlined text-sm">edit_note</span>
+                            General Information
+                        </h3>
+
+                        <div className="space-y-2">
+                            <label className="text-sm font-bold text-[#171112]">Session Title</label>
                             <input
+                                className="w-full bg-[#f8f6f6] border-none rounded-2xl focus:ring-2 focus:ring-primary/20 px-5 py-4 text-sm font-medium transition-all text-[#171112] placeholder:text-gray-400"
+                                placeholder="e.g. Master React Architecture"
                                 type="text"
-                                className="form-input"
                                 name="title"
                                 value={formData.title}
                                 onChange={handleChange}
-                                placeholder="e.g. 1-on-1 Mentorship"
                                 required
                             />
                         </div>
 
-                        <div className="form-group">
-                            <label className="form-label">Meeting Link (Google Meet, etc.)</label>
-                            <input
-                                type="url"
-                                className="form-input"
-                                name="meetingLink"
-                                value={formData.meetingLink}
-                                onChange={handleChange}
-                                placeholder="https://meet.google.com/xxx-xxxx-xxx"
-                            />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <label className="text-sm font-bold text-[#171112]">Date</label>
+                                <div className="relative">
+                                    <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg">calendar_month</span>
+                                    <input
+                                        className="w-full pl-12 bg-[#f8f6f6] border-none rounded-2xl focus:ring-2 focus:ring-primary/20 px-5 py-4 text-sm font-medium text-[#171112] cursor-pointer"
+                                        type="date"
+                                        name="scheduledDate"
+                                        value={formData.scheduledDate}
+                                        onChange={handleChange}
+                                        required
+                                    />
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-bold text-[#171112]">Start Time</label>
+                                <div className="relative">
+                                    <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg">schedule</span>
+                                    <input
+                                        className="w-full pl-12 bg-[#f8f6f6] border-none rounded-2xl focus:ring-2 focus:ring-primary/20 px-5 py-4 text-sm font-medium text-[#171112] cursor-pointer"
+                                        type="time"
+                                        name="scheduledTime"
+                                        value={formData.scheduledTime}
+                                        onChange={handleChange}
+                                        required
+                                    />
+                                </div>
+                            </div>
                         </div>
 
-                        <div className="form-grid">
-                            <div className="form-group">
-                                <label className="form-label">Date</label>
+                        <div className="space-y-3">
+                            <label className="text-sm font-bold text-[#171112]">Duration</label>
+                            <div className="grid grid-cols-4 gap-3">
+                                {[30, 60, 90, 120].map(mins => (
+                                    <button
+                                        key={mins}
+                                        type="button"
+                                        onClick={() => handleDurationChange(mins)}
+                                        className={`py-3 rounded-2xl text-xs font-black transition-all border-2 ${formData.duration === mins
+                                                ? 'border-primary bg-primary/5 text-primary shadow-sm'
+                                                : 'border-transparent bg-[#f8f6f6] text-[#876467] hover:bg-gray-200'
+                                            }`}
+                                    >
+                                        {mins}m
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Meeting Section */}
+                    <div className="space-y-6 pt-2">
+                        <h3 className="text-xs font-black uppercase tracking-widest text-primary flex items-center gap-2">
+                            <span className="material-symbols-outlined text-sm">link</span>
+                            Meeting Details
+                        </h3>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div className="space-y-2">
+                                <label className="text-sm font-bold text-[#171112]">Platform</label>
+                                <div className="relative">
+                                    <select
+                                        className="w-full bg-[#f8f6f6] border-none rounded-2xl focus:ring-2 focus:ring-primary/20 px-5 py-4 text-sm font-medium appearance-none text-[#171112] outline-none cursor-pointer"
+                                        name="linkType"
+                                        value={formData.linkType}
+                                        onChange={handleChange}
+                                    >
+                                        <option value="google_meet">Google Meet</option>
+                                        <option value="zoom">Zoom</option>
+                                        <option value="teams">Teams</option>
+                                        <option value="custom">Custom</option>
+                                    </select>
+                                    <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">expand_more</span>
+                                </div>
+                            </div>
+                            <div className="md:col-span-2 space-y-2">
+                                <label className="text-sm font-bold text-[#171112]">Meeting URL</label>
                                 <input
-                                    type="date"
-                                    className="form-input professional-input"
-                                    name="scheduledDate"
-                                    value={formData.scheduledDate}
+                                    className="w-full bg-[#f8f6f6] border-none rounded-2xl focus:ring-2 focus:ring-primary/20 px-5 py-4 text-sm font-medium text-[#171112] placeholder:text-gray-400"
+                                    placeholder="https://meet.google.com/..."
+                                    type="url"
+                                    name="meetingLink"
+                                    value={formData.meetingLink}
                                     onChange={handleChange}
                                     required
                                 />
                             </div>
-                            <div className="form-group">
-                                <label className="form-label">Time</label>
-                                <input
-                                    type="time"
-                                    className="form-input professional-input"
-                                    name="scheduledTime"
-                                    value={formData.scheduledTime}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </div>
                         </div>
+                    </div>
 
-                        <div className="form-grid">
-                            <div className="form-group">
-                                <label className="form-label">Duration (mins)</label>
-                                <select
-                                    className="form-select"
-                                    name="duration"
-                                    value={formData.duration}
-                                    onChange={handleChange}
-                                >
-                                    <option value={30}>30 Minutes</option>
-                                    <option value={60}>60 Minutes</option>
-                                    <option value={90}>90 Minutes</option>
-                                </select>
-                            </div>
-                            <div className="form-group">
-                                <label className="form-label">Price (NPR)</label>
-                                <input
-                                    type="number"
-                                    className="form-input"
-                                    name="price"
-                                    value={formData.price}
-                                    onChange={handleChange}
-                                    min="0"
-                                    required
-                                />
-                            </div>
-                        </div>
+                    {/* Pricing Section */}
+                    <div className="space-y-6 pt-2">
+                        <h3 className="text-xs font-black uppercase tracking-widest text-primary flex items-center gap-2">
+                            <span className="material-symbols-outlined text-sm">payments</span>
+                            Pricing Model
+                        </h3>
 
-                        <div className="form-group">
-                            <label className="form-label">Description</label>
-                            <textarea
-                                className="form-textarea"
-                                name="description"
-                                value={formData.description}
-                                onChange={handleChange}
-                                placeholder="What will be covered in this session?"
-                                rows="4"
-                            ></textarea>
-                        </div>
-
-                        <div className="modal-footer" style={{ marginTop: '2rem', padding: '1.5rem 0 0 0', display: 'flex', justifyContent: 'flex-end', gap: '1rem', borderTop: '1px solid #e5dcdd' }}>
-                            <button type="button" className="discard-btn" onClick={onClose} style={{ margin: 0 }}>
-                                Cancel
+                        <div className="flex gap-4">
+                            <button
+                                type="button"
+                                onClick={() => setFormData(prev => ({ ...prev, paymentType: 'free', price: 0 }))}
+                                className={`flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl text-sm font-bold transition-all ${formData.paymentType === 'free'
+                                        ? 'bg-[#171112] text-white shadow-xl'
+                                        : 'bg-[#f8f6f6] text-[#876467] hover:bg-gray-200'
+                                    }`}
+                            >
+                                <span className="material-symbols-outlined text-lg">volunteer_activism</span>
+                                Free
                             </button>
-                            <button type="submit" className="continue-btn" style={{ width: 'auto', padding: '0.625rem 2rem', margin: 0 }}>
-                                Create Session
+                            <button
+                                type="button"
+                                onClick={() => setFormData(prev => ({ ...prev, paymentType: 'bid' }))}
+                                className={`flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl text-sm font-bold transition-all ${formData.paymentType === 'bid'
+                                        ? 'bg-[#171112] text-white shadow-xl'
+                                        : 'bg-[#f8f6f6] text-[#876467] hover:bg-gray-200'
+                                    }`}
+                            >
+                                <span className="material-symbols-outlined text-lg">gavel</span>
+                                Bidding
                             </button>
                         </div>
-                    </form>
+
+                        {formData.paymentType === 'bid' && (
+                            <div className="space-y-2 animate-fade-in">
+                                <label className="text-sm font-bold text-[#171112]">Starting Price (NPR)</label>
+                                <div className="relative">
+                                    <span className="absolute left-5 top-1/2 -translate-y-1/2 font-black text-gray-400">Rs.</span>
+                                    <input
+                                        className="w-full pl-12 bg-[#f8f6f6] border-none rounded-2xl focus:ring-2 focus:ring-primary/20 px-5 py-4 text-sm font-black text-[#171112]"
+                                        type="number"
+                                        name="price"
+                                        value={formData.price}
+                                        onChange={handleChange}
+                                        min="0"
+                                        placeholder="0.00"
+                                    />
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </form>
+
+                {/* Footer */}
+                <div className="p-8 border-t border-gray-100 bg-[#fcfafa] rounded-b-3xl">
+                    <div className="flex flex-col sm:flex-row gap-3">
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="btn-premium btn-secondary sm:w-1/3 py-4"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            onClick={handleSubmit}
+                            className="btn-premium btn-primary flex-1 py-4"
+                        >
+                            <span className="material-symbols-outlined">add_circle</span>
+                            {sessionToEdit ? 'Update Session' : 'Launch Session'}
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     );
 }
+

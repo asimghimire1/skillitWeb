@@ -130,6 +130,32 @@ export const apiService = {
     }
   },
 
+  async updateSession(sessionId, sessionData) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/sessions/${sessionId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(sessionData),
+      });
+      return await response.json();
+    } catch (error) {
+      console.error('Update session error:', error);
+      return null;
+    }
+  },
+
+  async deleteSession(sessionId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/sessions/${sessionId}`, {
+        method: 'DELETE',
+      });
+      return await response.json();
+    } catch (error) {
+      console.error('Delete session error:', error);
+      return { success: false };
+    }
+  },
+
   // Content
   async getTeacherContent(teacherId) {
     try {
@@ -137,7 +163,7 @@ export const apiService = {
       return await response.json();
     } catch (error) {
       console.error('Get content error:', error);
-      return [];
+      return null;
     }
   },
 
@@ -156,6 +182,32 @@ export const apiService = {
     } catch (error) {
       console.error('Upload content error:', error);
       return null;
+    }
+  },
+
+  async updateContent(contentId, contentData) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/content/${contentId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(contentData),
+      });
+      return await response.json();
+    } catch (error) {
+      console.error('Update content error:', error);
+      return null;
+    }
+  },
+
+  async deleteContent(contentId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/content/${contentId}`, {
+        method: 'DELETE',
+      });
+      return await response.json();
+    } catch (error) {
+      console.error('Delete content error:', error);
+      return { success: false };
     }
   },
 };

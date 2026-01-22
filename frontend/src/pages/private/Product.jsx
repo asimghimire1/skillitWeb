@@ -96,16 +96,31 @@ const Product = () => {
           {/* Category */}
           <div className="field full">
             <label>Category</label>
-            <select
-              {...register("category", {
-                required: "Category is required",
-              })}
-            >
-              <option value="">Select category</option>
-              <option value="electronics">Electronics</option>
-              <option value="fashion">Fashion</option>
-              <option value="home">Home</option>
-            </select>
+            <div className="relative-select-wrapper" style={{ position: 'relative' }}>
+              <select
+                {...register("category", {
+                  required: "Category is required",
+                })}
+                style={{
+                  width: '100%',
+                  padding: '0.75rem 1rem',
+                  paddingRight: '2.5rem',
+                  borderRadius: '0.5rem',
+                  border: '1px solid #e5dcdd',
+                  appearance: 'none',
+                  backgroundColor: 'white',
+                  fontFamily: 'inherit'
+                }}
+              >
+                <option value="">Select category</option>
+                <option value="electronics">Electronics</option>
+                <option value="fashion">Fashion</option>
+                <option value="home">Home</option>
+              </select>
+              <div style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: '#886364' }}>
+                <span className="material-symbols-outlined" style={{ fontSize: '1.2rem' }}>expand_more</span>
+              </div>
+            </div>
             {errors.category && (
               <span className="error">{errors.category.message}</span>
             )}

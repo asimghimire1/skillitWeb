@@ -1,17 +1,35 @@
-import React, { useState } from 'react';
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                import React, { useState } from 'react';
 import '../css/upload-modal.css'; // Reusing existing modal CSS
 
-export default function CreatePostModal({ isOpen, onClose, onCreate }) {
+export default function CreatePostModal({ isOpen, onClose, onCreate, postToEdit = null }) {
     const [content, setContent] = useState('');
+
+    React.useEffect(() => {
+        if (postToEdit) {
+            setContent(postToEdit.description);
+        } else {
+            setContent('');
+        }
+    }, [postToEdit, isOpen]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        onCreate({
-            title: 'New Post', // Default title for now or add input
-            description: content,
-            type: 'post',
-            category: 'Announcements'
-        });
+        if (postToEdit) {
+            onCreate({
+                id: postToEdit.id,
+                title: 'Edited Post',
+                description: content,
+                type: 'post',
+                category: 'Announcements'
+            });
+        } else {
+            onCreate({
+                title: 'New Post',
+                description: content,
+                type: 'post',
+                category: 'Announcements'
+            });
+        }
         onClose();
         setContent('');
     };
@@ -22,7 +40,7 @@ export default function CreatePostModal({ isOpen, onClose, onCreate }) {
         <div className="upload-modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
             <div className="upload-modal" style={{ maxWidth: '500px' }}>
                 <div className="modal-header">
-                    <h1 className="modal-title">Create New Post</h1>
+                    <h1 className="modal-title">{postToEdit ? 'Edit Post' : 'Create New Post'}</h1>
                     <button className="modal-close-btn" onClick={onClose}>
                         <span className="material-symbols-outlined">close</span>
                     </button>
@@ -48,7 +66,7 @@ export default function CreatePostModal({ isOpen, onClose, onCreate }) {
                                 Cancel
                             </button>
                             <button type="submit" className="continue-btn" style={{ width: 'auto', padding: '0 2rem' }}>
-                                Post Update
+                                {postToEdit ? 'Save Changes' : 'Post Update'}
                             </button>
                         </div>
                     </form>

@@ -22,4 +22,32 @@ router.get('/teacher/:teacherId', async (req, res) => {
     }
 });
 
+// PUT /api/sessions/:id
+router.put('/:id', async (req, res) => {
+    try {
+        const session = await Session.update(req.params.id, req.body);
+        if (session) {
+            res.json(session);
+        } else {
+            res.status(404).json({ message: 'Session not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+// DELETE /api/sessions/:id
+router.delete('/:id', async (req, res) => {
+    try {
+        const deleted = await Session.delete(req.params.id);
+        if (deleted) {
+            res.json({ message: 'Session deleted successfully' });
+        } else {
+            res.status(404).json({ message: 'Session not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 module.exports = router;

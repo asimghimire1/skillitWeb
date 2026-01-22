@@ -13,6 +13,9 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
   const [isThumbnailDragging, setIsThumbnailDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  // New State for Payment Options
+  const [paymentType, setPaymentType] = useState('free'); // 'free' or 'bid'
+  const [price, setPrice] = useState(0);
 
   const handleFileChange = (event) => {
     const selectedFile = event.target.files?.[0];
@@ -89,13 +92,15 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
       });
     }, 250);
 
-    setTimeout(() => {
+    setTimeout(async () => {
       const formData = new FormData();
       formData.append('title', title);
       formData.append('description', description);
       formData.append('category', category === 'Other' ? customCategory : category);
       formData.append('level', level);
       formData.append('status', 'published');
+      formData.append('paymentType', paymentType);
+      formData.append('price', paymentType === 'free' ? 0 : price);
       formData.append('teacherId', JSON.parse(localStorage.getItem('user')).id);
 
       if (file) {
@@ -105,11 +110,22 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
         formData.append('thumbnail', thumbnail);
       }
 
-      onUpload(formData);
-      setIsUploading(false);
-      onClose();
-      resetForm();
-    }, 3000);
+      // DEBUG: Log FormData
+      for (var pair of formData.entries()) {
+        console.log(pair[0] + ', ' + pair[1]);
+      }
+
+      try {
+        await onUpload(formData);
+      } catch (error) {
+        console.error("Upload failed", error);
+        alert("Upload failed. Please try again.");
+      } finally {
+        setIsUploading(false);
+        onClose();
+        resetForm();
+      }
+    }, 3000); // Keep the simulated delay if desired, or remove it.
   };
 
   const resetForm = () => {
@@ -120,6 +136,8 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
     setCategory('Technology');
     setCustomCategory('');
     setLevel('Beginner');
+    setPaymentType('free');
+    setPrice(0);
     setIsUploading(false);
     setUploadProgress(0);
   };
@@ -230,22 +248,27 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
                 <div className="form-grid">
                   <div className="form-group">
                     <label className="form-label">Category</label>
-                    <select
-                      className="form-select"
-                      value={category}
-                      onChange={(e) => setCategory(e.target.value)}
-                      disabled={!file}
-                    >
-                      <option>Technology</option>
-                      <option>Business</option>
-                      <option>Marketing</option>
-                      <option>Health & Fitness</option>
-                      <option>Design</option>
-                      <option>Culinary Arts</option>
-                      <option>Music</option>
-                      <option>Personal Development</option>
-                      <option>Other</option>
-                    </select>
+                    <div className="relative">
+                      <select
+                        className="form-select appearance-none pr-10 focus:ring-2 focus:ring-[#ea2a33] focus:border-transparent"
+                        value={category}
+                        onChange={(e) => setCategory(e.target.value)}
+                        disabled={!file}
+                      >
+                        <option>Technology</option>
+                        <option>Business</option>
+                        <option>Marketing</option>
+                        <option>Health & Fitness</option>
+                        <option>Design</option>
+                        <option>Culinary Arts</option>
+                        <option>Music</option>
+                        <option>Personal Development</option>
+                        <option>Other</option>
+                      </select>
+                      <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                        <span className="material-symbols-outlined text-[#876467] text-sm">expand_more</span>
+                      </div>
+                    </div>
                   </div>
                   {category === 'Other' && (
                     <div className="form-group" style={{ gridColumn: 'span 2', marginTop: '-1.5rem' }}>
@@ -262,18 +285,69 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
                   )}
                   <div className="form-group">
                     <label className="form-label">Level</label>
-                    <select
-                      className="form-select"
-                      value={level}
-                      onChange={(e) => setLevel(e.target.value)}
-                      disabled={!file}
-                    >
-                      <option>Beginner</option>
-                      <option>Intermediate</option>
-                      <option>Expert</option>
-                    </select>
+                    <div className="relative">
+                      <select
+                        className="form-select appearance-none pr-10 focus:ring-2 focus:ring-[#ea2a33] focus:border-transparent"
+                        value={level}
+                        onChange={(e) => setLevel(e.target.value)}
+                        disabled={!file}
+                      >
+                        <option>Beginner</option>
+                        <option>Intermediate</option>
+                        <option>Expert</option>
+                      </select>
+                      <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                        <span className="material-symbols-outlined text-[#876467] text-sm">expand_more</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
+
+                {/* Payment Options */}
+                <div className="form-group" style={{ marginTop: '1rem' }}>
+                  <label className="form-label">Payment Options</label>
+                  <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.9rem' }}>
+                      <input
+                        type="radio"
+                        name="paymentType"
+                        checked={paymentType === 'free'}
+                        onChange={() => { setPaymentType('free'); setPrice(0); }}
+                        disabled={!file}
+                      />
+                      Free Content
+                    </label>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.9rem' }}>
+                      <input
+                        type="radio"
+                        name="paymentType"
+                        checked={paymentType === 'bid'}
+                        onChange={() => setPaymentType('bid')}
+                        disabled={!file}
+                      />
+                      Enable Bidding
+                    </label>
+                  </div>
+                </div>
+
+                {paymentType === 'bid' && (
+                  <div className="form-group">
+                    <label className="form-label">Base Price (NPR)</label>
+                    <input
+                      type="number"
+                      className="form-input"
+                      placeholder="0.00"
+                      value={price}
+                      onChange={(e) => setPrice(e.target.value)}
+                      min="0"
+                      required={paymentType === 'bid'}
+                      disabled={!file}
+                    />
+                    <p style={{ fontSize: '0.75rem', color: '#886364', marginTop: '0.25rem' }}>
+                      Students can bid starting from this price.
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Thumbnail Upload Section */}

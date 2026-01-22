@@ -100,6 +100,19 @@ class Session {
         }
         return null;
     }
+
+    static async delete(id) {
+        const data = readData();
+        if (!data.sessions) return false;
+
+        const sessionIndex = data.sessions.findIndex(s => s.id === parseInt(id));
+        if (sessionIndex !== -1) {
+            data.sessions.splice(sessionIndex, 1);
+            writeData(data);
+            return true;
+        }
+        return false;
+    }
 }
 
 module.exports = Session;

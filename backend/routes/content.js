@@ -51,4 +51,32 @@ router.get('/teacher/:teacherId', async (req, res) => {
     }
 });
 
+// DELETE /api/content/:id
+router.delete('/:id', async (req, res) => {
+    try {
+        const deleted = await Content.delete(req.params.id);
+        if (deleted) {
+            res.json({ message: 'Content deleted successfully' });
+        } else {
+            res.status(404).json({ message: 'Content not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
+// PUT /api/content/:id
+router.put('/:id', async (req, res) => {
+    try {
+        const updated = await Content.update(req.params.id, req.body);
+        if (updated) {
+            res.json(updated);
+        } else {
+            res.status(404).json({ message: 'Content not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 module.exports = router;
