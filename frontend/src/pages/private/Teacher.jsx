@@ -11,6 +11,22 @@ import PostsView from '../../components/teacher/PostsView';
 import apiService from '../../services/apiService';
 import { useToast } from '../../context/ToastContext';
 import { useConfirm } from '../../context/ConfirmContext';
+import {
+  LayoutDashboard,
+  ReceiptText,
+  SquarePlay,
+  CalendarDays,
+  Megaphone,
+  Wallet,
+  LogOut,
+  Bell,
+  Coins,
+  UploadCloud,
+  Video,
+  FileEdit,
+  Settings,
+  Construction
+} from 'lucide-react';
 import '../../css/teacher.css';
 
 export default function Teacher() {
@@ -218,9 +234,9 @@ export default function Teacher() {
   }
 
   const quickActions = [
-    { icon: 'upload_file', title: 'Upload Content', desc: 'Add new video courses or learning materials.', action: () => setIsUploadModalOpen(true) },
-    { icon: 'video_call', title: 'Create Session', desc: 'Schedule a live 1-on-1 or group session.', action: () => setIsSessionModalOpen(true) },
-    { icon: 'edit_note', title: 'New Post', desc: 'Share updates, tips, or announcements.', action: () => setIsPostModalOpen(true) },
+    { icon: <UploadCloud size={28} />, title: 'Upload Content', desc: 'Add new video courses or learning materials to your library.', action: () => setIsUploadModalOpen(true) },
+    { icon: <Video size={28} />, title: 'Create Session', desc: 'Schedule a live 1-on-1 or group session with your students.', action: () => setIsSessionModalOpen(true) },
+    { icon: <FileEdit size={28} />, title: 'New Post', desc: 'Share updates, tips, or announcements with your community.', action: () => setIsPostModalOpen(true) },
   ];
 
   return (
@@ -239,27 +255,27 @@ export default function Teacher() {
 
         <nav className="sidebar-nav">
           <div className={`nav-item ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={() => setActiveTab('dashboard')}>
-            <span className="material-symbols-outlined">grid_view</span>
+            <LayoutDashboard size={20} className={activeTab === 'dashboard' ? 'text-[#ea2a33]' : 'text-[#886364]'} />
             Dashboard
           </div>
           <div className={`nav-item ${activeTab === 'bids' ? 'active' : ''}`} onClick={() => setActiveTab('bids')}>
-            <span className={`material-symbols-outlined ${activeTab === 'bids' ? '' : 'inactive-icon'}`}>request_quote</span>
+            <ReceiptText size={20} className={activeTab === 'bids' ? 'text-[#ea2a33]' : 'text-[#886364]'} />
             Bid Requests
           </div>
           <div className={`nav-item ${activeTab === 'content' ? 'active' : ''}`} onClick={() => setActiveTab('content')}>
-            <span className={`material-symbols-outlined ${activeTab === 'content' ? '' : 'inactive-icon'}`}>video_library</span>
+            <SquarePlay size={20} className={activeTab === 'content' ? 'text-[#ea2a33]' : 'text-[#886364]'} />
             My Content
           </div>
           <div className={`nav-item ${activeTab === 'sessions' ? 'active' : ''}`} onClick={() => setActiveTab('sessions')}>
-            <span className={`material-symbols-outlined ${activeTab === 'sessions' ? '' : 'inactive-icon'}`}>calendar_today</span>
+            <CalendarDays size={20} className={activeTab === 'sessions' ? 'text-[#ea2a33]' : 'text-[#886364]'} />
             Sessions
           </div>
           <div className={`nav-item ${activeTab === 'posts' ? 'active' : ''}`} onClick={() => setActiveTab('posts')}>
-            <span className={`material-symbols-outlined ${activeTab === 'posts' ? '' : 'inactive-icon'}`}>campaign</span>
+            <Megaphone size={20} className={activeTab === 'posts' ? 'text-[#ea2a33]' : 'text-[#886364]'} />
             Posts
           </div>
           <div className={`nav-item ${activeTab === 'earnings' ? 'active' : ''}`} onClick={() => setActiveTab('earnings')}>
-            <span className={`material-symbols-outlined ${activeTab === 'earnings' ? '' : 'inactive-icon'}`}>payments</span>
+            <Wallet size={20} className={activeTab === 'earnings' ? 'text-[#ea2a33]' : 'text-[#886364]'} />
             Earnings
           </div>
         </nav>
@@ -273,7 +289,7 @@ export default function Teacher() {
             </div>
           </div>
           <button className="logout-btn" onClick={handleLogout}>
-            <span className="material-symbols-outlined">logout</span>
+            <LogOut size={20} />
             Log Out
           </button>
         </div>
@@ -295,12 +311,12 @@ export default function Teacher() {
           </div>
           <div className="navbar-right">
             <button className="navbar-btn">
-              <span className="material-symbols-outlined">notifications</span>
+              <Bell size={20} />
               <span className="notification-dot"></span>
             </button>
             <div className="navbar-divider"></div>
             <div className="earnings-display">
-              <span className="material-symbols-outlined">monetization_on</span>
+              <Coins size={20} className="text-[#ea2a33]" />
               <span>NPR {stats.monthlyEarnings.toLocaleString()}</span>
             </div>
           </div>
@@ -334,6 +350,7 @@ export default function Teacher() {
               uploads={uploads}
               onUpload={() => setIsUploadModalOpen(true)}
               onAction={handleQuickAction}
+              teacher={teacher}
             />
           )}
 
@@ -360,7 +377,7 @@ export default function Teacher() {
 
           {(activeTab === 'earnings') && (
             <div className="empty-state" style={{ padding: '4rem' }}>
-              <span className="material-symbols-outlined" style={{ fontSize: '4rem', color: '#ccc' }}>engineering</span>
+              <Construction size={64} className="text-gray-300" />
               <p style={{ marginTop: '1rem', fontSize: '1.2rem', color: '#666' }}>This feature is coming soon!</p>
             </div>
           )}

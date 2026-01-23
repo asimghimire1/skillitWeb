@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
+import ContentCard from './ContentCard';
 
-const ContentView = ({ uploads, onUpload, onAction }) => {
-    const libraryContent = uploads.filter(u => u.category !== 'Announcements');
+const ContentView = ({ uploads, onUpload, onAction, teacher }) => {
+    // Sort by newest first
+    const libraryContent = uploads
+        .filter(u => u.category !== 'Announcements')
+        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
     return (
         <div>
@@ -14,45 +18,22 @@ const ContentView = ({ uploads, onUpload, onAction }) => {
                     <span className="material-symbols-outlined">add</span> Upload New
                 </button>
             </div>
-            <div className="uploads-grid" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '2rem' }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {libraryContent.length === 0 ? (
-                    <div className="empty-state" style={{ gridColumn: '1 / -1' }}>
-                        <span className="material-symbols-outlined empty-state-icon">cloud_upload</span>
-                        <p className="empty-state-text">No content library found.</p>
+                    <div className="col-span-full">
+                        <div className="empty-state">
+                            <span className="material-symbols-outlined empty-state-icon">cloud_upload</span>
+                            <p className="empty-state-text">No content library found.</p>
+                        </div>
                     </div>
                 ) : (
                     libraryContent.map((upload, idx) => (
-                        <div key={idx} className="upload-card group/card">
-                            <div className="upload-thumbnail aspect-video w-full bg-black relative">
-                                {upload.videoUrl ? (
-                                    <video
-                                        src={upload.videoUrl.startsWith('http') ? upload.videoUrl : `http://localhost:5000${upload.videoUrl}`}
-                                        poster={upload.thumbnail ? (upload.thumbnail.startsWith('http') ? upload.thumbnail : `http://localhost:5000${upload.thumbnail}`) : null}
-                                        controls
-                                        className="w-full h-full object-cover"
-                                    />
-                                ) : (
-                                    <div
-                                        className="w-full h-full bg-cover bg-center bg-no-repeat transition-transform duration-500 group-hover/card:scale-105"
-                                        style={{ backgroundImage: `url('${upload.thumbnail ? (upload.thumbnail.startsWith('http') ? upload.thumbnail : `http://localhost:5000${upload.thumbnail}`) : 'https://via.placeholder.com/300'}')` }}
-                                    />
-                                )}
-                                <div className={`upload-badge badge-${upload.status || 'published'}`}>{upload.status || 'Published'}</div>
-                            </div>
-                            <div className="upload-info">
-                                <div className="flex-row-center justify-between items-start">
-                                    <h4 className="upload-title" style={{ fontSize: '1.1rem' }}>{upload.title}</h4>
-                                    <button className="icon-btn-small delete-btn" onClick={(e) => { e.stopPropagation(); onAction('deleteContent', upload.id); }}>
-                                        <span className="material-symbols-outlined">delete</span>
-                                    </button>
-                                </div>
-                                <p className="upload-desc-clamped" style={{ fontSize: '0.9rem', marginBottom: '1rem' }}>{upload.description}</p>
-                                <div className="upload-meta" style={{ fontSize: '0.85rem' }}>
-                                    <span>{upload.views || 0} views</span>
-                                    <span>{new Date(upload.created_at).toLocaleDateString()}</span>
-                                </div>
-                            </div>
-                        </div>
+                        <ContentCard
+                            key={idx}
+                            upload={upload}
+                            teacher={teacher}
+                            onAction={onAction}
+                        />
                     ))
                 )}
             </div>

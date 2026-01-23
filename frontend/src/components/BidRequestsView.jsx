@@ -11,75 +11,14 @@ const BidRequestsView = () => {
 
     // Stats data
     const stats = [
-        { label: 'Total Bids', value: '156', color: 'text-[#181111]' },
-        { label: 'Pending Review', value: '24', color: 'text-[#ea2a33]' },
-        { label: 'Avg Bid', value: 'NPR 1,250', color: 'text-[#181111]' },
-        { label: 'Acceptance Rate', value: '84%', color: 'text-[#07885d]' }
+        { label: 'Total Bids', value: '0', color: 'text-[#181111]' },
+        { label: 'Pending Review', value: '0', color: 'text-[#ea2a33]' },
+        { label: 'Avg Bid', value: 'NPR 0', color: 'text-[#181111]' },
+        { label: 'Acceptance Rate', value: '0%', color: 'text-[#07885d]' }
     ];
 
     // Mock Bid Data
-    const [allBids, setAllBids] = useState([
-        {
-            id: 1,
-            studentName: "Rohan Shrestha",
-            studentAvatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuD2_2-mmxZ5RJzYFpUSYic3PdgDyioSTTw8eZDlq1E9MKIrUMeUzctHrLxMGuHI0V1umr1mj3XF9BZDxWK6gn2zRQYWUGf15pveqFFK2N-OvHTDzSpa91qzhZ7S4m3OPc67S6s45rAGSMJV4Ym91Mt8TkWEwDcotG9pmP_H0WSrAb6zbWDHKqA-2D7FxpgXOTNs57wO0SJUoZU_YKOtm02pUdpqFawXmApGH3UY8UzfxqxgiRQZgoXDdWZVTi-ynTa4Pn0vl2MZlMA",
-            skillName: "UI/UX Strategy",
-            basePricePercentage: "80% of Base Price",
-            basePriceBadgeColor: "bg-yellow-100 text-yellow-700",
-            basePriceIcon: "trending_down",
-            duration: "2h 30m session",
-            bidAmount: "NPR 800",
-            timeLeft: "23h 45m left",
-            message: "I am a student at IOE and I want to improve my visual design skills specifically for mobile...",
-            proposedDate: "Tomorrow, Oct 24 • 4:00 PM",
-            status: "Pending"
-        },
-        {
-            id: 2,
-            studentName: "Anjali Tamang",
-            studentAvatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuAAsOYkySvV-AeuLzkNyjyX0rvDipfKiQCK2UBqtPH4iWhMQRY3SE1iNVStnuWQ-c3BL-Fe-PMG5W6mpCfrjTA5_hCJcVSL7IcooQcxzQyKQIVDYFvDOxovMDzNsNG2iUDyUkhLPmUHkbWin2AFZfOWiGgHCcxkh0P8QMGAqHD8b8VIUaqpb0XH7eENFTJjH2kzSHYh2HWnsCGrkUVgqOxC6txt0NIobv9liCjuMoJ8ihuoPtwEjAGjxMZwe6TNVIQH7HrjJ8Oe8zA",
-            skillName: "React Architecture",
-            basePricePercentage: "110% of Base Price",
-            basePriceBadgeColor: "bg-green-100 text-green-700",
-            basePriceIcon: "trending_up",
-            duration: "1h session",
-            bidAmount: "NPR 1,500",
-            timeLeft: "12h 10m left",
-            message: "I have a project deadline and need an expert review of my current codebase...",
-            proposedDate: "Today, Oct 23 • 8:00 PM",
-            status: "Pending"
-        },
-        {
-            id: 3,
-            studentName: "Suman K.C.",
-            studentAvatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuDPlKfBUIHvHdD5XdYa_kRu674BGLgaeMhMwS9_u51lXp2vsUZXhw-z5Ase7XkR2YXu3hKY8ox8QG9xEGSO-nEf4IgmBkGOBxNSo_HnAWvjAASh223qsiN5Akbl4t3OsBAQiE3cUFR6Uf9R_hjuiIIwfREfMCG7b61nHQd2WqQbQKdJ-ycdbwsw0E5sk1Nnpu7T_W_4hew4rkESnGO1czcTaOcByTxUJRYYOKJmIxxdidkhGJ54BiK9jQHmDMPY0eXaknrdPu_AIR4",
-            skillName: "Brand Design 101",
-            basePricePercentage: "100% of Base Price",
-            basePriceBadgeColor: "bg-gray-100 text-gray-700",
-            basePriceIcon: "drag_handle",
-            duration: "45m session",
-            bidAmount: "NPR 500",
-            timeLeft: "05h 22m left",
-            message: "I am interested in learning the basics of logo creation using Adobe Illustrator...",
-            proposedDate: "Oct 25 • 10:00 AM",
-            status: "Pending"
-        },
-        {
-            id: 4,
-            studentName: "Bishal Gurung",
-            studentAvatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuDv9-Uyk-56DG1mXKiFWmATUxMVx2J6hresnWGPKS5oP2hBTyBxHkNhb8kyK1N2Ixs9bch7ulzGXHom9sr-LwtzZdfkoVBwRQ2C8NBhCP3i0cczazuQfEnbYBLdevKNj5mNUaYEwK9NzOm5VeCZXtwyGBuSRJgQTL8cuj9MWqQddeZcVhW8xBQp8cVe17tHpOsbSjrL_j1QoC5ruu5q5RMokASYW2wp6Tdx2nHAwRRmO_ELc9bcVnfRwuoOpW_-SG3palPOsltDUCc",
-            skillName: "Python Basics",
-            basePricePercentage: "100% of Base Price",
-            basePriceBadgeColor: "bg-blue-100 text-blue-700",
-            basePriceIcon: "drag_handle",
-            duration: "1h session",
-            bidAmount: "NPR 1,000",
-            timeLeft: "-",
-            message: "Accepted for next week.",
-            proposedDate: "Oct 20",
-            status: "Accepted"
-        }
-    ]);
+    const [allBids, setAllBids] = useState([]);
 
     const filteredBids = allBids.filter(bid => {
         const matchesTab = activeTab === 'All Bids' || bid.status === activeTab;
