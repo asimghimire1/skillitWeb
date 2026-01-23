@@ -16,26 +16,32 @@ const SessionsView = ({ sessions, onCreate, onAction }) => {
             {/* Empty space for potential future header elements, or just padding */}
             <div className="mb-4"></div>
 
-            {/* List Control Header */}
-            <div className="flex items-center justify-end mb-8">
-                <div className="flex gap-4">
-                    <div className="premium-select-container min-w-[200px]">
-                        <PremiumDropdown
-                            options={[
-                                { value: 'newest', label: 'Upcoming', icon: 'schedule' },
-                                { value: 'oldest', label: 'Farthest', icon: 'calendar_month' },
-                            ]}
-                            value={filter}
-                            onChange={(val) => setFilter(val)}
-                        />
+            {/* Header & Controls */}
+            <div className="flex items-center justify-between mb-8">
+                <div>
+                    <h2 className="text-2xl font-bold text-[#ea2a33]">Sessions Schedule</h2>
+                    <p className="text-gray-500 mt-1">Manage your upcoming classes and bookings.</p>
+                </div>
+                <div className="flex items-center justify-end">
+                    <div className="flex gap-4">
+                        <div className="premium-select-container min-w-[200px]">
+                            <PremiumDropdown
+                                options={[
+                                    { value: 'newest', label: 'Upcoming', icon: 'schedule' },
+                                    { value: 'oldest', label: 'Farthest', icon: 'calendar_month' },
+                                ]}
+                                value={filter}
+                                onChange={(val) => setFilter(val)}
+                            />
+                        </div>
+                        <button
+                            className="bg-[#ea2a33] text-white px-6 py-3 rounded-2xl font-black text-xs hover:bg-[#d6252d] hover:shadow-xl hover:shadow-red-500/30 transition-all flex items-center justify-center gap-2 shadow-lg shadow-red-500/20"
+                            onClick={() => onCreate()}
+                        >
+                            <span className="material-symbols-outlined text-sm">add</span>
+                            Schedule Session
+                        </button>
                     </div>
-                    <button
-                        className="bg-[#ea2a33] text-white px-6 py-3 rounded-2xl font-black text-xs hover:bg-[#d6252d] hover:shadow-xl hover:shadow-red-500/30 transition-all flex items-center justify-center gap-2 shadow-lg shadow-red-500/20"
-                        onClick={() => onCreate()}
-                    >
-                        <span className="material-symbols-outlined text-sm">add</span>
-                        Schedule Session
-                    </button>
                 </div>
             </div>
 

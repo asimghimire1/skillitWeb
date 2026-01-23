@@ -7,6 +7,7 @@ import BidRequestsView from '../../components/BidRequestsView';
 import DashboardView from '../../components/teacher/DashboardView';
 import ContentView from '../../components/teacher/ContentView';
 import SessionsView from '../../components/teacher/SessionsView';
+import PostsView from '../../components/teacher/PostsView';
 import apiService from '../../services/apiService';
 import { useToast } from '../../context/ToastContext';
 import { useConfirm } from '../../context/ConfirmContext';
@@ -36,6 +37,7 @@ export default function Teacher() {
   });
   const [uploads, setUploads] = useState([]);
   const [sessions, setSessions] = useState([]);
+  const [posts, setPosts] = useState([]);
 
   useEffect(() => {
     const userJson = localStorage.getItem('user');
@@ -75,6 +77,9 @@ export default function Teacher() {
 
     const contentData = await apiService.getTeacherContent(teacherId);
     if (contentData) setUploads(contentData);
+
+    const postsData = await apiService.getTeacherPosts(teacherId);
+    if (postsData) setPosts(postsData);
   };
 
   const handleLogout = () => {
@@ -114,17 +119,25 @@ export default function Teacher() {
   };
 
   const handleCreatePost = async (postData) => {
-    if (postData.id) {
-      const updated = await apiService.updateContent(postData.id, postData);
-      if (updated) {
+    // Adapter for CreatePostModal data
+    // Post API expects: teacherId, title, content, category
+    const apiData = {
+      title: postData.title,
+      content: postData.description, // mapped from description
+      category: postData.category,
+      teacherId: teacher.id
+    };
+
+    if (postToEdit) {
+      const result = await apiService.updatePost(postToEdit.id, apiData);
+      if (result && !result.error) {
         showToast('Post updated successfully', 'success');
         fetchDashboardData(teacher.id);
+      } else if (result.error) {
+        showToast(result.error, 'error');
       }
     } else {
-      const newPost = await apiService.uploadContent({
-        teacherId: teacher.id,
-        ...postData
-      });
+      const newPost = await apiService.createPost(apiData);
       if (newPost) {
         showToast('New post shared', 'success');
         fetchDashboardData(teacher.id);
@@ -138,7 +151,8 @@ export default function Teacher() {
     else if (actionType === 'content') setActiveTab('content');
     else if (actionType === 'bids') setActiveTab('bids');
     else if (actionType === 'sessions') setActiveTab('sessions');
-    else if (actionType === 'post') setIsPostModalOpen(true);
+    else if (actionType === 'posts') setActiveTab('posts'); // Navigate to tab, or open modal if meant to be "New Post" logic
+    else if (actionType === 'post') setIsPostModalOpen(true); // "New Post" from dashboard
     else if (actionType === 'deleteContent') {
       const ok = await confirm({
         title: 'Delete Content',
@@ -166,11 +180,36 @@ export default function Teacher() {
         showToast('Session deleted successfully', 'success');
         fetchDashboardData(teacher.id);
       }
-    } else if (actionType === 'editAnnouncement') {
-      // For now, announcements edit can reuse post modal or content modal
-      // But CreatePostModal needs to be updated to support editing
-      setPostToEdit(data);
+    }
+  };
+
+  // Helper for PostsView callbacks
+  const handlePostAction = async (action, post) => {
+    if (action === 'edit') {
+      const canEdit = (new Date() - new Date(post.created_at)) / 1000 / 60 <= 30;
+      if (!canEdit) {
+        showToast('Posts can only be edited within 30 minutes of creation.', 'error');
+        return;
+      }
+      setPostToEdit({
+        id: post.id,
+        title: post.title,
+        description: post.content, // mapped back for modal
+        category: post.category
+      });
       setIsPostModalOpen(true);
+    } else if (action === 'delete') {
+      const ok = await confirm({
+        title: 'Delete Post',
+        message: 'Are you sure you want to delete this post?',
+        confirmText: 'Delete',
+        type: 'danger'
+      });
+      if (ok) {
+        await apiService.deletePost(post); // post here is id
+        showToast('Post deleted successfully', 'success');
+        fetchDashboardData(teacher.id);
+      }
     }
   };
 
@@ -215,18 +254,19 @@ export default function Teacher() {
             <span className={`material-symbols-outlined ${activeTab === 'sessions' ? '' : 'inactive-icon'}`}>calendar_today</span>
             Sessions
           </div>
+          <div className={`nav-item ${activeTab === 'posts' ? 'active' : ''}`} onClick={() => setActiveTab('posts')}>
+            <span className={`material-symbols-outlined ${activeTab === 'posts' ? '' : 'inactive-icon'}`}>campaign</span>
+            Posts
+          </div>
           <div className={`nav-item ${activeTab === 'earnings' ? 'active' : ''}`} onClick={() => setActiveTab('earnings')}>
             <span className={`material-symbols-outlined ${activeTab === 'earnings' ? '' : 'inactive-icon'}`}>payments</span>
             Earnings
-          </div>          <div className={`nav-item ${activeTab === 'analytics' ? 'active' : ''}`} onClick={() => setActiveTab('analytics')}>
-            <span className={`material-symbols-outlined ${activeTab === 'analytics' ? '' : 'inactive-icon'}`}>analytics</span>
-            Analytics
           </div>
         </nav>
 
         <div className="sidebar-footer">
           <div className="sidebar-user">
-            <div className="user-avatar" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuDv9-Uyk-56DG1mXKiFWmATUxMVx2J6hresnWGPKS5oP2hBTyBxHkNhb8kyK1N2Ixs9bch7ulzGXHom9sr-LwtzZdfkoVBwRQ2C8NBhCP3i0cczazuQfEnbYBLdevKNj5mNUaYEwK9NzOm5VeCZXtwyGBuSRJgQTL8cuj9MWqQddeZcVhW8xBQp8cVe17tHpOsbSjrL_j1QoC5ruu5q5RMokASYW2wp6Tdx2nHAwRRmO_ELc9bcVnfRwuoOpW_-SG3palPOsltDUCc')" }} />
+            <div className="user-avatar" style={{ backgroundImage: `url('${teacher.profilePicture || "https://ui-avatars.com/api/?name=" + (teacher.fullname || "Teacher") + "&background=ea2a33&color=fff"}')` }} />
             <div className="user-info">
               <p className="user-name">{teacher.fullname || teacher.fullName || 'Teacher'}</p>
               <p className="user-title">Verified Teacher</p>
@@ -250,7 +290,7 @@ export default function Teacher() {
               {activeTab === 'content' && 'My Content'}
               {activeTab === 'sessions' && 'Sessions Schedule'}
               {activeTab === 'earnings' && 'Earnings & Payouts'}
-              {activeTab === 'analytics' && 'Performance Analytics'}
+              {activeTab === 'posts' && 'Posts & Announcements'}
             </h2>
           </div>
           <div className="navbar-right">
@@ -280,6 +320,7 @@ export default function Teacher() {
               stats={stats}
               uploads={uploads}
               sessions={sessions}
+              posts={posts}
               quickActions={quickActions}
               onAction={handleQuickAction}
               teacher={teacher}
@@ -307,7 +348,17 @@ export default function Teacher() {
             />
           )}
 
-          {(activeTab === 'earnings' || activeTab === 'analytics') && (
+          {activeTab === 'posts' && (
+            <PostsView
+              posts={posts}
+              teacher={teacher}
+              onCreate={() => { setPostToEdit(null); setIsPostModalOpen(true); }}
+              onEdit={(post) => handlePostAction('edit', post)}
+              onDelete={(id) => handlePostAction('delete', id)}
+            />
+          )}
+
+          {(activeTab === 'earnings') && (
             <div className="empty-state" style={{ padding: '4rem' }}>
               <span className="material-symbols-outlined" style={{ fontSize: '4rem', color: '#ccc' }}>engineering</span>
               <p style={{ marginTop: '1rem', fontSize: '1.2rem', color: '#666' }}>This feature is coming soon!</p>

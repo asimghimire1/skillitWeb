@@ -44,7 +44,7 @@ router.post('/', upload.fields([
 // GET /api/content/teacher/:teacherId
 router.get('/teacher/:teacherId', async (req, res) => {
     try {
-        const contents = await Content.findByTeacher(req.params.teacherId);
+        const contents = await Content.findAll({ where: { teacherId: req.params.teacherId } });
         res.json(contents);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -54,7 +54,7 @@ router.get('/teacher/:teacherId', async (req, res) => {
 // DELETE /api/content/:id
 router.delete('/:id', async (req, res) => {
     try {
-        const deleted = await Content.delete(req.params.id);
+        const deleted = await Content.destroy({ where: { id: req.params.id } });
         if (deleted) {
             res.json({ message: 'Content deleted successfully' });
         } else {
@@ -68,9 +68,10 @@ router.delete('/:id', async (req, res) => {
 // PUT /api/content/:id
 router.put('/:id', async (req, res) => {
     try {
-        const updated = await Content.update(req.params.id, req.body);
+        const [updated] = await Content.update(req.body, { where: { id: req.params.id } });
         if (updated) {
-            res.json(updated);
+            const updatedContent = await Content.findByPk(req.params.id);
+            res.json(updatedContent);
         } else {
             res.status(404).json({ message: 'Content not found' });
         }

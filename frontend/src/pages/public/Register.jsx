@@ -5,7 +5,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { apiService } from '../../services/apiService';
-import Toast from '../../components/Toast';
+// import Toast from '../../components/Toast';
+// Use ToastContext for toast functionality
 
 const registerSchema = z.object({
   fullname: z.string().min(3, 'Full name must be at least 3 characters'),
@@ -237,15 +238,7 @@ const Register = () => {
         </div>
       </div>
 
-      {/* Toast Notification */}
-      {toastMessage && (
-        <Toast 
-          message={toastMessage} 
-          type={toastType} 
-          onClose={() => setToastMessage('')}
-          duration={5000}
-        />
-      )}
+      {/* Toast Notification removed. Use ToastContext for notifications. */}
     </div>
   );
 };

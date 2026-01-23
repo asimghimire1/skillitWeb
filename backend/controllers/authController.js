@@ -30,7 +30,7 @@ class AuthController {
       }
 
       // Check if user already exists
-      const existingUser = await User.findByEmail(email);
+      const existingUser = await User.findOne({ where: { email } });
       if (existingUser) {
         return res.status(409).json({ success: false, message: 'Email already registered' });
       }
@@ -40,7 +40,7 @@ class AuthController {
       const hashedPassword = await bcrypt.hash(password, salt);
 
       // Create user
-      const user = await User.create(email, fullname, hashedPassword, role);
+      const user = await User.create({ email, fullname, password: hashedPassword, role });
 
       // Generate token
       const token = jwt.sign(
@@ -79,7 +79,7 @@ class AuthController {
       const { email, password } = validatedData;
 
       // Find user
-      const user = await User.findByEmail(email);
+      const user = await User.findOne({ where: { email } });
       if (!user) {
         return res.status(401).json({ success: false, message: 'Invalid email or password' });
       }
@@ -123,7 +123,7 @@ class AuthController {
   static async getCurrentUser(req, res) {
     try {
       const userId = req.user.id;
-      const user = await User.findById(userId);
+      const user = await User.findByPk(userId);
 
       if (!user) {
         return res.status(404).json({ success: false, message: 'User not found' });

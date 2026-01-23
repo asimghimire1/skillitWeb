@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { useToast } from '../../context/ToastContext';
 import SessionListItem from './SessionListItem';
 
-const DashboardView = ({ stats, uploads, sessions, quickActions, onAction, teacher }) => {
+const DashboardView = ({ stats, uploads, sessions, posts, quickActions, onAction, teacher }) => {
     const { showToast } = useToast();
-    const announcements = uploads.filter(u => u.category === 'Announcements').sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    // Use the passed posts, sorted by newest first
+    const recentPosts = [...(posts || [])].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
     const recentUploads = uploads.filter(u => u.category !== 'Announcements').sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
     const statCards = [
@@ -124,30 +125,35 @@ const DashboardView = ({ stats, uploads, sessions, quickActions, onAction, teach
 
             <div className="content-grid">
                 <div className="main-content-column">
-                    {/* Recent Posts Section (Formerly Announcements) */}
+                    {/* Recent Posts Section */}
                     <div className="announcements-section" style={{ marginBottom: '2.5rem' }}>
                         <div className="uploads-section-header">
                             <h2 className="section-title">Recent Posts</h2>
-                            {announcements.length > 0 && (
-                                <button className="view-all-btn text-[#ea2a33] font-bold hover:text-[#c91d2b] transition-colors" onClick={() => onAction('content')}>View All Posts</button>
+                            {recentPosts.length > 0 && (
+                                <button className="view-all-btn text-[#ea2a33] font-bold hover:text-[#c91d2b] transition-colors" onClick={() => onAction('posts')}>View All Posts</button>
                             )}
                         </div>
-                        {announcements.length === 0 ? (
+                        {recentPosts.length === 0 ? (
                             <div className="empty-state" style={{ padding: '2rem' }}>
                                 <p className="empty-state-text">No posts yet</p>
                                 <button className="view-all-btn hover:text-[#ea2a33] transition-colors" onClick={() => onAction('post')} style={{ marginTop: '0.5rem' }}>Create Post</button>
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {announcements.slice(0, 2).map((post, idx) => (
+                                {recentPosts.slice(0, 2).map((post, idx) => (
                                     <div key={idx} className="bg-white p-6 rounded-[20px] shadow-sm border border-[#e5dcdc] h-full flex flex-col relative group">
                                         <div className="flex justify-between items-start mb-4">
                                             <div className="flex gap-3">
                                                 {/* Avatar */}
-                                                <div className="bg-cover bg-center h-10 w-10 rounded-full border border-gray-100" style={{ backgroundImage: `url('${teacher?.avatar || "https://lh3.googleusercontent.com/aida-public/AB6AXuDv9-Uyk-56DG1mXKiFWmATUxMVx2J6hresnWGPKS5oP2hBTyBxHkNhb8kyK1N2Ixs9bch7ulzGXHom9sr-LwtzZdfkoVBwRQ2C8NBhCP3i0cczazuQfEnbYBLdevKNj5mNUaYEwK9NzOm5VeCZXtwyGBuSRJgQTL8cuj3MWqQddeZcVhW8xBQp8cVe17tHpOsbSjrL_j1QoC5ruu5q5RMokASYW2wp6Tdx2nHAwRRmO_ELc9bcVnfRwuoOpW_-SG3palPOsltDUCc"}')` }}></div>
+                                                <div
+                                                    className="w-10 h-10 rounded-full bg-gray-200 bg-cover bg-center shrink-0 border border-gray-100"
+                                                    style={{
+                                                        backgroundImage: `url('${teacher?.profilePicture || "https://ui-avatars.com/api/?name=" + (teacher?.fullname || teacher?.fullName || "Teacher") + "&background=ea2a33&color=fff"}')`
+                                                    }}
+                                                />
                                                 <div>
                                                     <div className="flex items-center gap-2">
-                                                        <span className="font-bold text-[#181111] text-sm md:text-base">{teacher?.fullname || teacher?.fullName || 'Alex Rivera'}</span>
+                                                        <span className="font-bold text-[#181111] text-sm md:text-base">{teacher?.fullname || teacher?.fullName || 'Teacher'}</span>
                                                         <span className="bg-[#ffe5e7] text-[#ea2a33] text-[10px] font-bold px-2 py-0.5 rounded-full tracking-wider uppercase">Teacher</span>
                                                     </div>
                                                     <span className="text-[#886364] text-xs mt-0.5 block">{new Date(post.created_at).toLocaleDateString() === new Date().toLocaleDateString() ?
@@ -157,18 +163,10 @@ const DashboardView = ({ stats, uploads, sessions, quickActions, onAction, teach
                                                 </div>
                                             </div>
                                             {/* More Options Button */}
-                                            <div className="relative group/menu">
-                                                <button className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-full hover:bg-gray-50">
-                                                    <span className="material-symbols-outlined text-xl">more_horiz</span>
-                                                </button>
-                                                <div className="absolute right-0 top-full mt-1 w-32 bg-white border border-[#e5dcdc] rounded-lg shadow-lg opacity-0 invisible group-hover/menu:opacity-100 group-hover/menu:visible transition-all z-10">
-                                                    <button className="w-full text-left px-4 py-2 text-xs font-semibold text-[#181111] hover:bg-gray-50 hover:text-[#ea2a33] transition-colors rounded-t-lg" onClick={(e) => { e.stopPropagation(); onAction('editAnnouncement', post); }}>Edit</button>
-                                                    <button className="w-full text-left px-4 py-2 text-xs font-semibold text-[#181111] hover:bg-gray-50 hover:text-[#ea2a33] transition-colors rounded-b-lg" onClick={(e) => { e.stopPropagation(); onAction('deleteContent', post.id); }}>Delete</button>
-                                                </div>
-                                            </div>
+                                            {/* For dashboard view, maybe limited options or remove entirely if complex */}
                                         </div>
-                                        <p className="text-[#564e4e] text-sm leading-relaxed flex-grow">
-                                            {post.description}
+                                        <p className="text-[#564e4e] text-sm leading-relaxed flex-grow line-clamp-3">
+                                            {post.content}
                                         </p>
                                     </div>
                                 ))}
@@ -191,29 +189,22 @@ const DashboardView = ({ stats, uploads, sessions, quickActions, onAction, teach
                         ) : (
                             <div className="uploads-grid">
                                 {recentUploads.slice(0, 2).map((upload, idx) => (
-                                    <div key={idx} className="upload-card">
-                                        <div className="upload-thumbnail" style={{ background: '#000' }}>
-                                            {/* Fixed Video Rendering Logic - More Robust */}
-                                            {upload.type === 'video' || upload.category === 'video' || upload.videoUrl || (upload.fileUrl && (upload.fileUrl.endsWith('.mp4') || upload.fileUrl.endsWith('.mov'))) ? (
-                                                <>
-                                                    {upload.thumbnail ? (
-                                                        <div className="thumbnail-overlay" style={{ backgroundImage: `url('${upload.thumbnail.startsWith('http') ? upload.thumbnail : `http://localhost:5000${upload.thumbnail}`}')`, backgroundSize: 'contain', backgroundRepeat: 'no-repeat' }} />
-                                                    ) : (
-                                                        <div className="video-placeholder" style={{ width: '100%', height: '100%', background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                                            {(upload.videoUrl || upload.fileUrl) ? (
-                                                                <video
-                                                                    src={(upload.videoUrl || upload.fileUrl).startsWith('http') ? (upload.videoUrl || upload.fileUrl) : `http://localhost:5000${(upload.videoUrl || upload.fileUrl)}`}
-                                                                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-                                                                />
-                                                            ) : (
-                                                                <span className="material-symbols-outlined text-white text-4xl">movie</span>
-                                                            )}
-                                                        </div>
-                                                    )}
-                                                    <span className="material-symbols-outlined" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', color: 'white', fontSize: '3rem', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>play_circle</span>
-                                                </>
+                                    <div key={idx} className="upload-card group/card">
+                                        <div className="upload-thumbnail aspect-video w-full bg-black relative">
+                                            {(upload.videoUrl || (upload.fileUrl && (upload.fileUrl.endsWith('.mp4') || upload.fileUrl.endsWith('.mov')))) ? (
+                                                <video
+                                                    src={(upload.videoUrl || upload.fileUrl).startsWith('http') ? (upload.videoUrl || upload.fileUrl) : `http://localhost:5000${(upload.videoUrl || upload.fileUrl)}`}
+                                                    poster={upload.thumbnail ? (upload.thumbnail.startsWith('http') ? upload.thumbnail : `http://localhost:5000${upload.thumbnail}`) : null}
+                                                    controls
+                                                    className="w-full h-full object-cover"
+                                                />
                                             ) : (
-                                                <div className="thumbnail-overlay" style={{ backgroundImage: `url('${upload.thumbnail ? (upload.thumbnail.startsWith('http') ? upload.thumbnail : `http://localhost:5000${upload.thumbnail}`) : 'https://via.placeholder.com/300?text=No+Thumbnail'}')`, backgroundSize: 'contain', backgroundRepeat: 'no-repeat' }} />
+                                                <div
+                                                    className="w-full h-full bg-cover bg-center bg-no-repeat"
+                                                    style={{
+                                                        backgroundImage: `url('${upload.thumbnail ? (upload.thumbnail.startsWith('http') ? upload.thumbnail : `http://localhost:5000${upload.thumbnail}`) : 'https://via.placeholder.com/300?text=No+Thumbnail'}')`
+                                                    }}
+                                                />
                                             )}
 
                                             <div className={`upload-badge badge-${upload.status || 'published'}`}>{upload.status || 'Published'}</div>
@@ -246,33 +237,76 @@ const DashboardView = ({ stats, uploads, sessions, quickActions, onAction, teach
                     ) : (
                         <div className="space-y-3">
                             {sessions.slice(0, 3).map((session, idx) => (
-                                <div key={session.id || idx} className="bg-white p-4 rounded-2xl border border-[#e5dcdc] flex items-center justify-between hover:border-primary/20 transition-all group">
-                                    <div className="flex items-center gap-3">
-                                        <div className="size-10 rounded-xl bg-[#f4f0f0] flex items-center justify-center text-primary group-hover:bg-primary/10 transition-colors">
-                                            <span className="material-symbols-outlined text-xl">calendar_today</span>
-                                        </div>
-                                        <div>
-                                            <h4 className="font-bold text-sm text-[#181111]">{session.title}</h4>
-                                            <p className="text-[10px] text-[#886364] mt-0.5">{session.scheduledDate} • {session.scheduledTime}</p>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        {session.meetingLink && (
-                                            <a href={session.meetingLink} target="_blank" rel="noopener noreferrer" className="size-8 rounded-lg bg-primary/5 text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-all">
-                                                <span className="material-symbols-outlined text-base">video_call</span>
-                                            </a>
-                                        )}
-                                        <button className="size-8 rounded-lg hover:bg-gray-50 flex items-center justify-center text-[#d1c1c2] hover:text-primary transition-all" onClick={() => onAction('editSession', session)}>
-                                            <span className="material-symbols-outlined text-base">edit</span>
-                                        </button>
-                                    </div>
-                                </div>
+                                <SessionItemWithDetails
+                                    key={session.id || idx}
+                                    session={session}
+                                    onAction={onAction}
+                                />
                             ))}
                         </div>
                     )}
                 </div>
             </div>
         </>
+    );
+};
+
+const SessionItemWithDetails = ({ session, onAction }) => {
+    const [isExpanded, setIsExpanded] = useState(false);
+
+    return (
+        <div className="bg-white rounded-2xl border border-[#e5dcdc] hover:border-primary/20 transition-all overflow-hidden group">
+            <div className="p-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                    <div className="size-10 rounded-xl bg-[#f4f0f0] flex items-center justify-center text-primary group-hover:bg-primary/10 transition-colors">
+                        <span className="material-symbols-outlined text-xl">calendar_today</span>
+                    </div>
+                    <div>
+                        <h4 className="font-bold text-sm text-[#181111]">{session.title}</h4>
+                        <p className="text-[10px] text-[#886364] mt-0.5">{session.scheduledDate} • {session.scheduledTime}</p>
+                    </div>
+                </div>
+                <div className="flex items-center gap-2">
+                    {session.meetingLink && (
+                        <a href={session.meetingLink} target="_blank" rel="noopener noreferrer" className="size-8 rounded-lg bg-[#ea2a33] text-white flex items-center justify-center hover:bg-[#c91d2b] transition-all shadow-sm shadow-red-500/20">
+                            <span className="material-symbols-outlined text-base">video_call</span>
+                        </a>
+                    )}
+                    <button className="size-8 rounded-lg hover:bg-gray-50 flex items-center justify-center text-[#d1c1c2] hover:text-primary transition-all" onClick={() => onAction('editSession', session)}>
+                        <span className="material-symbols-outlined text-base">edit</span>
+                    </button>
+                    <button
+                        className={`size-8 rounded-lg hover:bg-gray-50 flex items-center justify-center transition-all ${isExpanded ? 'text-primary bg-primary/5' : 'text-[#d1c1c2]'}`}
+                        onClick={() => setIsExpanded(!isExpanded)}
+                        title="View Details"
+                    >
+                        <span className="material-symbols-outlined text-base">{isExpanded ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}</span>
+                    </button>
+                </div>
+            </div>
+
+            {/* Expanded Details */}
+            {isExpanded && (
+                <div className="px-4 pb-4 pt-0 animate-fade-in">
+                    <div className="pt-3 border-t border-gray-100 grid grid-cols-2 gap-4">
+                        <div>
+                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Description</p>
+                            <p className="text-xs text-gray-600 mt-1">{session.notes || session.description || 'No description provided'}</p>
+                        </div>
+                        <div className="space-y-2">
+                            <div>
+                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Duration</p>
+                                <p className="text-xs text-gray-600 mt-0.5">{session.duration} minutes</p>
+                            </div>
+                            <div>
+                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Type</p>
+                                <p className="text-xs text-gray-600 mt-0.5 capitalize">{session.paymentType === 'free' ? 'Free Session' : `Paid (Rs. ${session.price})`}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
     );
 };
 

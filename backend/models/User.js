@@ -1,76 +1,42 @@
-const fs = require('fs');
-const path = require('path');
 
-const dataFile = path.join(__dirname, '../data.json');
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/database');
 
-const readData = () => {
-  const data = fs.readFileSync(dataFile, 'utf8');
-  return JSON.parse(data);
-};
-
-const writeData = (data) => {
-  fs.writeFileSync(dataFile, JSON.stringify(data, null, 2));
-};
-
-class User {
-  static async create(email, fullname, password, role) {
-    const data = readData();
-    const newUser = {
-      id: data.users.length + 1,
-      email,
-      fullname,
-      password,
-      role,
-      avatar: null,
-      bio: '',
-      verified: false,
-      phone: null,
-      location: null,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    };
-    data.users.push(newUser);
-    writeData(data);
-    return newUser;
-  }
-
-  static async findByEmail(email) {
-    const data = readData();
-    return data.users.find(u => u.email === email);
-  }
-
-  static async findById(id) {
-    const data = readData();
-    const user = data.users.find(u => u.id === id);
-    if (user) {
-      const { password, ...userWithoutPassword } = user;
-      return userWithoutPassword;
-    }
-    return user;
-  }
-
-  static async update(id, updateData) {
-    const data = readData();
-    const userIndex = data.users.findIndex(u => u.id === id);
-    if (userIndex !== -1) {
-      data.users[userIndex] = {
-        ...data.users[userIndex],
-        ...updateData,
-        updated_at: new Date().toISOString()
-      };
-      writeData(data);
-      return data.users[userIndex];
-    }
-    return null;
-  }
-
-  static async getAll() {
-    const data = readData();
-    return data.users.map(user => {
-      const { password, ...userWithoutPassword } = user;
-      return userWithoutPassword;
-    });
-  }
-}
+const User = sequelize.define('User', {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+  email: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true,
+  },
+  fullname: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  password: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  role: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  avatar: DataTypes.STRING,
+  bio: DataTypes.TEXT,
+  verified: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+  },
+  phone: DataTypes.STRING,
+  location: DataTypes.STRING,
+}, {
+  timestamps: true,
+  createdAt: 'created_at',
+  updatedAt: 'updated_at',
+});
 
 module.exports = User;

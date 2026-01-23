@@ -210,6 +210,60 @@ export const apiService = {
       return { success: false };
     }
   },
+
+  // Posts
+  async getTeacherPosts(teacherId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/posts/teacher/${teacherId}`);
+      return await response.json();
+    } catch (error) {
+      console.error('Get posts error:', error);
+      return [];
+    }
+  },
+
+  async createPost(postData) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/posts`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(postData),
+      });
+      return await response.json();
+    } catch (error) {
+      console.error('Create post error:', error);
+      return null;
+    }
+  },
+
+  async updatePost(postId, postData) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/posts/${postId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(postData),
+      });
+      if (response.status === 403) {
+        return { error: 'Edit time limit exceeded (30 minutes)' };
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Update post error:', error);
+      return null;
+    }
+  },
+
+  async deletePost(postId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/posts/${postId}`, {
+        method: 'DELETE',
+      });
+      return await response.json();
+    } catch (error) {
+      console.error('Delete post error:', error);
+      return { success: false };
+    }
+  }
 };
 
 export default apiService;

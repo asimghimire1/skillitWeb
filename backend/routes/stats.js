@@ -7,8 +7,8 @@ const Content = require('../models/Content');
 router.get('/teacher/:teacherId', async (req, res) => {
     try {
         const teacherId = req.params.teacherId;
-        const sessions = await Session.findByTeacher(teacherId);
-        const contents = await Content.findByTeacher(teacherId);
+        const sessions = await Session.findAll({ where: { teacherId } });
+        const contents = await Content.findAll({ where: { teacherId } });
 
         // Calculate Stats
         const totalStudents = new Set(sessions.map(s => s.learnerId)).size;

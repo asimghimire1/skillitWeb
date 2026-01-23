@@ -41,6 +41,20 @@
       "location": null,
       "created_at": "2026-01-21T03:33:17.265Z",
       "updated_at": "2026-01-21T03:33:17.265Z"
+    },
+    {
+      "id": 4,
+      "email": "rohit@gmail.com",
+      "fullname": "Rohit Shrestha",
+      "password": "$2a$10$0zSDz/1oI5iP2fD6qCtTrO.3fyBb.J46Fm3D1/9BPIEA7QADTwJ5W",
+      "role": "teacher",
+      "avatar": null,
+      "bio": "",
+      "verified": false,
+      "phone": null,
+      "location": null,
+      "created_at": "2026-01-23T02:07:29.937Z",
+      "updated_at": "2026-01-23T02:07:29.937Z"
     }
   ],
   "skills": [],

@@ -97,6 +97,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/content', contentRoutes);
 app.use('/api/sessions', sessionRoutes);
 app.use('/api/stats', statsRoutes);
+app.use('/api/posts', require('./routes/posts'));
 
 // Health Check Route
 app.get('/api/health', (req, res) => {
@@ -146,17 +147,26 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 5000;
 const HOST = process.env.HOST || 'localhost';
 
-app.listen(PORT, HOST, () => {
-  console.log('\n' + '='.repeat(50));
-  console.log('Backend Server Started Successfully');
-  console.log('='.repeat(50));
-  console.log(`Server running on: http://${HOST}:${PORT}`);
-  console.log(`Uploads folder: /uploads`);
-  console.log(`Images folder: /uploads/images`);
-  console.log(`Avatars folder: /uploads/avatars`);
-  console.log(`Skills folder: /uploads/skills`);
-  console.log(`API Health: http://${HOST}:${PORT}/api/health`);
-  console.log('='.repeat(50) + '\n');
-});
+const sequelize = require('./config/database');
+
+sequelize.sync({ alter: true })
+  .then(() => {
+    app.listen(PORT, HOST, () => {
+      console.log('\n' + '='.repeat(50));
+      console.log('Backend Server Started Successfully');
+      console.log('='.repeat(50));
+      console.log(`Server running on: http://${HOST}:${PORT}`);
+      console.log(`Uploads folder: /uploads`);
+      console.log(`Images folder: /uploads/images`);
+      console.log(`Avatars folder: /uploads/avatars`);
+      console.log(`Skills folder: /uploads/skills`);
+      console.log(`API Health: http://${HOST}:${PORT}/api/health`);
+      console.log('='.repeat(50) + '\n');
+    });
+  })
+  .catch((err) => {
+    console.error('Failed to sync database:', err);
+    process.exit(1);
+  });
 
 module.exports = app;

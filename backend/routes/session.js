@@ -15,7 +15,7 @@ router.post('/', async (req, res) => {
 // GET /api/sessions/teacher/:teacherId
 router.get('/teacher/:teacherId', async (req, res) => {
     try {
-        const sessions = await Session.findByTeacher(req.params.teacherId);
+        const sessions = await Session.findAll({ where: { teacherId: req.params.teacherId } });
         res.json(sessions);
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -25,9 +25,10 @@ router.get('/teacher/:teacherId', async (req, res) => {
 // PUT /api/sessions/:id
 router.put('/:id', async (req, res) => {
     try {
-        const session = await Session.update(req.params.id, req.body);
-        if (session) {
-            res.json(session);
+        const [updated] = await Session.update(req.body, { where: { id: req.params.id } });
+        if (updated) {
+            const updatedSession = await Session.findByPk(req.params.id);
+            res.json(updatedSession);
         } else {
             res.status(404).json({ message: 'Session not found' });
         }
@@ -39,7 +40,7 @@ router.put('/:id', async (req, res) => {
 // DELETE /api/sessions/:id
 router.delete('/:id', async (req, res) => {
     try {
-        const deleted = await Session.delete(req.params.id);
+        const deleted = await Session.destroy({ where: { id: req.params.id } });
         if (deleted) {
             res.json({ message: 'Session deleted successfully' });
         } else {
