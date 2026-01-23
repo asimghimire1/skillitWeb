@@ -9,20 +9,22 @@ const ContentView = ({ uploads, onUpload, onAction, teacher }) => {
 
     return (
         <div>
-            <div className="flex items-center justify-between mb-8">
-                <div>
-                    <h2 className="text-2xl font-bold text-[#ea2a33]">My Content</h2>
-                    <p className="text-gray-500 mt-1">Manage your video lessons and materials.</p>
+            <div className="page-header">
+                <div className="page-header-content">
+                    <h2>My Content</h2>
+                    <p>Manage your video lessons and materials.</p>
                 </div>
                 <button className="btn-premium btn-primary" onClick={onUpload} style={{ width: 'auto' }}>
                     <span className="material-symbols-outlined">add</span> Upload New
                 </button>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="content-grid">
                 {libraryContent.length === 0 ? (
-                    <div className="col-span-full">
+                    <div style={{ gridColumn: '1 / -1' }}>
                         <div className="empty-state">
-                            <span className="material-symbols-outlined empty-state-icon">cloud_upload</span>
+                            <div className="empty-state-icon">
+                                <span className="material-symbols-outlined" style={{ fontSize: '1.5rem' }}>cloud_upload</span>
+                            </div>
                             <p className="empty-state-text">No content library found.</p>
                         </div>
                     </div>

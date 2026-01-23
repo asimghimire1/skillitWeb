@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PremiumDatePicker from './PremiumDatePicker';
 import PremiumTimePicker from './PremiumTimePicker';
+import '../css/teacher.css';
 
 const CounterOfferModal = ({ isOpen, onClose, onSend, bid }) => {
     const [price, setPrice] = useState('');
@@ -40,12 +41,12 @@ const CounterOfferModal = ({ isOpen, onClose, onSend, bid }) => {
                 {/* Header */}
                 <div className="p-8 border-b border-gray-100 flex items-center justify-between shrink-0">
                     <div>
-                        <h2 className="text-2xl font-black text-[#171112] tracking-tight">Counter Offer</h2>
-                        <p className="text-sm text-[#876467] font-medium mt-1">Propose a new price or time</p>
+                        <h2 className="modal-title">Counter Offer</h2>
+                        <p className="modal-subtitle">Propose a new price or time</p>
                     </div>
                     <button
                         onClick={onClose}
-                        className="p-2 rounded-full hover:bg-gray-100 transition-colors text-[#876467]"
+                        className="modal-close-btn"
                     >
                         <span className="material-symbols-outlined">close</span>
                     </button>
@@ -53,47 +54,48 @@ const CounterOfferModal = ({ isOpen, onClose, onSend, bid }) => {
 
                 <div className="flex-1 overflow-y-auto p-8 space-y-8">
                     {/* Bid Context */}
-                    <div className="bg-[#fcf8f8] border border-primary/10 rounded-2xl p-5 flex items-center justify-between">
+                    <div className="counter-offer-bid-card">
                         <div className="flex items-center gap-4">
                             <div
-                                className="size-12 rounded-full bg-cover bg-center border-2 border-white shadow-sm"
+                                className="counter-offer-avatar"
                                 style={{ backgroundImage: `url('${bid.studentAvatar}')` }}
                             ></div>
                             <div>
-                                <p className="text-[10px] font-black text-[#876467] uppercase tracking-widest">Student's Bid</p>
+                                <p className="counter-offer-label">Student's Bid</p>
                                 <p className="text-lg font-black text-primary">{bid.bidAmount}</p>
                             </div>
                         </div>
                         <div className="text-right">
-                            <p className="text-[10px] font-black text-[#876467] uppercase tracking-widest">Skill</p>
-                            <p className="text-sm font-bold text-[#171112]">{bid.skillName}</p>
+                            <p className="counter-offer-label">Skill</p>
+                            <p className="counter-offer-value">{bid.skillName}</p>
                         </div>
                     </div>
 
                     {/* Form Fields */}
                     <div className="space-y-6">
                         <div className="space-y-2">
-                            <label className="text-sm font-bold text-[#171112]">Your Counter Offer (NPR)</label>
-                            <div className="relative">
+                            <label className="modal-label">Your Counter Offer (NPR)</label>
+                            <div className="upload-price-input-wrapper">
                                 <span className="absolute left-5 top-1/2 -translate-y-1/2 font-black text-gray-400">Rs.</span>
                                 <input
-                                    className="w-full pl-12 bg-[#f8f6f6] border-none rounded-2xl focus:ring-2 focus:ring-primary/20 px-5 py-4 text-sm font-black text-[#171112]"
+                                    className="upload-price-input"
                                     type="number"
                                     placeholder="0.00"
                                     value={price}
                                     onChange={(e) => setPrice(e.target.value)}
                                 />
                             </div>
-                            <p className="text-[10px] text-[#876467] font-medium">
+                            <p className="counter-offer-hint">
                                 <span className="text-primary font-black uppercase tracking-tighter mr-1">Pro Tip:</span>
                                 Stay within 15% of the original bid for better acceptance.
                             </p>
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-sm font-bold text-[#171112]">Message to Student</label>
+                            <label className="modal-label">Message to Student</label>
                             <textarea
-                                className="w-full bg-[#f8f6f6] border-none rounded-2xl focus:ring-2 focus:ring-primary/20 px-5 py-4 text-sm font-medium transition-all text-[#171112] placeholder:text-gray-400 min-h-[120px]"
+                                className="modal-textarea"
+                                style={{ minHeight: '120px' }}
                                 placeholder="Explain your proposal..."
                                 value={message}
                                 onChange={(e) => setMessage(e.target.value)}
@@ -101,7 +103,7 @@ const CounterOfferModal = ({ isOpen, onClose, onSend, bid }) => {
                         </div>
 
                         {/* <div className="space-y-3">
-                            <label className="text-sm font-bold text-[#171112]">Alternative Date & Time (Optional)</label>
+                            <label className="modal-label">Alternative Date & Time (Optional)</label>
                             <div className="grid grid-cols-2 gap-4">
                                 <PremiumDatePicker
                                     value={date}
@@ -119,7 +121,7 @@ const CounterOfferModal = ({ isOpen, onClose, onSend, bid }) => {
                 </div>
 
                 {/* Footer */}
-                <div className="p-8 border-t border-gray-100 bg-[#fcfafa] shrink-0">
+                <div className="modal-footer">
                     <div className="flex flex-col sm:flex-row gap-3">
                         <button
                             type="button"

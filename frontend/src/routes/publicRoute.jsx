@@ -1,14 +1,34 @@
 import React from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const PublicRoute = () => {
-  const token = localStorage.getItem('authToken');
+  const { isAuthenticated, isLoading, user } = useAuth();
   const location = useLocation();
 
-  // Allow access to login and register pages regardless of auth status
-  // Redirect to / (landing) only for other public routes if already authenticated
-  if (token && location.pathname !== '/login' && location.pathname !== '/register') {
-    return <Navigate to="/" replace />;
+  // Show loading while checking auth
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#ea2a33]"></div>
+      </div>
+    );
+  }
+
+  // If authenticated and trying to access login/register, redirect to appropriate dashboard
+  if (isAuthenticated && (location.pathname === '/login' || location.pathname === '/register')) {
+    // Get redirect destination from state or default based on role
+    const from = location.state?.from?.pathname;
+    
+    if (from) {
+      return <Navigate to={from} replace />;
+    }
+    
+    // Redirect based on user role
+    if (user?.role === 'teacher' || user?.role === 'mentor') {
+      return <Navigate to="/private/Teacher" replace />;
+    }
+    return <Navigate to="/private/Home" replace />;
   }
 
   return <Outlet />;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useToast } from '../../context/ToastContext';
 import SessionListItem from './SessionListItem';
 import ContentCard from './ContentCard';
@@ -19,11 +19,58 @@ import {
     VideoIcon
 } from 'lucide-react';
 
-const DashboardView = ({ stats, uploads, sessions, posts, quickActions, onAction, teacher }) => {
+const DashboardView = ({ stats, uploads, sessions, posts, quickActions, onAction, teacher, onSessionStatusUpdate }) => {
     const { showToast } = useToast();
-    // Use the passed posts, sorted by newest first
-    const recentPosts = [...(posts || [])].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    // Use the passed posts, sorted by newest first - show only 2 latest
+    const recentPosts = [...(posts || [])].sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 2);
     const recentUploads = uploads.filter(u => u.category !== 'Announcements').sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+    // Track clicked session links
+    const [clickedSessions, setClickedSessions] = useState(() => {
+        const saved = localStorage.getItem('clickedSessions');
+        return saved ? JSON.parse(saved) : [];
+    });
+
+    // Filter sessions - only show upcoming sessions that haven't passed by 30 mins
+    const getFilteredSessions = () => {
+        const now = new Date();
+        return sessions.filter(session => {
+            const sessionDateTime = new Date(`${session.scheduledDate}T${session.scheduledTime}`);
+            const timeDiff = (now - sessionDateTime) / (1000 * 60); // difference in minutes
+            
+            // If session is more than 30 mins past, it should be moved to sessions view
+            if (timeDiff > 30) {
+                // Mark as missed or completed based on whether link was clicked
+                const wasClicked = clickedSessions.includes(session.id);
+                if (onSessionStatusUpdate && session.status !== 'completed' && session.status !== 'missed') {
+                    onSessionStatusUpdate(session.id, wasClicked ? 'completed' : 'missed');
+                }
+                return false;
+            }
+            return true;
+        }).sort((a, b) => {
+            const dateA = new Date(`${a.scheduledDate}T${a.scheduledTime}`);
+            const dateB = new Date(`${b.scheduledDate}T${b.scheduledTime}`);
+            return dateA - dateB; // Sort by nearest first
+        });
+    };
+
+    const upcomingSessions = getFilteredSessions().slice(0, 1); // Only show 1 latest session
+
+    // Handle session link click
+    const handleSessionLinkClick = (sessionId) => {
+        const updated = [...clickedSessions, sessionId];
+        setClickedSessions(updated);
+        localStorage.setItem('clickedSessions', JSON.stringify(updated));
+    };
+
+    // Check sessions every minute
+    useEffect(() => {
+        const interval = setInterval(() => {
+            getFilteredSessions(); // This will trigger status updates for expired sessions
+        }, 60000);
+        return () => clearInterval(interval);
+    }, [sessions, clickedSessions]);
 
     const statCards = [
         { icon: <Users size={24} />, label: 'Total Students', value: 0, color: '#886364' },
@@ -36,7 +83,7 @@ const DashboardView = ({ stats, uploads, sessions, posts, quickActions, onAction
 
     return (
         <>
-            <div className="stats-grid">
+            <div className="dashboard-stats-grid dashboard-section">
                 {statCards.map((stat, idx) => (
                     <div key={idx} className="stat-card hover-lift">
                         <div className="stat-icon-wrapper" style={{ backgroundColor: `${stat.color}10` }}>
@@ -50,77 +97,77 @@ const DashboardView = ({ stats, uploads, sessions, posts, quickActions, onAction
                 ))}
             </div>
 
-            <div className="quick-actions-section" style={{ marginBottom: '3rem' }}>
+            <div className="quick-actions-section dashboard-section">
                 <h2 className="section-title" style={{ marginBottom: '2rem' }}>Quick Actions</h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="quick-actions-grid">
                     {quickActions.map((action, idx) => (
                         <div
                             key={idx}
-                            className="bg-white p-10 rounded-[40px] border border-[#e5dcdc] hover:border-[#ea2a33]/30 transition-all hover:shadow-2xl hover:-translate-y-2 cursor-pointer group flex flex-col items-start"
+                            className="quick-action-card"
                             onClick={action.action}
                         >
-                            <div className="size-16 rounded-full bg-[#ea2a33] flex items-center justify-center mb-8 shadow-lg shadow-[#ea2a33]/20 group-hover:scale-110 transition-transform duration-300">
-                                <div className="text-white">
-                                    {typeof action.icon === 'string' ? (
-                                        <span className="material-symbols-outlined text-3xl">{action.icon}</span>
-                                    ) : (
-                                        action.icon
-                                    )}
-                                </div>
+                            <div className="quick-action-icon">
+                                {typeof action.icon === 'string' ? (
+                                    <span className="material-symbols-outlined" style={{ fontSize: '1.875rem' }}>{action.icon}</span>
+                                ) : (
+                                    action.icon
+                                )}
                             </div>
-                            <h3 className="text-xl font-black text-[#181111] mb-3">{action.title}</h3>
-                            <p className="text-xs text-[#886364] leading-relaxed font-medium">
-                                {action.desc}
-                            </p>
+                            <h3 className="quick-action-title">{action.title}</h3>
+                            <p className="quick-action-desc">{action.desc}</p>
                         </div>
                     ))}
                 </div>
             </div>
 
             {/* Side-by-Side: Recent Posts & Upcoming Sessions */}
-            <div className="grid grid-cols-1 md:grid-cols-[3fr_2fr] gap-8" style={{ marginBottom: '2.5rem' }}>
+            <div className="dashboard-main-grid dashboard-section">
                 {/* Recent Posts */}
-                <div className="bg-white rounded-[40px] border border-[#e5dcdc] overflow-hidden flex flex-col h-full">
-                    <div className="flex justify-between items-center px-8 py-4 border-b border-gray-50 bg-[#fafafa]/30">
-                        <h2 className="text-lg font-black text-[#181111]">Recent Posts</h2>
-                        <button className="flex items-center gap-1 text-[10px] font-black text-[#886364] hover:text-[#ea2a33] transition-colors" onClick={() => onAction('posts')}>
+                <div className="dashboard-card">
+                    <div className="dashboard-card-header">
+                        <h2 className="dashboard-card-title">Recent Posts</h2>
+                        <button className="view-all-link" onClick={() => onAction('posts')}>
                             View All <ArrowRight size={12} strokeWidth={3} />
                         </button>
                     </div>
 
-                    <div className="p-8 flex-grow flex flex-col justify-center">
+                    <div className="dashboard-card-body">
                         {recentPosts.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center py-6 text-center">
-                                <div className="size-14 rounded-full bg-white shadow-[0_10px_30px_-10px_rgba(0,0,0,0.1)] flex items-center justify-center mb-4">
-                                    <Sparkles size={24} className="text-[#ea2a33]" />
+                            <div className="empty-state">
+                                <div className="empty-state-icon">
+                                    <Sparkles size={24} />
                                 </div>
-                                <h3 className="text-xl font-black text-[#181111] mb-2">No Posts Yet</h3>
-                                <p className="text-[10px] text-[#886364] max-w-[300px] leading-relaxed font-medium">
+                                <h3 className="empty-state-title">No Posts Yet</h3>
+                                <p className="empty-state-text">
                                     Share your first update or tip with your students.
                                 </p>
                             </div>
                         ) : (
-                            <div className="space-y-4">
-                                {recentPosts.slice(0, 1).map((post, idx) => (
-                                    <div key={idx} className="bg-white p-5 rounded-[32px] shadow-sm border border-[#e5dcdc] relative group">
-                                        <div className="flex items-center gap-3 mb-3">
+                            <div className={`posts-list-grid ${recentPosts.length === 1 ? 'single-post' : ''}`}>
+                                {recentPosts.map((post, idx) => (
+                                    <div key={idx} className="post-card" style={{ margin: 0 }}>
+                                        <div className="post-card-header">
                                             <div
-                                                className="w-10 h-10 rounded-full bg-gray-200 bg-cover bg-center shrink-0 border border-gray-100"
+                                                className="post-avatar"
                                                 style={{
                                                     backgroundImage: `url('${teacher?.profilePicture || "https://ui-avatars.com/api/?name=" + (teacher?.fullname || teacher?.fullName || "Teacher") + "&background=ea2a33&color=fff"}')`
                                                 }}
                                             />
                                             <div>
-                                                <div className="flex items-center gap-2">
-                                                    <span className="font-bold text-[#181111] text-xs">{teacher?.fullname || teacher?.fullName || 'Teacher'}</span>
-                                                    <span className="bg-[#ffe5e7] text-[#ea2a33] text-[8px] font-black px-1.5 py-0.5 rounded-full tracking-wider uppercase">Teacher</span>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                    <span className="post-author-name">{teacher?.fullname || teacher?.fullName || 'Teacher'}</span>
+                                                    <span className="post-teacher-badge">Teacher</span>
                                                 </div>
-                                                <span className="text-[#886364] text-[10px] block">{new Date(post.created_at).toLocaleDateString()}</span>
+                                                <span className="post-date">{new Date(post.created_at).toLocaleDateString()}</span>
                                             </div>
                                         </div>
-                                        <p className="text-[#564e4e] text-xs leading-relaxed line-clamp-2">
-                                            {post.content}
-                                        </p>
+                                        <p className="post-content" style={{ 
+                                            overflow: 'hidden', 
+                                            textOverflow: 'ellipsis', 
+                                            display: '-webkit-box', 
+                                            WebkitLineClamp: 3, 
+                                            WebkitBoxOrient: 'vertical' 
+                                        }}>{post.content}</p>
                                     </div>
                                 ))}
                             </div>
@@ -129,30 +176,31 @@ const DashboardView = ({ stats, uploads, sessions, posts, quickActions, onAction
                 </div>
 
                 {/* Upcoming Sessions */}
-                <div className="bg-white rounded-[40px] border border-[#e5dcdc] overflow-hidden flex flex-col h-full">
-                    <div className="flex justify-between items-center px-8 py-4 border-b border-gray-50 bg-[#fafafa]/30">
-                        <h2 className="text-lg font-black text-[#181111]">Upcoming Sessions</h2>
-                        <button className="flex items-center gap-1 text-[10px] font-black text-[#886364] hover:text-[#ea2a33] transition-colors" onClick={() => onAction('sessions')}>
+                <div className="dashboard-card">
+                    <div className="dashboard-card-header">
+                        <h2 className="dashboard-card-title">Upcoming Sessions</h2>
+                        <button className="view-all-link" onClick={() => onAction('sessions')}>
                             View All <ArrowRight size={12} strokeWidth={3} />
                         </button>
                     </div>
-                    <div className="p-8 flex-grow flex flex-col justify-center">
-                        {sessions.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center py-6 text-center">
-                                <div className="size-14 rounded-full bg-white shadow-[0_10px_30px_-10px_rgba(0,0,0,0.1)] flex items-center justify-center mb-4">
-                                    <Calendar size={24} className="text-[#ea2a33]" />
+                    <div className="dashboard-card-body">
+                        {upcomingSessions.length === 0 ? (
+                            <div className="empty-state">
+                                <div className="empty-state-icon">
+                                    <Calendar size={24} />
                                 </div>
-                                <h3 className="text-xl font-black text-[#181111] mb-2">No Sessions Yet</h3>
-                                <button className="text-[10px] font-black text-[#ea2a33] hover:underline" onClick={() => onAction('session')}>Create Session</button>
+                                <h3 className="empty-state-title">No Sessions Yet</h3>
+                                <button className="empty-state-link" onClick={() => onAction('session')}>Create Session</button>
                             </div>
                         ) : (
-                            <div className="space-y-3">
-                                {sessions.slice(0, 2).map((session, idx) => (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                                {upcomingSessions.map((session, idx) => (
                                     <SessionItemWithDetails
                                         key={session.id || idx}
                                         session={session}
                                         onAction={onAction}
                                         compact={true}
+                                        onLinkClick={handleSessionLinkClick}
                                     />
                                 ))}
                             </div>
@@ -162,22 +210,22 @@ const DashboardView = ({ stats, uploads, sessions, posts, quickActions, onAction
             </div>
 
             {/* Latest Bid Requests Section */}
-            <div className="bg-white rounded-[40px] border border-[#e5dcdc] overflow-hidden" style={{ marginBottom: '2.5rem' }}>
-                <div className="flex justify-between items-center px-10 py-4 border-b border-gray-50 bg-[#fafafa]/30">
-                    <h2 className="text-lg font-black text-[#181111]">Latest Bid Requests</h2>
-                    <button className="flex items-center gap-1 text-[10px] font-black text-[#886364] hover:text-[#ea2a33] transition-colors" onClick={() => onAction('bids')}>
+            <div className="dashboard-card dashboard-section">
+                <div className="dashboard-card-header" style={{ padding: '1rem 2.5rem' }}>
+                    <h2 className="dashboard-card-title">Latest Bid Requests</h2>
+                    <button className="view-all-link" onClick={() => onAction('bids')}>
                         View All <ArrowRight size={14} strokeWidth={3} />
                     </button>
                 </div>
 
-                <div className="px-10 py-6">
+                <div style={{ padding: '1.5rem 2.5rem' }}>
                     {bidRequests.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center py-6 text-center">
-                            <div className="size-14 rounded-full bg-white shadow-[0_10px_30px_-10px_rgba(0,0,0,0.1)] flex items-center justify-center mb-4 transform hover:scale-105 transition-transform duration-500">
-                                <Banknote size={24} className="text-[#ea2a33]" />
+                        <div className="empty-state">
+                            <div className="empty-state-icon">
+                                <Banknote size={24} />
                             </div>
-                            <h3 className="text-xl font-black text-[#181111] mb-2">No Bids Yet</h3>
-                            <p className="text-[10px] text-[#886364] max-w-[320px] leading-relaxed font-medium">
+                            <h3 className="empty-state-title">No Bids Yet</h3>
+                            <p className="empty-state-text">
                                 Your active sessions will appear here once students start bidding.
                             </p>
                         </div>
@@ -185,35 +233,35 @@ const DashboardView = ({ stats, uploads, sessions, posts, quickActions, onAction
                         <div className="bids-grid">
                             {bidRequests.map((bid) => (
                                 <div key={bid.id} className="bid-card">
-                                    <div className="flex justify-between items-center">
-                                        <div className="flex items-center gap-4">
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                                             <div className="bid-student-avatar" style={{ backgroundImage: `url('${bid.avatar}')` }}></div>
                                             <div>
-                                                <h4 className="font-bold text-base">{bid.studentName}</h4>
-                                                <div className="flex items-center gap-1 text-xs text-[#886364]">
+                                                <h4 className="bid-student-name">{bid.studentName}</h4>
+                                                <div className="bid-time">
                                                     <History size={10} />
                                                     {bid.timeAgo}
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="text-right">
-                                            <span className="text-[10px] font-bold uppercase tracking-wider text-[#886364]">Requested Skill</span>
-                                            <p className="text-sm font-bold text-primary">{bid.skill}</p>
+                                        <div style={{ textAlign: 'right' }}>
+                                            <span className="bid-skill-label">Requested Skill</span>
+                                            <p className="bid-skill-value">{bid.skill}</p>
                                         </div>
                                     </div>
                                     <div className="bid-info-box">
                                         <div>
-                                            <p className="text-xs text-[#886364] mb-1">Base Price: <span className="line-through">${bid.basePrice.toFixed(2)}</span></p>
-                                            <div className="flex items-baseline gap-2">
+                                            <p className="bid-base-price">Base Price: <span style={{ textDecoration: 'line-through' }}>${bid.basePrice.toFixed(2)}</span></p>
+                                            <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem' }}>
                                                 <span className="bid-price">${bid.bidAmount.toFixed(2)}</span>
                                                 <span className="bid-trend">
                                                     <TrendingUp size={12} /> +{bid.increase}%
                                                 </span>
                                             </div>
                                         </div>
-                                        <div className="flex gap-2">
-                                            <button className="btn-premium btn-secondary text-xs" onClick={() => showToast('Inquiry sent to Sarah', 'info')}>Decline</button>
-                                            <button className="btn-premium btn-primary text-xs" onClick={() => showToast('Bid accepted! Preparing session...', 'success')}>Accept Bid</button>
+                                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                            <button className="btn-premium btn-secondary" onClick={() => showToast('Inquiry sent to Sarah', 'info')}>Decline</button>
+                                            <button className="btn-premium btn-primary" onClick={() => showToast('Bid accepted! Preparing session...', 'success')}>Accept Bid</button>
                                         </div>
                                     </div>
                                 </div>
@@ -225,20 +273,22 @@ const DashboardView = ({ stats, uploads, sessions, posts, quickActions, onAction
 
             {/* Recent Uploads Section - At the bottom */}
             <div className="uploads-section" style={{ marginBottom: '2rem' }}>
-                <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-xl font-black text-[#181111]">Recent Uploads</h2>
-                    <button className="text-xs font-bold text-[#ea2a33] hover:text-[#c91d2b] transition-colors" onClick={() => onAction('content')}>View All Library</button>
+                <div className="uploads-section-header">
+                    <h2 className="section-title">Recent Uploads</h2>
+                    <button className="view-all-btn" onClick={() => onAction('content')}>View All Library</button>
                 </div>
                 {recentUploads.length === 0 ? (
-                    <div className="bg-white rounded-[40px] border border-[#e5dcdc] p-10 flex flex-col items-center justify-center text-center">
-                        <div className="size-14 rounded-full bg-gray-50 flex items-center justify-center mb-4">
-                            <CloudUpload size={28} className="text-gray-300" />
+                    <div className="dashboard-card" style={{ padding: '2.5rem', textAlign: 'center' }}>
+                        <div className="empty-state">
+                            <div className="empty-state-icon" style={{ backgroundColor: '#f9f9f9' }}>
+                                <CloudUpload size={28} style={{ color: '#ccc' }} />
+                            </div>
+                            <p className="empty-state-text">No content uploaded yet</p>
+                            <button className="empty-state-link" style={{ marginTop: '0.5rem' }} onClick={() => onAction('upload')}>Upload Now</button>
                         </div>
-                        <p className="text-sm font-medium text-[#886364]">No content uploaded yet</p>
-                        <button className="text-xs font-bold text-[#ea2a33] mt-2 hover:underline" onClick={() => onAction('upload')}>Upload Now</button>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div className="recent-uploads-grid">
                         {recentUploads.slice(0, 3).map((upload, idx) => (
                             <ContentCard
                                 key={idx}
@@ -254,59 +304,66 @@ const DashboardView = ({ stats, uploads, sessions, posts, quickActions, onAction
     );
 };
 
-const SessionItemWithDetails = ({ session, onAction, compact }) => {
+const SessionItemWithDetails = ({ session, onAction, compact, onLinkClick }) => {
     const [isExpanded, setIsExpanded] = useState(false);
+
+    const handleJoinClick = (e) => {
+        e.stopPropagation();
+        if (session.meetingLink) {
+            if (onLinkClick) {
+                onLinkClick(session.id);
+            }
+            window.open(session.meetingLink, '_blank');
+        } else {
+            onAction('session');
+        }
+    };
 
     if (compact) {
         return (
-            <div className="bg-white rounded-[24px] border border-gray-100 p-4 shadow-sm hover:shadow-md transition-all group">
-                <div className="flex justify-between items-start mb-4">
-                    <div>
-                        <h4 className="font-black text-sm text-[#181111]">{session.title}</h4>
-                        <p className="text-[10px] text-[#ea2a33] font-bold mt-1">
-                            {session.scheduledDate === new Date().toLocaleDateString() ? 'Today' : session.scheduledDate}, {session.scheduledTime}
-                        </p>
+            <div className="session-item-compact" style={{ textAlign: 'left' }}>
+                <div className="session-item-compact-top" style={{ alignItems: 'flex-start' }}>
+                    <div className="session-item-compact-header" style={{ width: '100%' }}>
+                        <div style={{ textAlign: 'left' }}>
+                            <h4 className="session-item-compact-title" style={{ textAlign: 'left' }}>{session.title}</h4>
+                            <p className="session-item-compact-date" style={{ textAlign: 'left' }}>
+                                {session.scheduledDate === new Date().toLocaleDateString() ? 'Today' : session.scheduledDate}, {session.scheduledTime}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="session-item-compact-actions" style={{ justifyContent: 'flex-start' }}>
+                        <button
+                            className="session-join-btn-sm"
+                            onClick={handleJoinClick}
+                        >
+                            <VideoIcon size={14} />
+                            Join Session
+                        </button>
+                        <button
+                            className={`session-details-btn ${isExpanded ? 'active' : ''}`}
+                            onClick={() => setIsExpanded(!isExpanded)}
+                        >
+                            {isExpanded ? 'Hide' : 'Details'}
+                        </button>
                     </div>
                 </div>
 
-                <div className="flex gap-2">
-                    <button
-                        className="flex-grow py-2 bg-[#ea2a33] text-white text-[10px] font-black rounded-xl hover:bg-[#c91d2b] transition-all flex items-center justify-center gap-1.5"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            if (session.meetingLink) {
-                                window.open(session.meetingLink, '_blank');
-                            } else {
-                                onAction('session');
-                            }
-                        }}
-                    >
-                        <VideoIcon size={14} />
-                        Join Session
-                    </button>
-                    <button
-                        className={`px-3 py-2 border rounded-xl text-[10px] font-bold transition-all ${isExpanded ? 'bg-gray-100 border-gray-200 text-gray-700' : 'border-[#e5dcdc] text-[#886364] hover:bg-gray-50'}`}
-                        onClick={() => setIsExpanded(!isExpanded)}
-                    >
-                        {isExpanded ? 'Hide' : 'Details'}
-                    </button>
-                </div>
-
                 {isExpanded && (
-                    <div className="mt-4 pt-3 border-t border-gray-50 animate-fade-in">
-                        <div className="grid grid-cols-2 gap-3 text-[10px]">
+                    <div className="session-expanded-details" style={{ textAlign: 'left' }}>
+                        <div className="session-details-grid">
                             <div>
-                                <p className="font-bold text-gray-400 uppercase tracking-tighter mb-1">Duration</p>
-                                <p className="text-gray-600 font-medium">{session.duration} mins</p>
+                                <p className="session-detail-label">Duration</p>
+                                <p className="session-detail-value">{session.duration} mins</p>
                             </div>
                             <div>
-                                <p className="font-bold text-gray-400 uppercase tracking-tighter mb-1">Type</p>
-                                <p className="text-gray-600 font-medium capitalize">{session.paymentType || 'Free'}</p>
+                                <p className="session-detail-label">Type</p>
+                                <p className="session-detail-value" style={{ textTransform: 'capitalize' }}>{session.paymentType || 'Free'}</p>
                             </div>
                             {session.notes && (
-                                <div className="col-span-2">
-                                    <p className="font-bold text-gray-400 uppercase tracking-tighter mb-1">Notes</p>
-                                    <p className="text-gray-600 font-medium line-clamp-2">{session.notes}</p>
+                                <div style={{ gridColumn: 'span 2' }}>
+                                    <p className="session-detail-label">Notes</p>
+                                    <p className="session-detail-value" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{session.notes}</p>
                                 </div>
                             )}
                         </div>
@@ -317,28 +374,28 @@ const SessionItemWithDetails = ({ session, onAction, compact }) => {
     }
 
     return (
-        <div className="bg-white rounded-2xl border border-[#e5dcdc] hover:border-primary/20 transition-all overflow-hidden group">
-            <div className="p-4 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                    <div className="size-10 rounded-xl bg-[#f4f0f0] flex items-center justify-center text-primary group-hover:bg-primary/10 transition-colors">
+        <div className="session-item-full">
+            <div style={{ padding: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <div className="session-icon-wrapper">
                         <Calendar size={18} />
                     </div>
                     <div>
-                        <h4 className="font-bold text-sm text-[#181111]">{session.title}</h4>
-                        <p className="text-[10px] text-[#886364] mt-0.5">{session.scheduledDate} • {session.scheduledTime}</p>
+                        <h4 className="session-item-compact-title">{session.title}</h4>
+                        <p className="session-item-compact-date" style={{ color: 'var(--text-secondary)', marginTop: '0.125rem' }}>{session.scheduledDate} • {session.scheduledTime}</p>
                     </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     {session.meetingLink && (
-                        <a href={session.meetingLink} target="_blank" rel="noopener noreferrer" className="size-8 rounded-lg bg-[#ea2a33] text-white flex items-center justify-center hover:bg-[#c91d2b] transition-all shadow-sm shadow-red-500/20">
+                        <a href={session.meetingLink} target="_blank" rel="noopener noreferrer" className="session-action-btn primary">
                             <VideoIcon size={16} />
                         </a>
                     )}
-                    <button className="size-8 rounded-lg hover:bg-gray-50 flex items-center justify-center text-[#d1c1c2] hover:text-primary transition-all" onClick={() => onAction('editSession', session)}>
+                    <button className="session-action-btn" onClick={() => onAction('editSession', session)}>
                         <Edit size={16} />
                     </button>
                     <button
-                        className={`size-8 rounded-lg hover:bg-gray-50 flex items-center justify-center transition-all ${isExpanded ? 'text-primary bg-primary/5' : 'text-[#d1c1c2]'}`}
+                        className={`session-action-btn ${isExpanded ? 'active' : ''}`}
                         onClick={() => setIsExpanded(!isExpanded)}
                         title="View Details"
                     >
@@ -349,20 +406,20 @@ const SessionItemWithDetails = ({ session, onAction, compact }) => {
 
             {/* Expanded Details */}
             {isExpanded && (
-                <div className="px-4 pb-4 pt-0 animate-fade-in">
-                    <div className="pt-3 border-t border-gray-100 grid grid-cols-2 gap-4">
+                <div style={{ padding: '0 1rem 1rem 1rem' }}>
+                    <div style={{ paddingTop: '0.75rem', borderTop: '1px solid #f3f4f6', display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' }}>
                         <div>
-                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Description</p>
-                            <p className="text-xs text-gray-600 mt-1">{session.notes || session.description || 'No description provided'}</p>
+                            <p className="session-detail-label">Description</p>
+                            <p className="session-detail-value" style={{ marginTop: '0.25rem' }}>{session.notes || session.description || 'No description provided'}</p>
                         </div>
-                        <div className="space-y-2">
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                             <div>
-                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Duration</p>
-                                <p className="text-xs text-gray-600 mt-0.5">{session.duration} minutes</p>
+                                <p className="session-detail-label">Duration</p>
+                                <p className="session-detail-value" style={{ marginTop: '0.125rem' }}>{session.duration} minutes</p>
                             </div>
                             <div>
-                                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Type</p>
-                                <p className="text-xs text-gray-600 mt-0.5 capitalize">{session.paymentType === 'free' ? 'Free Session' : `Paid (Rs. ${session.price})`}</p>
+                                <p className="session-detail-label">Type</p>
+                                <p className="session-detail-value" style={{ marginTop: '0.125rem', textTransform: 'capitalize' }}>{session.paymentType === 'free' ? 'Free Session' : `Paid (Rs. ${session.price})`}</p>
                             </div>
                         </div>
                     </div>

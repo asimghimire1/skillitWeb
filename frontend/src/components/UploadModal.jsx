@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useToast } from '../context/ToastContext';
 import PremiumDropdown from './PremiumDropdown';
 import '../css/upload-modal.css';
+import '../css/teacher.css';
 
 export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) {
   const { showToast } = useToast();
@@ -162,22 +163,22 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
         {/* Header - Fixed */}
         <div className="p-8 border-b border-gray-100 flex items-center justify-between bg-white shrink-0">
           <div>
-            <h2 className="text-2xl font-black text-[#171112] tracking-tight">Upload Content</h2>
+            <h2 className="modal-title">Upload Content</h2>
             <div className="flex items-center gap-4 mt-2">
               <div className="flex items-center gap-2">
-                <div className="size-6 rounded-full bg-primary text-white flex items-center justify-center text-[10px] font-black">1</div>
-                <span className="text-xs font-bold text-[#171112]">Upload</span>
+                <div className="upload-step-indicator active">1</div>
+                <span className="upload-step-label active">Upload</span>
               </div>
               <div className="w-8 h-px bg-gray-200"></div>
               <div className="flex items-center gap-2">
-                <div className={`size-6 rounded-full flex items-center justify-center text-[10px] font-black ${file ? 'bg-primary text-white' : 'bg-gray-100 text-[#876467]'}`}>2</div>
-                <span className={`text-xs font-bold ${file ? 'text-[#171112]' : 'text-[#876467]'}`}>Details</span>
+                <div className={`upload-step-indicator ${file ? 'active' : 'inactive'}`}>2</div>
+                <span className={`upload-step-label ${file ? 'active' : 'inactive'}`}>Details</span>
               </div>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-full hover:bg-gray-100 transition-colors text-[#876467]"
+            className="modal-close-btn"
           >
             <span className="material-symbols-outlined">close</span>
           </button>
@@ -195,18 +196,18 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
                   Step 1: Media Asset
                 </h3>
                 <div
-                  className={`border-2 border-dashed rounded-3xl p-10 transition-all cursor-pointer flex flex-col items-center text-center gap-4 ${isDragging ? 'border-primary bg-primary/5' : 'border-[#e5dcdc] bg-[#f8f6f6] hover:bg-gray-100'}`}
+                  className={`upload-dropzone ${isDragging ? 'dragging' : ''}`}
                   onDragOver={handleDragOver}
                   onDragLeave={handleDragLeave}
                   onDrop={handleDrop}
                   onClick={() => document.getElementById('file-input').click()}
                 >
-                  <div className="size-16 rounded-2xl bg-white shadow-sm flex items-center justify-center text-primary">
+                  <div className="upload-icon-wrapper">
                     <span className="material-symbols-outlined text-3xl">cloud_upload</span>
                   </div>
                   <div>
-                    <p className="text-sm font-black text-[#171112]">Click to upload or drag and drop</p>
-                    <p className="text-xs text-[#876467] mt-1 font-medium">MP4, MOV (Max 500MB)</p>
+                    <p className="upload-dropzone-title">Click to upload or drag and drop</p>
+                    <p className="upload-dropzone-subtitle">MP4, MOV (Max 500MB)</p>
                   </div>
                   <input
                     id="file-input"
@@ -220,7 +221,7 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
                   <div className="flex items-center justify-between bg-primary/5 border border-primary/10 p-3 rounded-2xl animate-fade-in">
                     <div className="flex items-center gap-3">
                       <span className="material-symbols-outlined text-primary">check_circle</span>
-                      <span className="text-xs font-bold text-[#171112] truncate max-w-[200px]">{file.name}</span>
+                      <span className="upload-file-preview">{file.name}</span>
                     </div>
                     <button
                       className="text-[10px] font-black text-primary hover:underline"
@@ -240,10 +241,10 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
                 </h3>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-[#171112]">Content Title</label>
+                  <label className="modal-label">Content Title</label>
                   <input
                     type="text"
-                    className="w-full bg-[#f8f6f6] border-none rounded-2xl focus:ring-2 focus:ring-primary/20 px-5 py-4 text-sm font-medium transition-all text-[#171112] placeholder:text-gray-400"
+                    className="modal-input"
                     placeholder="e.g. Advanced Portrait Lighting Masterclass"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
@@ -251,9 +252,10 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-[#171112]">Description</label>
+                  <label className="modal-label">Description</label>
                   <textarea
-                    className="w-full bg-[#f8f6f6] border-none rounded-2xl focus:ring-2 focus:ring-primary/20 px-5 py-4 text-sm font-medium transition-all text-[#171112] placeholder:text-gray-400 min-h-[120px]"
+                    className="modal-textarea"
+                    style={{ minHeight: '120px' }}
                     placeholder="What will your students learn?"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
@@ -262,7 +264,7 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
 
                 <div className="grid grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-[#171112]">Category</label>
+                    <label className="modal-label">Category</label>
                     <PremiumDropdown
                       options={[
                         { value: 'Technology', label: 'Technology', icon: 'devices' },
@@ -280,7 +282,7 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-[#171112]">Level</label>
+                    <label className="modal-label">Level</label>
                     <PremiumDropdown
                       options={[
                         { value: 'Beginner', label: 'Beginner', icon: 'signal_cellular_1_bar' },
@@ -295,15 +297,12 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
 
                 {/* Pricing Section */}
                 <div className="space-y-4">
-                  <label className="text-sm font-bold text-[#171112]">Pricing Model</label>
+                  <label className="modal-label">Pricing Model</label>
                   <div className="flex gap-4">
                     <button
                       type="button"
                       onClick={() => { setPaymentType('free'); setPrice(0); }}
-                      className={`flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl text-sm font-bold transition-all ${paymentType === 'free'
-                        ? 'bg-[#171112] text-white shadow-xl'
-                        : 'bg-[#f8f6f6] text-[#876467] hover:bg-gray-200'
-                        }`}
+                      className={`upload-pricing-btn ${paymentType === 'free' ? 'active' : 'inactive'}`}
                     >
                       <span className="material-symbols-outlined text-lg">volunteer_activism</span>
                       Free
@@ -311,10 +310,7 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
                     <button
                       type="button"
                       onClick={() => setPaymentType('bid')}
-                      className={`flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl text-sm font-bold transition-all ${paymentType === 'bid'
-                        ? 'bg-[#171112] text-white shadow-xl'
-                        : 'bg-[#f8f6f6] text-[#876467] hover:bg-gray-200'
-                        }`}
+                      className={`upload-pricing-btn ${paymentType === 'bid' ? 'active' : 'inactive'}`}
                     >
                       <span className="material-symbols-outlined text-lg">gavel</span>
                       Bidding
@@ -323,11 +319,11 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
 
                   {paymentType === 'bid' && (
                     <div className="space-y-2 animate-fade-in">
-                      <label className="text-sm font-bold text-[#171112]">Starting Price (NPR)</label>
-                      <div className="relative">
+                      <label className="modal-label">Starting Price (NPR)</label>
+                      <div className="upload-price-input-wrapper">
                         <span className="absolute left-5 top-1/2 -translate-y-1/2 font-black text-gray-400">Rs.</span>
                         <input
-                          className="w-full pl-12 bg-[#f8f6f6] border-none rounded-2xl focus:ring-2 focus:ring-primary/20 px-5 py-4 text-sm font-black text-[#171112]"
+                          className="upload-price-input"
                           type="number"
                           value={price}
                           onChange={(e) => setPrice(e.target.value)}
@@ -346,14 +342,14 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
                     Step 3: Thumbnail (Optional)
                   </h3>
                   <div
-                    className={`border-2 border-dashed rounded-3xl p-8 transition-all cursor-pointer flex flex-col items-center text-center gap-3 ${isThumbnailDragging ? 'border-primary bg-primary/5' : 'border-[#e5dcdc] bg-[#f8f6f6] hover:bg-gray-100'}`}
+                    className={`upload-thumbnail-dropzone ${isThumbnailDragging ? 'dragging' : ''}`}
                     onDragOver={handleThumbnailDragOver}
                     onDragLeave={handleThumbnailDragLeave}
                     onDrop={handleThumbnailDrop}
                     onClick={() => document.getElementById('thumbnail-input').click()}
                   >
-                    <span className="material-symbols-outlined text-[#876467] text-3xl">add_photo_alternate</span>
-                    <p className="text-xs font-bold text-[#171112]">Click to add thumbnail</p>
+                    <span className="material-symbols-outlined upload-thumbnail-icon">add_photo_alternate</span>
+                    <p className="upload-thumbnail-title">Click to add thumbnail</p>
                     <input
                       id="thumbnail-input"
                       type="file"
@@ -363,7 +359,7 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
                     />
                   </div>
                   {thumbnail && (
-                    <p className="text-[10px] font-bold text-center text-[#876467]">
+                    <p className="upload-thumbnail-hint">
                       {thumbnail.name} selected
                     </p>
                   )}
@@ -372,8 +368,8 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
             </div>
 
             {/* Right: Preview Area */}
-            <div className="bg-[#fcfafa] rounded-3xl p-10 flex flex-col items-center justify-center sticky top-0 border border-[#f0e8e9]">
-              <div className="w-full max-w-[320px] bg-white rounded-[32px] overflow-hidden shadow-2xl border border-gray-100 transform rotate-1 scale-105">
+            <div className="upload-preview-section">
+              <div className="upload-preview-card">
                 <div className="aspect-video bg-black relative group">
                   {thumbnail ? (
                     <img src={URL.createObjectURL(thumbnail)} alt="preview" className="w-full h-full object-cover" />
@@ -396,22 +392,22 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
                 <div className="p-6 space-y-4">
                   <div className="flex justify-between items-start">
                     <div className="bg-primary/10 text-primary text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-wider">New Content</div>
-                    <div className="flex items-center gap-1 text-[#876467]">
+                    <div className="flex items-center gap-1 modal-text-secondary">
                       <span className="material-symbols-outlined text-xs">star</span>
                       <span className="text-[10px] font-black">4.9</span>
                     </div>
                   </div>
-                  <h4 className="text-lg font-black text-[#171112] line-clamp-1">{title || 'Your Content Title'}</h4>
-                  <p className="text-xs text-[#876467] line-clamp-2 leading-relaxed">
+                  <h4 className="upload-preview-title">{title || 'Your Content Title'}</h4>
+                  <p className="upload-preview-description">
                     {description || 'The description will appear here for your students to see...'}
                   </p>
                   <div className="pt-2 flex items-center gap-3">
-                    <div className="size-8 rounded-full bg-gray-200 bg-cover bg-center" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuBKp2LOu34hcxh7LHZsAo0cTXSQQIWtGnOKsCakyjNAKADpsFWBoK65kszWXCKc5P6Mpc65u7QLHq0ylGKYvV5JIMuoFkBWjCt44tmaCFXL1dXyb6XLbxBNSCO6KKlYUtyECgvK4V9I25fRHqluSissRVhzMHpIwVkvWEw06NOP-FuQ8LecRvSykV3aEWUY9LiUy-rfWAum9gt-h6ZrNAeSvte--O_n9RoeXwh1PzDxGlqPpmoC9KYQ2thKnwVO_2vnY997LNZRVoE')" }}></div>
-                    <span className="text-[11px] font-black text-[#171112]">{teacherName || 'Teacher'}</span>
+                    <div className="upload-preview-author-avatar" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuBKp2LOu34hcxh7LHZsAo0cTXSQQIWtGnOKsCakyjNAKADpsFWBoK65kszWXCKc5P6Mpc65u7QLHq0ylGKYvV5JIMuoFkBWjCt44tmaCFXL1dXyb6XLbxBNSCO6KKlYUtyECgvK4V9I25fRHqluSissRVhzMHpIwVkvWEw06NOP-FuQ8LecRvSykV3aEWUY9LiUy-rfWAum9gt-h6ZrNAeSvte--O_n9RoeXwh1PzDxGlqPpmoC9KYQ2thKnwVO_2vnY997LNZRVoE')" }}></div>
+                    <span className="upload-preview-author-name">{teacherName || 'Teacher'}</span>
                   </div>
                 </div>
               </div>
-              <p className="text-xs text-[#876467] font-medium mt-10 max-w-[280px] text-center italic">
+              <p className="upload-preview-hint">
                 This is a live preview of how your course will look to potential students.
               </p>
             </div>
@@ -419,11 +415,11 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
         </div>
 
         {/* Footer - Fixed */}
-        <div className="p-8 border-t border-gray-100 bg-[#fcfafa] shrink-0">
+        <div className="modal-footer">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
             <button
               onClick={handleDiscard}
-              className="text-sm font-black text-[#876467] hover:text-[#171112] transition-colors"
+              className="upload-cancel-btn"
             >
               Discard Changes
             </button>

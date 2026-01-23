@@ -11,6 +11,7 @@ import PostsView from '../../components/teacher/PostsView';
 import apiService from '../../services/apiService';
 import { useToast } from '../../context/ToastContext';
 import { useConfirm } from '../../context/ConfirmContext';
+import { useAuth } from '../../context/AuthContext';
 import {
   LayoutDashboard,
   ReceiptText,
@@ -24,8 +25,9 @@ import {
   UploadCloud,
   Video,
   FileEdit,
-  Settings,
-  Construction
+  Construction,
+  Menu,
+  X
 } from 'lucide-react';
 import '../../css/teacher.css';
 
@@ -33,9 +35,11 @@ export default function Teacher() {
   const navigate = useNavigate();
   const { showToast } = useToast();
   const { confirm } = useConfirm();
+  const { user, logout, isAuthenticated } = useAuth();
   const [teacher, setTeacher] = useState(null);
   const [isDark, setIsDark] = useState(false);
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Modal States
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
@@ -56,17 +60,16 @@ export default function Teacher() {
   const [posts, setPosts] = useState([]);
 
   useEffect(() => {
-    const userJson = localStorage.getItem('user');
-    if (!userJson) {
-      navigate('/public/Login');
+    // Use user from auth context instead of localStorage
+    if (!isAuthenticated || !user) {
       return;
     }
 
-    const user = JSON.parse(userJson);
-    if (user.role !== 'teacher') {
-      navigate('/private/Home');
+    if (user.role !== 'teacher' && user.role !== 'mentor') {
+      navigate('/private/Home', { replace: true });
       return;
     }
+    
     setTeacher(user);
 
     const darkMode = localStorage.getItem('darkMode') === 'true';
@@ -74,7 +77,7 @@ export default function Teacher() {
 
     // Fetch Data
     fetchDashboardData(user.id);
-  }, [navigate]);
+  }, [navigate, user, isAuthenticated]);
 
   const fetchDashboardData = async (teacherId) => {
     const statsData = await apiService.getTeacherStats(teacherId);
@@ -98,9 +101,23 @@ export default function Teacher() {
     if (postsData) setPosts(postsData);
   };
 
+  // Handle session status updates (missed/completed)
+  const handleSessionStatusUpdate = async (sessionId, status) => {
+    // Update local state
+    setSessions(prev => prev.map(session => 
+      session.id === sessionId ? { ...session, status } : session
+    ));
+    
+    // Optionally update on server
+    try {
+      await apiService.updateSession(sessionId, { status });
+    } catch (error) {
+      console.error('Failed to update session status:', error);
+    }
+  };
+
   const handleLogout = () => {
-    apiService.logout();
-    navigate('/public/Login');
+    logout(); // Use the auth context logout which handles navigation
   };
 
   const handleUploadContent = async (uploadData) => {
@@ -242,7 +259,7 @@ export default function Teacher() {
   return (
     <div className={`teacher-container ${isDark ? 'dark' : ''}`}>
       {/* Sidebar */}
-      <aside className="teacher-sidebar">
+      <aside className={`teacher-sidebar ${isMobileMenuOpen ? 'mobile-active' : ''}`}>
         <div className="sidebar-header" onClick={() => navigate('/private/Home')} style={{ cursor: 'pointer' }}>
           <div className="sidebar-logo">
             <img src="http://localhost:5000/uploads/images/logo.png" alt="Skillit Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
@@ -251,31 +268,35 @@ export default function Teacher() {
             <h1 className="sidebar-title">Skillit</h1>
             <p className="sidebar-subtitle">Teacher Pro</p>
           </div>
+          {/* Mobile Close Button */}
+          <button className="mobile-close-btn" onClick={() => setIsMobileMenuOpen(false)}>
+            <X size={24} />
+          </button>
         </div>
 
         <nav className="sidebar-nav">
-          <div className={`nav-item ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={() => setActiveTab('dashboard')}>
-            <LayoutDashboard size={20} className={activeTab === 'dashboard' ? 'text-[#ea2a33]' : 'text-[#886364]'} />
+          <div className={`nav-item ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={() => { setActiveTab('dashboard'); setIsMobileMenuOpen(false); }}>
+            <LayoutDashboard size={20} className={activeTab === 'dashboard' ? 'nav-icon-active' : 'nav-icon-inactive'} />
             Dashboard
           </div>
-          <div className={`nav-item ${activeTab === 'bids' ? 'active' : ''}`} onClick={() => setActiveTab('bids')}>
-            <ReceiptText size={20} className={activeTab === 'bids' ? 'text-[#ea2a33]' : 'text-[#886364]'} />
+          <div className={`nav-item ${activeTab === 'bids' ? 'active' : ''}`} onClick={() => { setActiveTab('bids'); setIsMobileMenuOpen(false); }}>
+            <ReceiptText size={20} className={activeTab === 'bids' ? 'nav-icon-active' : 'nav-icon-inactive'} />
             Bid Requests
           </div>
-          <div className={`nav-item ${activeTab === 'content' ? 'active' : ''}`} onClick={() => setActiveTab('content')}>
-            <SquarePlay size={20} className={activeTab === 'content' ? 'text-[#ea2a33]' : 'text-[#886364]'} />
+          <div className={`nav-item ${activeTab === 'content' ? 'active' : ''}`} onClick={() => { setActiveTab('content'); setIsMobileMenuOpen(false); }}>
+            <SquarePlay size={20} className={activeTab === 'content' ? 'nav-icon-active' : 'nav-icon-inactive'} />
             My Content
           </div>
-          <div className={`nav-item ${activeTab === 'sessions' ? 'active' : ''}`} onClick={() => setActiveTab('sessions')}>
-            <CalendarDays size={20} className={activeTab === 'sessions' ? 'text-[#ea2a33]' : 'text-[#886364]'} />
+          <div className={`nav-item ${activeTab === 'sessions' ? 'active' : ''}`} onClick={() => { setActiveTab('sessions'); setIsMobileMenuOpen(false); }}>
+            <CalendarDays size={20} className={activeTab === 'sessions' ? 'nav-icon-active' : 'nav-icon-inactive'} />
             Sessions
           </div>
-          <div className={`nav-item ${activeTab === 'posts' ? 'active' : ''}`} onClick={() => setActiveTab('posts')}>
-            <Megaphone size={20} className={activeTab === 'posts' ? 'text-[#ea2a33]' : 'text-[#886364]'} />
+          <div className={`nav-item ${activeTab === 'posts' ? 'active' : ''}`} onClick={() => { setActiveTab('posts'); setIsMobileMenuOpen(false); }}>
+            <Megaphone size={20} className={activeTab === 'posts' ? 'nav-icon-active' : 'nav-icon-inactive'} />
             Posts
           </div>
-          <div className={`nav-item ${activeTab === 'earnings' ? 'active' : ''}`} onClick={() => setActiveTab('earnings')}>
-            <Wallet size={20} className={activeTab === 'earnings' ? 'text-[#ea2a33]' : 'text-[#886364]'} />
+          <div className={`nav-item ${activeTab === 'earnings' ? 'active' : ''}`} onClick={() => { setActiveTab('earnings'); setIsMobileMenuOpen(false); }}>
+            <Wallet size={20} className={activeTab === 'earnings' ? 'nav-icon-active' : 'nav-icon-inactive'} />
             Earnings
           </div>
         </nav>
@@ -295,11 +316,19 @@ export default function Teacher() {
         </div>
       </aside>
 
+      {/* Mobile Overlay */}
+      {isMobileMenuOpen && (
+        <div className="sidebar-overlay" onClick={() => setIsMobileMenuOpen(false)} />
+      )}
+
       {/* Main Content */}
       <main className="teacher-main">
         {/* Navbar */}
         <header className="teacher-navbar">
           <div className="navbar-left">
+            <button className="mobile-menu-btn" onClick={() => setIsMobileMenuOpen(true)}>
+              <Menu size={24} />
+            </button>
             <h2 style={{ fontSize: '1.25rem', fontWeight: 600 }}>
               {activeTab === 'dashboard' && 'Dashboard'}
               {activeTab === 'bids' && 'Bid Requests'}
@@ -316,7 +345,7 @@ export default function Teacher() {
             </button>
             <div className="navbar-divider"></div>
             <div className="earnings-display">
-              <Coins size={20} className="text-[#ea2a33]" />
+              <Coins size={20} className="nav-icon-active" />
               <span>NPR {stats.monthlyEarnings.toLocaleString()}</span>
             </div>
           </div>
@@ -340,6 +369,7 @@ export default function Teacher() {
               quickActions={quickActions}
               onAction={handleQuickAction}
               teacher={teacher}
+              onSessionStatusUpdate={handleSessionStatusUpdate}
             />
           )}
 

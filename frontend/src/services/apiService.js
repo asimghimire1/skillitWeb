@@ -2,6 +2,18 @@
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
+// Helper function to handle 401 responses
+const handleUnauthorized = () => {
+  localStorage.removeItem('authToken');
+  localStorage.removeItem('userEmail');
+  localStorage.removeItem('userName');
+  localStorage.removeItem('userRole');
+  localStorage.removeItem('userId');
+  localStorage.removeItem('user');
+  // Dispatch a custom event that AuthContext can listen to
+  window.dispatchEvent(new CustomEvent('auth:unauthorized'));
+};
+
 export const apiService = {
   // Register a new user
   async register(email, fullname, password, role) {
@@ -78,6 +90,12 @@ export const apiService = {
         },
       });
 
+      // Handle unauthorized response
+      if (response.status === 401) {
+        handleUnauthorized();
+        return { success: false, message: 'Token expired or invalid' };
+      }
+
       const data = await response.json();
       return data;
     } catch (error) {
@@ -92,6 +110,8 @@ export const apiService = {
     localStorage.removeItem('userEmail');
     localStorage.removeItem('userName');
     localStorage.removeItem('userRole');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('user');
   },
 
   // Stats

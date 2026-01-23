@@ -1,130 +1,27 @@
-import { useForm } from "react-hook-form";
-import PremiumDropdown from "../../components/PremiumDropdown";
-import "../../css/product.css";
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 
-const Product = () => {
-  const {
-    register,
-    handleSubmit,
-    watch,
-    setValue,
-    formState: { errors },
-  } = useForm();
+export default function Product() {
+  const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuth();
 
-  const watchCategory = watch('category');
-
-  const productSave = (data) => {
-    console.log(data);
-  };
+  // Redirect teachers/mentors to Teacher dashboard
+  React.useEffect(() => {
+    if (isAuthenticated && user && (user.role === 'teacher' || user.role === 'mentor')) {
+      navigate('/private/Teacher', { replace: true });
+    }
+  }, [isAuthenticated, user, navigate]);
 
   return (
-    <div className="page">
-      <form className="product-form" onSubmit={handleSubmit(productSave)}>
-        <div className="form-header">
-          <h2>Add Product</h2>
-          <p>Enter product details below</p>
-        </div>
-
-        <div className="form-body">
-          {/* Product Name */}
-          <div className="field full">
-            <label>Product Name</label>
-            <input
-              {...register("productName", {
-                required: "Product name is required",
-              })}
-              type="text"
-              placeholder="Wireless Headphones"
-            />
-            {errors.productName && (
-              <span className="error">{errors.productName.message}</span>
-            )}
-          </div>
-
-          {/* Price */}
-          <div className="field">
-            <label>Price</label>
-            <input
-              {...register("price", { required: "Price is required" })}
-              type="number"
-              placeholder="1999"
-            />
-            {errors.price && (
-              <span className="error">{errors.price.message}</span>
-            )}
-          </div>
-
-          {/* Stock */}
-          <div className="field">
-            <label>Stock Quantity</label>
-            <input
-              {...register("stockQuantity", {
-                required: "Stock quantity is required",
-              })}
-              type="number"
-              placeholder="50"
-            />
-            {errors.stockQuantity && (
-              <span className="error">{errors.stockQuantity.message}</span>
-            )}
-          </div>
-
-          {/* Description */}
-          <div className="field full">
-            <label>Description</label>
-            <textarea
-              {...register("description", {
-                required: "Description is required",
-              })}
-              placeholder="Write a short product description..."
-            />
-            {errors.description && (
-              <span className="error">{errors.description.message}</span>
-            )}
-          </div>
-
-          {/* Image URL */}
-          <div className="field full">
-            <label>Image URL</label>
-            <input
-              {...register("imageUrl", {
-                required: "Image URL is required",
-              })}
-              type="text"
-              placeholder="https://example.com/image.jpg"
-            />
-            {errors.imageUrl && (
-              <span className="error">{errors.imageUrl.message}</span>
-            )}
-          </div>
-
-          {/* Category */}
-          <div className="field full">
-            <label>Category</label>
-            <div className="premium-select-container">
-              <PremiumDropdown
-                options={[
-                  { value: 'electronics', label: 'Electronics', icon: 'devices' },
-                  { value: 'fashion', label: 'Fashion', icon: 'checkroom' },
-                  { value: 'home', label: 'Home', icon: 'home' },
-                ]}
-                value={watchCategory}
-                onChange={(val) => setValue('category', val)}
-                placeholder="Select category"
-              />
-            </div>
-            {errors.category && (
-              <span className="error">{errors.category.message}</span>
-            )}
-          </div>
-        </div>
-
-        <div className="form-footer">
-          <button type="submit">Save Product</button>
-        </div>
-      </form>
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="text-center p-8">
+        <h1 className="text-2xl font-bold text-gray-800 mb-4">Student Dashboard</h1>
+        <p className="text-gray-600">Welcome to SkillIt!</p>
+        {user && (
+          <p className="text-gray-500 mt-2">Logged in as: {user.fullname || user.email}</p>
+        )}
+      </div>
     </div>
   );
-};
-
-export default Product;
+}

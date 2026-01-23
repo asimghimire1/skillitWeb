@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import PremiumDropdown from './PremiumDropdown';
 import PremiumDatePicker from './PremiumDatePicker';
 import PremiumTimePicker from './PremiumTimePicker';
+import '../css/teacher.css';
 
 export default function CreateSessionModal({ isOpen, onClose, onCreate, sessionToEdit = null }) {
     const [formData, setFormData] = useState({
@@ -63,14 +64,14 @@ export default function CreateSessionModal({ isOpen, onClose, onCreate, sessionT
                 {/* Header - Fixed */}
                 <div className="p-8 border-b border-gray-100 flex items-center justify-between bg-white shrink-0">
                     <div>
-                        <h2 className="text-2xl font-black text-[#171112] tracking-tight">
+                        <h2 className="modal-title">
                             {sessionToEdit ? 'Edit Session' : 'New Session'}
                         </h2>
-                        <p className="text-sm text-[#876467] font-medium mt-1">Fill in the details for your session</p>
+                        <p className="modal-subtitle">Fill in the details for your session</p>
                     </div>
                     <button
                         onClick={onClose}
-                        className="p-2 rounded-full hover:bg-gray-100 transition-colors text-[#876467]"
+                        className="modal-close-btn"
                     >
                         <span className="material-symbols-outlined">close</span>
                     </button>
@@ -88,9 +89,9 @@ export default function CreateSessionModal({ isOpen, onClose, onCreate, sessionT
                             </h3>
 
                             <div className="space-y-2">
-                                <label className="text-sm font-bold text-[#171112]">Session Title</label>
+                                <label className="modal-label">Session Title</label>
                                 <input
-                                    className="w-full bg-[#f8f6f6] border-none rounded-2xl focus:ring-2 focus:ring-primary/20 px-5 py-4 text-sm font-medium transition-all text-[#171112] placeholder:text-gray-400"
+                                    className="modal-input"
                                     placeholder="e.g. Master React Architecture"
                                     type="text"
                                     name="title"
@@ -102,7 +103,7 @@ export default function CreateSessionModal({ isOpen, onClose, onCreate, sessionT
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
-                                    <label className="text-sm font-bold text-[#171112]">Date</label>
+                                    <label className="modal-label">Date</label>
                                     <PremiumDatePicker
                                         value={formData.scheduledDate}
                                         onChange={(val) => handleChange({ target: { name: 'scheduledDate', value: val } })}
@@ -110,7 +111,7 @@ export default function CreateSessionModal({ isOpen, onClose, onCreate, sessionT
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="text-sm font-bold text-[#171112]">Start Time</label>
+                                    <label className="modal-label">Start Time</label>
                                     <PremiumTimePicker
                                         value={formData.scheduledTime}
                                         onChange={(val) => handleChange({ target: { name: 'scheduledTime', value: val } })}
@@ -120,17 +121,14 @@ export default function CreateSessionModal({ isOpen, onClose, onCreate, sessionT
                             </div>
 
                             <div className="space-y-3">
-                                <label className="text-sm font-bold text-[#171112]">Duration</label>
+                                <label className="modal-label">Duration</label>
                                 <div className="grid grid-cols-4 gap-3">
                                     {[30, 60, 90, 120].map(mins => (
                                         <button
                                             key={mins}
                                             type="button"
                                             onClick={() => handleDurationChange(mins)}
-                                            className={`py-3 rounded-2xl text-xs font-black transition-all border-2 ${formData.duration === mins
-                                                ? 'border-primary bg-primary/5 text-primary shadow-sm'
-                                                : 'border-transparent bg-[#f8f6f6] text-[#876467] hover:bg-gray-200'
-                                                }`}
+                                            className={`session-modal-duration-btn ${formData.duration === mins ? 'active' : 'inactive'}`}
                                         >
                                             {mins}m
                                         </button>
@@ -148,7 +146,7 @@ export default function CreateSessionModal({ isOpen, onClose, onCreate, sessionT
 
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div className="space-y-2">
-                                    <label className="text-sm font-bold text-[#171112]">Platform</label>
+                                    <label className="modal-label">Platform</label>
                                     <div className="premium-select-container">
                                         <PremiumDropdown
                                             options={[
@@ -163,9 +161,9 @@ export default function CreateSessionModal({ isOpen, onClose, onCreate, sessionT
                                     </div>
                                 </div>
                                 <div className="md:col-span-2 space-y-2">
-                                    <label className="text-sm font-bold text-[#171112]">Meeting URL</label>
+                                    <label className="modal-label">Meeting URL</label>
                                     <input
-                                        className="w-full bg-[#f8f6f6] border-none rounded-2xl focus:ring-2 focus:ring-primary/20 px-5 py-4 text-sm font-medium text-[#171112] placeholder:text-gray-400"
+                                        className="modal-input"
                                         placeholder="https://meet.google.com/..."
                                         type="url"
                                         name="meetingLink"
@@ -188,10 +186,7 @@ export default function CreateSessionModal({ isOpen, onClose, onCreate, sessionT
                                 <button
                                     type="button"
                                     onClick={() => setFormData(prev => ({ ...prev, paymentType: 'free', price: 0 }))}
-                                    className={`flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl text-sm font-bold transition-all ${formData.paymentType === 'free'
-                                        ? 'bg-[#171112] text-white shadow-xl'
-                                        : 'bg-[#f8f6f6] text-[#876467] hover:bg-gray-200'
-                                        }`}
+                                    className={`upload-pricing-btn ${formData.paymentType === 'free' ? 'active' : 'inactive'}`}
                                 >
                                     <span className="material-symbols-outlined text-lg">volunteer_activism</span>
                                     Free
@@ -199,10 +194,7 @@ export default function CreateSessionModal({ isOpen, onClose, onCreate, sessionT
                                 <button
                                     type="button"
                                     onClick={() => setFormData(prev => ({ ...prev, paymentType: 'bid' }))}
-                                    className={`flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl text-sm font-bold transition-all ${formData.paymentType === 'bid'
-                                        ? 'bg-[#171112] text-white shadow-xl'
-                                        : 'bg-[#f8f6f6] text-[#876467] hover:bg-gray-200'
-                                        }`}
+                                    className={`upload-pricing-btn ${formData.paymentType === 'bid' ? 'active' : 'inactive'}`}
                                 >
                                     <span className="material-symbols-outlined text-lg">gavel</span>
                                     Bidding
@@ -211,11 +203,11 @@ export default function CreateSessionModal({ isOpen, onClose, onCreate, sessionT
 
                             {formData.paymentType === 'bid' && (
                                 <div className="space-y-2 animate-fade-in">
-                                    <label className="text-sm font-bold text-[#171112]">Starting Price (NPR)</label>
-                                    <div className="relative">
+                                    <label className="modal-label">Starting Price (NPR)</label>
+                                    <div className="upload-price-input-wrapper">
                                         <span className="absolute left-5 top-1/2 -translate-y-1/2 font-black text-gray-400">Rs.</span>
                                         <input
-                                            className="w-full pl-12 bg-[#f8f6f6] border-none rounded-2xl focus:ring-2 focus:ring-primary/20 px-5 py-4 text-sm font-black text-[#171112]"
+                                            className="upload-price-input"
                                             type="number"
                                             name="price"
                                             value={formData.price}
@@ -230,7 +222,7 @@ export default function CreateSessionModal({ isOpen, onClose, onCreate, sessionT
                     </div>
 
                     {/* Footer Actions - Fixed at bottom of form */}
-                    <div className="p-8 border-t border-gray-100 bg-[#fcfafa] shrink-0">
+                    <div className="modal-footer">
                         <div className="flex flex-col sm:flex-row gap-3">
                             <button
                                 type="button"

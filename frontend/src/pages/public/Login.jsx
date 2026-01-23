@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import '../../css/auth.css';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { apiService } from '../../services/apiService';
+import { useAuth } from '../../context/AuthContext';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -13,6 +13,8 @@ const loginSchema = z.object({
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { login } = useAuth();
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: zodResolver(loginSchema)
   });
@@ -28,8 +30,7 @@ const Login = () => {
     setLoginError('');
 
     try {
-      // Call backend API for login
-      const result = await apiService.login(data.email, data.password);
+      const result = await login(data.email, data.password);
 
       if (!result.success) {
         setLoginError(result.message || 'Invalid email or password');
@@ -37,19 +38,15 @@ const Login = () => {
         return;
       }
 
-      // Store token and user data in localStorage
-      localStorage.setItem('authToken', result.token);
-      localStorage.setItem('userEmail', result.user.email);
-      localStorage.setItem('userName', result.user.fullname);
-      localStorage.setItem('userRole', result.user.role);
-      localStorage.setItem('userId', result.user.id);
-      localStorage.setItem('user', JSON.stringify(result.user));
-
-      // Redirect to appropriate dashboard based on role
-      if (result.user.role === 'teacher' || result.user.role === 'mentor') {
-        navigate('/private/Teacher');
+      // Get redirect destination from location state or default based on role
+      const from = location.state?.from?.pathname;
+      
+      if (from) {
+        navigate(from, { replace: true });
+      } else if (result.user.role === 'teacher' || result.user.role === 'mentor') {
+        navigate('/private/Teacher', { replace: true });
       } else {
-        navigate('/private/Home');
+        navigate('/private/Home', { replace: true });
       }
     } catch (error) {
       console.error('Login error:', error);

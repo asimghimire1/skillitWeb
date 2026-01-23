@@ -6,6 +6,19 @@ const SessionListItem = ({ session, onCreate, onAction }) => {
     const month = date.toLocaleDateString(undefined, { month: 'short' }).toUpperCase();
     const year = date.getFullYear();
 
+    // Determine status badge
+    const getStatusBadge = () => {
+        if (session.status === 'completed') {
+            return { className: 'completed', text: '• Completed' };
+        }
+        if (session.status === 'missed') {
+            return { className: 'missed', text: '• Missed' };
+        }
+        return { className: 'scheduled', text: '• Scheduled' };
+    };
+
+    const statusBadge = getStatusBadge();
+
     return (
         <div className="session-card-v2">
             <div className="session-accent-bar"></div>
@@ -24,9 +37,9 @@ const SessionListItem = ({ session, onCreate, onAction }) => {
                         <span className="material-symbols-outlined text-sm">schedule</span>
                         {session.scheduledTime}
                     </div>
-                    <span className="text-[#d1c1c2]">•</span>
-                    <div className="session-status-badge scheduled">
-                        • Scheduled
+                    <span className="session-dot-separator">•</span>
+                    <div className={`session-status-badge ${statusBadge.className}`}>
+                        {statusBadge.text}
                     </div>
                 </div>
 
@@ -46,21 +59,21 @@ const SessionListItem = ({ session, onCreate, onAction }) => {
 
             {/* Actions Area */}
             <div className="session-actions-v2">
-                {session.meetingLink ? (
+                {session.meetingLink && session.status !== 'missed' && session.status !== 'completed' ? (
                     <a
                         href={session.meetingLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="bg-[#ea2a33] text-white px-10 py-3 rounded-2xl font-black text-sm hover:bg-[#d6252d] hover:shadow-xl hover:shadow-red-500/30 transition-all shadow-md shadow-red-500/20"
+                        className="session-join-btn"
                     >
                         Join
                     </a>
                 ) : (
-                    <button disabled className="bg-gray-100 text-[#876467] px-8 py-3 rounded-2xl font-black text-sm cursor-not-allowed">
-                        Join
+                    <button disabled className="session-join-btn">
+                        {session.status === 'completed' ? 'Done' : session.status === 'missed' ? 'Missed' : 'Join'}
                     </button>
                 )}
-                <div className="h-8 w-px bg-gray-100"></div>
+                <div style={{ height: '2rem', width: '1px', backgroundColor: '#f3f4f6' }}></div>
                 <button
                     className="action-icon-btn"
                     onClick={() => onAction('editSession', session)}

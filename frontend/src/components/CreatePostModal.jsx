@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import '../css/upload-modal.css'; // Reusing existing modal CSS
+import '../css/upload-modal.css';
+import '../css/teacher.css';
 
 export default function CreatePostModal({ isOpen, onClose, onCreate, postToEdit = null }) {
     const [content, setContent] = useState('');
@@ -45,14 +46,14 @@ export default function CreatePostModal({ isOpen, onClose, onCreate, postToEdit 
                 {/* Header */}
                 <div className="p-8 border-b border-gray-100 flex items-center justify-between shrink-0">
                     <div>
-                        <h2 className="text-2xl font-black text-[#171112] tracking-tight">
+                        <h2 className="modal-title">
                             {postToEdit ? 'Edit Post' : 'New Post'}
                         </h2>
-                        <p className="text-sm text-[#876467] font-medium mt-1">Share something with your students</p>
+                        <p className="modal-subtitle">Share something with your students</p>
                     </div>
                     <button
                         onClick={onClose}
-                        className="p-2 rounded-full hover:bg-gray-100 transition-colors text-[#876467]"
+                        className="modal-close-btn"
                     >
                         <span className="material-symbols-outlined">close</span>
                     </button>
@@ -61,9 +62,10 @@ export default function CreatePostModal({ isOpen, onClose, onCreate, postToEdit 
                 <form onSubmit={handleSubmit} className="flex-1 flex flex-col min-h-0">
                     <div className="flex-1 overflow-y-auto p-8 space-y-6">
                         <div className="space-y-2">
-                            <label className="text-sm font-bold text-[#171112]">What's on your mind?</label>
+                            <label className="modal-label">What's on your mind?</label>
                             <textarea
-                                className="w-full bg-[#f8f6f6] border-none rounded-2xl focus:ring-2 focus:ring-primary/20 px-5 py-4 text-sm font-medium transition-all text-[#171112] placeholder:text-gray-400 min-h-[200px]"
+                                className="modal-textarea"
+                                style={{ minHeight: '200px' }}
                                 value={content}
                                 onChange={(e) => setContent(e.target.value)}
                                 placeholder="Share updates, tips, or announcements..."
@@ -74,7 +76,7 @@ export default function CreatePostModal({ isOpen, onClose, onCreate, postToEdit 
                     </div>
 
                     {/* Footer */}
-                    <div className="p-8 border-t border-gray-100 bg-[#fcfafa] shrink-0">
+                    <div className="modal-footer">
                         <div className="flex flex-col sm:flex-row gap-3">
                             <button
                                 type="button"
