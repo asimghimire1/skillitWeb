@@ -6,6 +6,18 @@ const fs = require('fs');
 
 const upload = require('../middleware/upload');
 
+// GET /api/content - Get all content (for students)
+router.get('/', async (req, res) => {
+    try {
+        const contents = await Content.findAll({
+            order: [['created_at', 'DESC']]
+        });
+        res.json(contents);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 // POST /api/content
 router.post('/', upload.fields([
     { name: 'file', maxCount: 1 },

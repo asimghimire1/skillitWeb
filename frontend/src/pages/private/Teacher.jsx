@@ -59,6 +59,13 @@ export default function Teacher() {
   const [sessions, setSessions] = useState([]);
   const [posts, setPosts] = useState([]);
 
+  // Helper function to generate username URL
+  const getUsernameUrl = (userData) => {
+    if (!userData) return '/dashboard';
+    const fullname = userData.fullname || userData.fullName || '';
+    return '/' + fullname.toLowerCase().replace(/\s+/g, '');
+  };
+
   useEffect(() => {
     // Use user from auth context instead of localStorage
     if (!isAuthenticated || !user) {
@@ -66,7 +73,7 @@ export default function Teacher() {
     }
 
     if (user.role !== 'teacher' && user.role !== 'mentor') {
-      navigate('/private/Home', { replace: true });
+      navigate('/dashboard', { replace: true });
       return;
     }
     
@@ -260,7 +267,7 @@ export default function Teacher() {
     <div className={`teacher-container ${isDark ? 'dark' : ''}`}>
       {/* Sidebar */}
       <aside className={`teacher-sidebar ${isMobileMenuOpen ? 'mobile-active' : ''}`}>
-        <div className="sidebar-header" onClick={() => navigate('/private/Home')} style={{ cursor: 'pointer' }}>
+        <div className="sidebar-header" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
           <div className="sidebar-logo">
             <img src="http://localhost:5000/uploads/images/logo.png" alt="Skillit Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
           </div>

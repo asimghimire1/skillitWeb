@@ -31,4 +31,23 @@ router.get('/teacher/:teacherId', async (req, res) => {
     }
 });
 
+// GET /api/stats/student/:studentId
+router.get('/student/:studentId', async (req, res) => {
+    try {
+        const studentId = req.params.studentId;
+        
+        // For now, return default stats (can be enhanced later with real tracking)
+        res.json({
+            hoursLearned: 0,
+            sessionsAttended: 0,
+            contentWatched: 0,
+            credits: 1000, // Default starting credits
+            skillsMastered: 0,
+            dayStreak: 0
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 module.exports = router;

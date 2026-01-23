@@ -24,11 +24,17 @@ const PublicRoute = () => {
       return <Navigate to={from} replace />;
     }
     
+    // Generate username URL from full name
+    const getUsernameUrl = (userData) => {
+      const fullname = userData?.fullname || userData?.fullName || '';
+      return '/' + fullname.toLowerCase().replace(/\s+/g, '');
+    };
+    
     // Redirect based on user role
     if (user?.role === 'teacher' || user?.role === 'mentor') {
-      return <Navigate to="/private/Teacher" replace />;
+      return <Navigate to={getUsernameUrl(user)} replace />;
     }
-    return <Navigate to="/private/Home" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
 
   return <Outlet />;

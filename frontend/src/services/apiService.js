@@ -283,6 +283,269 @@ export const apiService = {
       console.error('Delete post error:', error);
       return { success: false };
     }
+  },
+
+  // ═══════════════════════════════════════════════════════════════
+  // STUDENT API FUNCTIONS
+  // ═══════════════════════════════════════════════════════════════
+
+  // Student Stats & Profile
+  async getStudentStats(studentId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/stats/student/${studentId}`);
+      const data = await response.json();
+      // Return mock data if API not ready
+      return data || {
+        hoursLearned: 0,
+        sessionsAttended: 0,
+        contentWatched: 0,
+        credits: 0
+      };
+    } catch (error) {
+      console.error('Get student stats error:', error);
+      return {
+        hoursLearned: 0,
+        sessionsAttended: 0,
+        contentWatched: 0,
+        credits: 0
+      };
+    }
+  },
+
+  async getStudentBalance(studentId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/students/${studentId}/balance`);
+      const data = await response.json();
+      return data?.credits || 0;
+    } catch (error) {
+      console.error('Get balance error:', error);
+      return 0;
+    }
+  },
+
+  async addCredits(studentId, amount) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/students/${studentId}/credits`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount }),
+      });
+      return await response.json();
+    } catch (error) {
+      console.error('Add credits error:', error);
+      return { success: false };
+    }
+  },
+
+  async deductCredits(studentId, amount) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/students/${studentId}/credits/deduct`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount }),
+      });
+      return await response.json();
+    } catch (error) {
+      console.error('Deduct credits error:', error);
+      return { success: false };
+    }
+  },
+
+  // Browse Content (from all teachers)
+  async getAvailableSessions(filters = {}) {
+    try {
+      const params = new URLSearchParams(filters).toString();
+      const response = await fetch(`${API_BASE_URL}/sessions${params ? `?${params}` : ''}`);
+      return await response.json();
+    } catch (error) {
+      console.error('Get available sessions error:', error);
+      return [];
+    }
+  },
+
+  async getSessionsByCategory(category) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/sessions/category/${category}`);
+      return await response.json();
+    } catch (error) {
+      console.error('Get sessions by category error:', error);
+      return [];
+    }
+  },
+
+  async getAllContent() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/content`);
+      return await response.json();
+    } catch (error) {
+      console.error('Get all content error:', error);
+      return [];
+    }
+  },
+
+  async getContentByCategory(category) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/content/category/${category}`);
+      return await response.json();
+    } catch (error) {
+      console.error('Get content by category error:', error);
+      return [];
+    }
+  },
+
+  async getTeachers() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/teachers`);
+      return await response.json();
+    } catch (error) {
+      console.error('Get teachers error:', error);
+      return [];
+    }
+  },
+
+  async getRecentPosts(limit = 2) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/posts?limit=${limit}`);
+      return await response.json();
+    } catch (error) {
+      console.error('Get recent posts error:', error);
+      return [];
+    }
+  },
+
+  async searchAll(query) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/search?q=${encodeURIComponent(query)}`);
+      return await response.json();
+    } catch (error) {
+      console.error('Search error:', error);
+      return { sessions: [], content: [], teachers: [] };
+    }
+  },
+
+  // Enrollment & Unlocking
+  async enrollSession(sessionId, studentId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/sessions/${sessionId}/enroll`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ studentId }),
+      });
+      return await response.json();
+    } catch (error) {
+      console.error('Enroll session error:', error);
+      return { success: false };
+    }
+  },
+
+  async unlockContent(contentId, studentId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/content/${contentId}/unlock`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ studentId }),
+      });
+      return await response.json();
+    } catch (error) {
+      console.error('Unlock content error:', error);
+      return { success: false };
+    }
+  },
+
+  async getStudentEnrollments(studentId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/students/${studentId}/enrollments`);
+      return await response.json();
+    } catch (error) {
+      console.error('Get enrollments error:', error);
+      return [];
+    }
+  },
+
+  async getStudentUnlockedContent(studentId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/students/${studentId}/content`);
+      return await response.json();
+    } catch (error) {
+      console.error('Get unlocked content error:', error);
+      return [];
+    }
+  },
+
+  // Student Bidding
+  async submitBid(bidData) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/bids`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(bidData),
+      });
+      return await response.json();
+    } catch (error) {
+      console.error('Submit bid error:', error);
+      return { success: false };
+    }
+  },
+
+  async getStudentBids(studentId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/bids/student/${studentId}`);
+      return await response.json();
+    } catch (error) {
+      console.error('Get student bids error:', error);
+      return [];
+    }
+  },
+
+  async respondToCounter(bidId, accept) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/bids/${bidId}/respond`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ accept }),
+      });
+      return await response.json();
+    } catch (error) {
+      console.error('Respond to counter error:', error);
+      return { success: false };
+    }
+  },
+
+  async cancelBid(bidId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/bids/${bidId}`, {
+        method: 'DELETE',
+      });
+      return await response.json();
+    } catch (error) {
+      console.error('Cancel bid error:', error);
+      return { success: false };
+    }
+  },
+
+  // Teacher Bid Requests (for teacher dashboard)
+  async getBidRequests(teacherId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/bids/teacher/${teacherId}`);
+      return await response.json();
+    } catch (error) {
+      console.error('Get bid requests error:', error);
+      return [];
+    }
+  },
+
+  async respondToBid(bidId, response) {
+    try {
+      const res = await fetch(`${API_BASE_URL}/bids/${bidId}/teacher-respond`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(response),
+      });
+      return await res.json();
+    } catch (error) {
+      console.error('Respond to bid error:', error);
+      return { success: false };
+    }
   }
 };
 

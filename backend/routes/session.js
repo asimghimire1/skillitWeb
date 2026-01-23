@@ -2,6 +2,18 @@ const express = require('express');
 const router = express.Router();
 const Session = require('../models/Session');
 
+// GET /api/sessions - Get all sessions (for students)
+router.get('/', async (req, res) => {
+    try {
+        const sessions = await Session.findAll({
+            order: [['scheduledDate', 'ASC'], ['scheduledTime', 'ASC']]
+        });
+        res.json(sessions);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 // POST /api/sessions
 router.post('/', async (req, res) => {
     try {

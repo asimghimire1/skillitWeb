@@ -1,11 +1,14 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 require('dotenv').config();
 
 const authRoutes = require('./routes/auth');
 const statsRoutes = require('./routes/stats');
 const sessionRoutes = require('./routes/session');
 const contentRoutes = require('./routes/content');
+const studentsRoutes = require('./routes/students');
+const bidsRoutes = require('./routes/bids');
 
 const app = express();
 
@@ -25,12 +28,17 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 
+// Serve static files from uploads directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/stats', statsRoutes);
 app.use('/api/sessions', sessionRoutes);
 app.use('/api/content', contentRoutes);
 app.use('/api/posts', require('./routes/posts'));
+app.use('/api/students', studentsRoutes);
+app.use('/api/bids', bidsRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

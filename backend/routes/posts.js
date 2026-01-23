@@ -2,6 +2,23 @@ const express = require('express');
 const router = express.Router();
 const Post = require('../models/Post');
 
+// GET /api/posts - Get all posts (for students)
+router.get('/', async (req, res) => {
+    try {
+        const limit = req.query.limit ? parseInt(req.query.limit) : null;
+        const options = {
+            order: [['created_at', 'DESC']]
+        };
+        if (limit) {
+            options.limit = limit;
+        }
+        const posts = await Post.findAll(options);
+        res.json(posts);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 // GET /api/posts/teacher/:teacherId
 router.get('/teacher/:teacherId', async (req, res) => {
     try {

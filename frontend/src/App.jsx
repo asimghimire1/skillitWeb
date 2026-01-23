@@ -7,6 +7,7 @@ import { AuthProvider } from './context/AuthContext';
 const Home = lazy(() => import('./pages/private/Home.jsx'));
 const Product = lazy(() => import('./pages/private/Product.jsx'));
 const Teacher = lazy(() => import('./pages/private/Teacher.jsx'));
+const Student = lazy(() => import('./pages/private/Student.jsx'));
 const Login = lazy(() => import('./pages/public/Login.jsx'));
 const Register = lazy(() => import('./pages/public/Register.jsx'));
 
@@ -40,11 +41,10 @@ function App() {
                   <Route path="/register" element={<Register />} />
                 </Route>
 
-                {/* Private Routes */}
+                {/* Private Routes - Dynamic username-based URLs */}
                 <Route element={<PrivateRoute />}>
-                  <Route path="/private/Home" element={<Product />} />
-                  <Route path="/private/Product" element={<Product />} />
-                  <Route path="/private/Teacher" element={<Teacher />} />
+                  <Route path="/:username" element={<Teacher />} />
+                  <Route path="/dashboard" element={<Product />} />
                 </Route>
 
                 {/* Catch All */}

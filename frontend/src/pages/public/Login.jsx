@@ -41,12 +41,18 @@ const Login = () => {
       // Get redirect destination from location state or default based on role
       const from = location.state?.from?.pathname;
       
+      // Generate username URL from full name
+      const getUsernameUrl = (userData) => {
+        const fullname = userData.fullname || userData.fullName || '';
+        return '/' + fullname.toLowerCase().replace(/\s+/g, '');
+      };
+      
       if (from) {
         navigate(from, { replace: true });
       } else if (result.user.role === 'teacher' || result.user.role === 'mentor') {
-        navigate('/private/Teacher', { replace: true });
+        navigate(getUsernameUrl(result.user), { replace: true });
       } else {
-        navigate('/private/Home', { replace: true });
+        navigate('/dashboard', { replace: true });
       }
     } catch (error) {
       console.error('Login error:', error);
