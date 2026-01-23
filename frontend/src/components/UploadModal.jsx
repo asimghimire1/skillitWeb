@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
+import { useToast } from '../context/ToastContext';
+import PremiumDropdown from './PremiumDropdown';
 import '../css/upload-modal.css';
 
 export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) {
+  const { showToast } = useToast();
   const [file, setFile] = useState(null);
   const [thumbnail, setThumbnail] = useState(null);
   const [title, setTitle] = useState('');
@@ -25,7 +28,7 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
         setTitle(selectedFile.name.replace(/\.[^/.]+$/, ''));
       }
     } else if (selectedFile) {
-      alert('Please select a video file.');
+      showToast('Please select a video file', 'error');
     }
   };
 
@@ -48,7 +51,7 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
         setTitle(droppedFile.name.replace(/\.[^/.]+$/, ''));
       }
     } else if (droppedFile) {
-      alert('Please select a video file.');
+      showToast('Please select a video file', 'error');
     }
   };
 
@@ -117,9 +120,10 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
 
       try {
         await onUpload(formData);
+        showToast('Content uploaded successfully', 'success');
       } catch (error) {
         console.error("Upload failed", error);
-        alert("Upload failed. Please try again.");
+        showToast("Upload failed. Please try again.", "error");
       } finally {
         setIsUploading(false);
         onClose();
@@ -150,348 +154,305 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
   if (!isOpen) return null;
 
   return (
-    <div className="upload-modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="upload-modal">
-        {/* Header */}
-        <div className="modal-header">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-md px-4" onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <div
+        className="bg-white w-full max-w-5xl rounded-3xl border border-[#e5dcdd] shadow-2xl animate-fade-in flex flex-col max-h-[90vh] overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header - Fixed */}
+        <div className="p-8 border-b border-gray-100 flex items-center justify-between bg-white shrink-0">
           <div>
-            <h1 className="modal-title">Upload Content</h1>
-            <div className="modal-steps">
-              <div className="step-item">
-                <div className="step-number">1</div>
-                <span className="step-label">Upload</span>
+            <h2 className="text-2xl font-black text-[#171112] tracking-tight">Upload Content</h2>
+            <div className="flex items-center gap-4 mt-2">
+              <div className="flex items-center gap-2">
+                <div className="size-6 rounded-full bg-primary text-white flex items-center justify-center text-[10px] font-black">1</div>
+                <span className="text-xs font-bold text-[#171112]">Upload</span>
               </div>
-              <div className="step-divider"></div>
-              <div className="step-item">
-                <div className={`step-number ${!file ? 'inactive' : ''}`}>2</div>
-                <span className={`step-label ${!file ? 'inactive' : ''}`}>Details</span>
+              <div className="w-8 h-px bg-gray-200"></div>
+              <div className="flex items-center gap-2">
+                <div className={`size-6 rounded-full flex items-center justify-center text-[10px] font-black ${file ? 'bg-primary text-white' : 'bg-gray-100 text-[#876467]'}`}>2</div>
+                <span className={`text-xs font-bold ${file ? 'text-[#171112]' : 'text-[#876467]'}`}>Details</span>
               </div>
             </div>
           </div>
-          <button className="modal-close-btn" onClick={onClose}>
+          <button
+            onClick={onClose}
+            className="p-2 rounded-full hover:bg-gray-100 transition-colors text-[#876467]"
+          >
             <span className="material-symbols-outlined">close</span>
           </button>
         </div>
 
-        {/* Content */}
-        <div className="modal-content">
-          {/* Left: Upload Form */}
-          <div className="modal-left">
-            <div className="modal-form-container">
+        {/* Scrollable Content Area */}
+        <div className="flex-1 overflow-y-auto p-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            {/* Left: Upload Form */}
+            <div className="space-y-8">
               {/* Upload Zone */}
-              <div>
-                <label className="upload-label">Step 1: Media Asset</label>
+              <div className="space-y-3">
+                <h3 className="text-xs font-black uppercase tracking-widest text-primary flex items-center gap-2">
+                  <span className="material-symbols-outlined text-sm">movie</span>
+                  Step 1: Media Asset
+                </h3>
                 <div
-                  className={`drag-drop-zone ${isDragging ? 'active' : ''}`}
+                  className={`border-2 border-dashed rounded-3xl p-10 transition-all cursor-pointer flex flex-col items-center text-center gap-4 ${isDragging ? 'border-primary bg-primary/5' : 'border-[#e5dcdc] bg-[#f8f6f6] hover:bg-gray-100'}`}
                   onDragOver={handleDragOver}
                   onDragLeave={handleDragLeave}
                   onDrop={handleDrop}
                   onClick={() => document.getElementById('file-input').click()}
                 >
-                  <div className="upload-icon-container">
-                    <span className="material-symbols-outlined upload-icon">cloud_upload</span>
+                  <div className="size-16 rounded-2xl bg-white shadow-sm flex items-center justify-center text-primary">
+                    <span className="material-symbols-outlined text-3xl">cloud_upload</span>
                   </div>
-                  <div className="upload-text">
-                    <p className="upload-title">Click to upload or drag and drop</p>
-                    <p className="upload-subtitle">MP4, MOV (Max 500MB)</p>
+                  <div>
+                    <p className="text-sm font-black text-[#171112]">Click to upload or drag and drop</p>
+                    <p className="text-xs text-[#876467] mt-1 font-medium">MP4, MOV (Max 500MB)</p>
                   </div>
-                  <button type="button" className="upload-button">
-                    Select Video
-                  </button>
                   <input
                     id="file-input"
                     type="file"
                     accept="video/*"
                     onChange={handleFileChange}
+                    className="hidden"
                   />
                 </div>
                 {file && (
-                  <div style={{ marginTop: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem' }}>
-                    <p className="upload-subtitle" style={{ margin: 0 }}>
-                      Selected: <strong>{file.name}</strong>
-                    </p>
+                  <div className="flex items-center justify-between bg-primary/5 border border-primary/10 p-3 rounded-2xl animate-fade-in">
+                    <div className="flex items-center gap-3">
+                      <span className="material-symbols-outlined text-primary">check_circle</span>
+                      <span className="text-xs font-bold text-[#171112] truncate max-w-[200px]">{file.name}</span>
+                    </div>
                     <button
-                      className="discard-btn"
-                      style={{ padding: '0.25rem 0.75rem', fontSize: '0.75rem' }}
+                      className="text-[10px] font-black text-primary hover:underline"
                       onClick={() => setFile(null)}
                     >
-                      Re-upload
+                      CHANGE
                     </button>
                   </div>
                 )}
               </div>
 
               {/* Details Section */}
-              <div className={!file ? 'form-section-dimmed' : ''}>
-                <label className="upload-label">Step 2: Information</label>
-                <div className="form-group">
-                  <label className="form-label">Content Title</label>
+              <div className={`space-y-6 transition-opacity duration-300 ${!file ? 'opacity-40 pointer-events-none' : 'opacity-100'}`}>
+                <h3 className="text-xs font-black uppercase tracking-widest text-primary flex items-center gap-2">
+                  <span className="material-symbols-outlined text-sm">edit_note</span>
+                  Step 2: Information
+                </h3>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-[#171112]">Content Title</label>
                   <input
                     type="text"
-                    className="form-input"
+                    className="w-full bg-[#f8f6f6] border-none rounded-2xl focus:ring-2 focus:ring-primary/20 px-5 py-4 text-sm font-medium transition-all text-[#171112] placeholder:text-gray-400"
                     placeholder="e.g. Advanced Portrait Lighting Masterclass"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    disabled={!file}
                   />
                 </div>
-                <div className="form-group">
-                  <label className="form-label">Description</label>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-[#171112]">Description</label>
                   <textarea
-                    className="form-textarea"
+                    className="w-full bg-[#f8f6f6] border-none rounded-2xl focus:ring-2 focus:ring-primary/20 px-5 py-4 text-sm font-medium transition-all text-[#171112] placeholder:text-gray-400 min-h-[120px]"
                     placeholder="What will your students learn?"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    disabled={!file}
                   ></textarea>
                 </div>
-                <div className="form-grid">
-                  <div className="form-group">
-                    <label className="form-label">Category</label>
-                    <div className="relative">
-                      <select
-                        className="form-select appearance-none pr-10 focus:ring-2 focus:ring-[#ea2a33] focus:border-transparent"
-                        value={category}
-                        onChange={(e) => setCategory(e.target.value)}
-                        disabled={!file}
-                      >
-                        <option>Technology</option>
-                        <option>Business</option>
-                        <option>Marketing</option>
-                        <option>Health & Fitness</option>
-                        <option>Design</option>
-                        <option>Culinary Arts</option>
-                        <option>Music</option>
-                        <option>Personal Development</option>
-                        <option>Other</option>
-                      </select>
-                      <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                        <span className="material-symbols-outlined text-[#876467] text-sm">expand_more</span>
-                      </div>
-                    </div>
+
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-[#171112]">Category</label>
+                    <PremiumDropdown
+                      options={[
+                        { value: 'Technology', label: 'Technology', icon: 'devices' },
+                        { value: 'Business', label: 'Business', icon: 'payments' },
+                        { value: 'Marketing', label: 'Marketing', icon: 'trending_up' },
+                        { value: 'Health & Fitness', label: 'Health & Fitness', icon: 'fitness_center' },
+                        { value: 'Design', label: 'Design', icon: 'palette' },
+                        { value: 'Culinary Arts', label: 'Culinary Arts', icon: 'restaurant' },
+                        { value: 'Music', label: 'Music', icon: 'music_note' },
+                        { value: 'Personal Development', label: 'Personal Development', icon: 'psychology' },
+                        { value: 'Other', label: 'Other', icon: 'more_horiz' },
+                      ]}
+                      value={category}
+                      onChange={setCategory}
+                    />
                   </div>
-                  {category === 'Other' && (
-                    <div className="form-group" style={{ gridColumn: 'span 2', marginTop: '-1.5rem' }}>
-                      <label className="form-label">Specify Category</label>
-                      <input
-                        type="text"
-                        className="form-input"
-                        placeholder="Type your category here..."
-                        value={customCategory}
-                        onChange={(e) => setCustomCategory(e.target.value)}
-                        required
-                      />
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-[#171112]">Level</label>
+                    <PremiumDropdown
+                      options={[
+                        { value: 'Beginner', label: 'Beginner', icon: 'signal_cellular_1_bar' },
+                        { value: 'Intermediate', label: 'Intermediate', icon: 'signal_cellular_3_bar' },
+                        { value: 'Expert', label: 'Expert', icon: 'signal_cellular_4_bar' },
+                      ]}
+                      value={level}
+                      onChange={setLevel}
+                    />
+                  </div>
+                </div>
+
+                {/* Pricing Section */}
+                <div className="space-y-4">
+                  <label className="text-sm font-bold text-[#171112]">Pricing Model</label>
+                  <div className="flex gap-4">
+                    <button
+                      type="button"
+                      onClick={() => { setPaymentType('free'); setPrice(0); }}
+                      className={`flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl text-sm font-bold transition-all ${paymentType === 'free'
+                        ? 'bg-[#171112] text-white shadow-xl'
+                        : 'bg-[#f8f6f6] text-[#876467] hover:bg-gray-200'
+                        }`}
+                    >
+                      <span className="material-symbols-outlined text-lg">volunteer_activism</span>
+                      Free
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPaymentType('bid')}
+                      className={`flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl text-sm font-bold transition-all ${paymentType === 'bid'
+                        ? 'bg-[#171112] text-white shadow-xl'
+                        : 'bg-[#f8f6f6] text-[#876467] hover:bg-gray-200'
+                        }`}
+                    >
+                      <span className="material-symbols-outlined text-lg">gavel</span>
+                      Bidding
+                    </button>
+                  </div>
+
+                  {paymentType === 'bid' && (
+                    <div className="space-y-2 animate-fade-in">
+                      <label className="text-sm font-bold text-[#171112]">Starting Price (NPR)</label>
+                      <div className="relative">
+                        <span className="absolute left-5 top-1/2 -translate-y-1/2 font-black text-gray-400">Rs.</span>
+                        <input
+                          className="w-full pl-12 bg-[#f8f6f6] border-none rounded-2xl focus:ring-2 focus:ring-primary/20 px-5 py-4 text-sm font-black text-[#171112]"
+                          type="number"
+                          value={price}
+                          onChange={(e) => setPrice(e.target.value)}
+                          min="0"
+                          placeholder="0.00"
+                        />
+                      </div>
                     </div>
                   )}
-                  <div className="form-group">
-                    <label className="form-label">Level</label>
-                    <div className="relative">
-                      <select
-                        className="form-select appearance-none pr-10 focus:ring-2 focus:ring-[#ea2a33] focus:border-transparent"
-                        value={level}
-                        onChange={(e) => setLevel(e.target.value)}
-                        disabled={!file}
-                      >
-                        <option>Beginner</option>
-                        <option>Intermediate</option>
-                        <option>Expert</option>
-                      </select>
-                      <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                        <span className="material-symbols-outlined text-[#876467] text-sm">expand_more</span>
-                      </div>
-                    </div>
-                  </div>
                 </div>
 
-                {/* Payment Options */}
-                <div className="form-group" style={{ marginTop: '1rem' }}>
-                  <label className="form-label">Payment Options</label>
-                  <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.9rem' }}>
-                      <input
-                        type="radio"
-                        name="paymentType"
-                        checked={paymentType === 'free'}
-                        onChange={() => { setPaymentType('free'); setPrice(0); }}
-                        disabled={!file}
-                      />
-                      Free Content
-                    </label>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.9rem' }}>
-                      <input
-                        type="radio"
-                        name="paymentType"
-                        checked={paymentType === 'bid'}
-                        onChange={() => setPaymentType('bid')}
-                        disabled={!file}
-                      />
-                      Enable Bidding
-                    </label>
-                  </div>
-                </div>
-
-                {paymentType === 'bid' && (
-                  <div className="form-group">
-                    <label className="form-label">Base Price (NPR)</label>
-                    <input
-                      type="number"
-                      className="form-input"
-                      placeholder="0.00"
-                      value={price}
-                      onChange={(e) => setPrice(e.target.value)}
-                      min="0"
-                      required={paymentType === 'bid'}
-                      disabled={!file}
-                    />
-                    <p style={{ fontSize: '0.75rem', color: '#886364', marginTop: '0.25rem' }}>
-                      Students can bid starting from this price.
-                    </p>
-                  </div>
-                )}
-              </div>
-
-              {/* Thumbnail Upload Section */}
-              {file && (
-                <div>
-                  <label className="upload-label">Step 3: Thumbnail (Optional)</label>
+                {/* Thumbnail */}
+                <div className="space-y-3 pt-2">
+                  <h3 className="text-xs font-black uppercase tracking-widest text-primary flex items-center gap-2">
+                    <span className="material-symbols-outlined text-sm">image</span>
+                    Step 3: Thumbnail (Optional)
+                  </h3>
                   <div
-                    className={`drag-drop-zone ${isThumbnailDragging ? 'active' : ''}`}
+                    className={`border-2 border-dashed rounded-3xl p-8 transition-all cursor-pointer flex flex-col items-center text-center gap-3 ${isThumbnailDragging ? 'border-primary bg-primary/5' : 'border-[#e5dcdc] bg-[#f8f6f6] hover:bg-gray-100'}`}
                     onDragOver={handleThumbnailDragOver}
                     onDragLeave={handleThumbnailDragLeave}
                     onDrop={handleThumbnailDrop}
                     onClick={() => document.getElementById('thumbnail-input').click()}
                   >
-                    <div className="upload-icon-container">
-                      <span className="material-symbols-outlined upload-icon">image</span>
-                    </div>
-                    <div className="upload-text">
-                      <p className="upload-title">Click to upload or drag and drop</p>
-                      <p className="upload-subtitle">PNG or JPEG (Max 5MB)</p>
-                    </div>
-                    <button type="button" className="upload-button">
-                      Select Thumbnail
-                    </button>
+                    <span className="material-symbols-outlined text-[#876467] text-3xl">add_photo_alternate</span>
+                    <p className="text-xs font-bold text-[#171112]">Click to add thumbnail</p>
                     <input
                       id="thumbnail-input"
                       type="file"
                       accept="image/*"
                       onChange={handleThumbnailChange}
+                      className="hidden"
                     />
                   </div>
                   {thumbnail && (
-                    <p className="upload-subtitle" style={{ marginTop: '0.75rem', textAlign: 'center' }}>
-                      Selected: <strong>{thumbnail.name}</strong>
+                    <p className="text-[10px] font-bold text-center text-[#876467]">
+                      {thumbnail.name} selected
                     </p>
                   )}
                 </div>
-              )}
-            </div>
-          </div>
-
-          {/* Right: Preview */}
-          <div className="modal-right">
-            <div className="preview-header">
-              <h3 className="preview-title">Live Preview</h3>
-              <span className="preview-status">Syncing</span>
+              </div>
             </div>
 
-            <div className="preview-card">
-              <div className="preview-thumbnail">
-                {thumbnail ? (
-                  <img src={URL.createObjectURL(thumbnail)} alt="preview" className="preview-image" style={{ objectFit: 'contain', opacity: 1 }} />
-                ) : file ? (
-                  file.type.startsWith('video/') ? (
+            {/* Right: Preview Area */}
+            <div className="bg-[#fcfafa] rounded-3xl p-10 flex flex-col items-center justify-center sticky top-0 border border-[#f0e8e9]">
+              <div className="w-full max-w-[320px] bg-white rounded-[32px] overflow-hidden shadow-2xl border border-gray-100 transform rotate-1 scale-105">
+                <div className="aspect-video bg-black relative group">
+                  {thumbnail ? (
+                    <img src={URL.createObjectURL(thumbnail)} alt="preview" className="w-full h-full object-cover" />
+                  ) : file ? (
                     <video
                       src={URL.createObjectURL(file)}
-                      className="preview-image"
-                      controls
-                      style={{ objectFit: 'contain', opacity: 1 }}
-                    >
-                      Your browser does not support the video tag.
-                    </video>
+                      className="w-full h-full object-cover"
+                    />
                   ) : (
-                    <img src={URL.createObjectURL(file)} alt="preview" className="preview-image" style={{ objectFit: 'contain', opacity: 1 }} />
-                  )
-                ) : (
-                  <span className="material-symbols-outlined" style={{ fontSize: '3rem', opacity: 0.3 }}>image</span>
-                )}
-                {!thumbnail && file && file.type.startsWith('video/') && (
-                  <div className="play-button">
-                    <span className="material-symbols-outlined">play_arrow</span>
-                  </div>
-                )}
-              </div>
-              <div className="preview-content">
-                <div className="preview-badge">New Course</div>
-                <h4 className="preview-content-title">
-                  {title || 'Your Content Title'}
-                </h4>
-                <div className="preview-meta" style={{ fontSize: '0.75rem', color: '#876467', display: 'flex', gap: '0.5rem' }}>
-                  <span>{category === 'Other' ? customCategory || 'Other' : category}</span>
-                  <span>•</span>
-                  <span>{level}</span>
+                    <div className="w-full h-full flex items-center justify-center text-gray-700 opacity-20">
+                      <span className="material-symbols-outlined text-6xl">play_circle</span>
+                    </div>
+                  )}
+                  {file && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-all">
+                      <span className="material-symbols-outlined text-white text-5xl">play_circle</span>
+                    </div>
+                  )}
                 </div>
-                <p className="preview-description">
-                  {description || 'Your content description will appear here'}
-                </p>
-                <div className="preview-separator"></div>
-                <div className="preview-footer">
-                  <div className="teacher-info">
-                    <div
-                      className="teacher-avatar"
-                      style={{
-                        backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuBKp2LOu34hcxh7LHZsAo0cTXSQQIWtGnOKsCakyjNAKADpsFWBoK65kszWXCKc5P6Mpc65u7QLHq0ylGKYvV5JIMuoFkBWjCt44tmaCFXL1dXyb6XLbxBNSCO6KKlYUtyECgvK4V9I25fRHqluSissRVhzMHpIwVkvWEw06NOP-FuQ8LecRvSykV3aEWUY9LiUy-rfWAum9gt-h6ZrNAeSvte--O_n9RoeXwh1PzDxGlqPpmoC9KYQ2thKnwVO_2vnY997LNZRVoE')",
-                      }}
-                    ></div>
-                    <span className="teacher-name">{teacherName || 'Teacher'}</span>
+                <div className="p-6 space-y-4">
+                  <div className="flex justify-between items-start">
+                    <div className="bg-primary/10 text-primary text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-wider">New Content</div>
+                    <div className="flex items-center gap-1 text-[#876467]">
+                      <span className="material-symbols-outlined text-xs">star</span>
+                      <span className="text-[10px] font-black">4.9</span>
+                    </div>
                   </div>
-                  <div className="teacher-rating">
-                    <span className="material-symbols-outlined rating-star">star</span>
-                    <span className="rating-value">4.9</span>
+                  <h4 className="text-lg font-black text-[#171112] line-clamp-1">{title || 'Your Content Title'}</h4>
+                  <p className="text-xs text-[#876467] line-clamp-2 leading-relaxed">
+                    {description || 'The description will appear here for your students to see...'}
+                  </p>
+                  <div className="pt-2 flex items-center gap-3">
+                    <div className="size-8 rounded-full bg-gray-200 bg-cover bg-center" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuBKp2LOu34hcxh7LHZsAo0cTXSQQIWtGnOKsCakyjNAKADpsFWBoK65kszWXCKc5P6Mpc65u7QLHq0ylGKYvV5JIMuoFkBWjCt44tmaCFXL1dXyb6XLbxBNSCO6KKlYUtyECgvK4V9I25fRHqluSissRVhzMHpIwVkvWEw06NOP-FuQ8LecRvSykV3aEWUY9LiUy-rfWAum9gt-h6ZrNAeSvte--O_n9RoeXwh1PzDxGlqPpmoC9KYQ2thKnwVO_2vnY997LNZRVoE')" }}></div>
+                    <span className="text-[11px] font-black text-[#171112]">{teacherName || 'Teacher'}</span>
                   </div>
                 </div>
               </div>
-            </div>
-
-            <div className="preview-info-box">
-              <div className="info-box-content">
-                <span className="material-symbols-outlined info-icon">info</span>
-                <p className="info-text">
-                  This is how your content will appear to students on the marketplace. Make sure your thumbnail and title are eye-catching!
-                </p>
-              </div>
+              <p className="text-xs text-[#876467] font-medium mt-10 max-w-[280px] text-center italic">
+                This is a live preview of how your course will look to potential students.
+              </p>
             </div>
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="modal-footer">
-          <button className="discard-btn" onClick={handleDiscard}>
-            Discard Changes
-          </button>
-          <div className="footer-actions">
-            <button className="draft-btn" onClick={handleDiscard}>
-              Save Draft
-            </button>
+        {/* Footer - Fixed */}
+        <div className="p-8 border-t border-gray-100 bg-[#fcfafa] shrink-0">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
             <button
-              className="continue-btn"
-              onClick={handleUpload}
-              disabled={!file || !title || isUploading}
-              style={{ opacity: (file && title && !isUploading) ? 1 : 0.5, cursor: (file && title && !isUploading) ? 'pointer' : 'not-allowed' }}
-              title={!file ? 'Please upload a file first' : !title ? 'Please enter a title' : ''}
+              onClick={handleDiscard}
+              className="text-sm font-black text-[#876467] hover:text-[#171112] transition-colors"
             >
-              {isUploading ? (
-                <>
-                  <span className="material-symbols-outlined rotating">sync</span>
-                  <span>Uploading {uploadProgress}%</span>
-                </>
-              ) : (
-                <>
-                  <span>Upload</span>
-                  <span className="material-symbols-outlined">arrow_forward</span>
-                </>
-              )}
+              Discard Changes
             </button>
+            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+              <button
+                type="button"
+                onClick={handleDiscard}
+                className="btn-premium btn-secondary py-4 px-10"
+              >
+                Save Draft
+              </button>
+              <button
+                onClick={handleUpload}
+                disabled={!file || !title || isUploading}
+                className={`btn-premium btn-primary py-4 px-12 min-w-[200px] ${(!file || !title || isUploading) ? 'opacity-50 cursor-not-allowed' : ''}`}
+              >
+                {isUploading ? (
+                  <>
+                    <span className="material-symbols-outlined animate-spin">sync</span>
+                    <span>Uploading {uploadProgress}%</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Publish Content</span>
+                    <span className="material-symbols-outlined">arrow_forward</span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       </div>

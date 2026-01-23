@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import PremiumDropdown from '../PremiumDropdown';
+import SessionListItem from './SessionListItem';
 
 const SessionsView = ({ sessions, onCreate, onAction }) => {
     const [filter, setFilter] = useState('newest');
@@ -10,65 +12,50 @@ const SessionsView = ({ sessions, onCreate, onAction }) => {
     });
 
     return (
-        <div>
-            <div className="uploads-section-header">
-                <h2 className="section-title">All Sessions</h2>
-                <div className="flex gap-3">
-                    <div className="relative">
-                        <select
-                            className="appearance-none pl-4 pr-10 py-2 border border-[#e5dcdc] rounded-lg text-sm bg-white text-[#181111] focus:ring-2 focus:ring-[#ea2a33] focus:border-transparent outline-none cursor-pointer hover:border-gray-300 transition-all shadow-sm"
+        <div className="sessions-v2-container">
+            {/* Empty space for potential future header elements, or just padding */}
+            <div className="mb-4"></div>
+
+            {/* List Control Header */}
+            <div className="flex items-center justify-end mb-8">
+                <div className="flex gap-4">
+                    <div className="premium-select-container min-w-[200px]">
+                        <PremiumDropdown
+                            options={[
+                                { value: 'newest', label: 'Upcoming', icon: 'schedule' },
+                                { value: 'oldest', label: 'Farthest', icon: 'calendar_month' },
+                            ]}
                             value={filter}
-                            onChange={(e) => setFilter(e.target.value)}
-                        >
-                            <option value="newest">Upcoming (Nearest)</option>
-                            <option value="oldest">Future (Farthest)</option>
-                        </select>
-                        <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                            <span className="material-symbols-outlined text-[#876467] text-sm">expand_more</span>
-                        </div>
+                            onChange={(val) => setFilter(val)}
+                        />
                     </div>
-                    <button className="btn-premium btn-primary" onClick={() => onCreate()} style={{ width: 'auto' }}>
-                        <span className="material-symbols-outlined">add</span> Schedule Session
+                    <button
+                        className="bg-[#ea2a33] text-white px-6 py-3 rounded-2xl font-black text-xs hover:bg-[#d6252d] hover:shadow-xl hover:shadow-red-500/30 transition-all flex items-center justify-center gap-2 shadow-lg shadow-red-500/20"
+                        onClick={() => onCreate()}
+                    >
+                        <span className="material-symbols-outlined text-sm">add</span>
+                        Schedule Session
                     </button>
                 </div>
             </div>
-            <div className="sessions-list">
-                {sortedSessions.length === 0 ? <p>No sessions scheduled.</p> : sortedSessions.map((session, idx) => (
-                    <div key={idx} className="session-item-professional">
-                        <div className="session-accent"></div>
-                        <div className="session-main-info">
-                            <div className="session-time-badge">
-                                <span className="material-symbols-outlined">calendar_today</span>
-                                {new Date(session.scheduledDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
-                                <span className="time-sep">•</span>
-                                <span className="material-symbols-outlined">schedule</span>
-                                {session.scheduledTime}
-                            </div>
-                            <h4 className="session-title-large">{session.title}</h4>
-                            <div className="session-details-row">
-                                <span className="detail-pill"><span className="material-symbols-outlined">timer</span> {session.duration} mins</span>
-                                <span className="detail-pill pricing">NPR {session.price}</span>
-                                <span className={`status-pill status-${session.status}`}>{session.status}</span>
-                            </div>
-                            {session.description && <p className="session-desc-text">{session.description}</p>}
-                        </div>
-                        <div className="flex-row-center mt-4 w-full justify-start">
-                            {session.meetingLink ? (
-                                <a href={session.meetingLink} target="_blank" rel="noopener noreferrer" className="btn-premium btn-primary">
-                                    Join
-                                </a>
-                            ) : (
-                                <button className="btn-premium disabled" disabled>No Link</button>
-                            )}
-                            <button className="btn-premium btn-secondary" onClick={() => onCreate(session)}>
-                                Edit
-                            </button>
-                            <button className="btn-premium btn-danger" onClick={() => { if (window.confirm('Delete session?')) onAction('deleteSession', session.id); }}>
-                                Delete
-                            </button>
-                        </div>
+
+            {/* Sessions List */}
+            <div className="sessions-list-v2">
+                {sortedSessions.length === 0 ? (
+                    <div className="empty-state-v2 bg-white rounded-3xl border border-[#e5dcdc] border-dashed">
+                        <span className="material-symbols-outlined calendar-icon">calendar_month</span>
+                        <p>No more scheduled sessions for this week</p>
                     </div>
-                ))}
+                ) : (
+                    sortedSessions.map((session, idx) => (
+                        <SessionListItem
+                            key={session.id || idx}
+                            session={session}
+                            onCreate={onCreate}
+                            onAction={onAction}
+                        />
+                    ))
+                )}
             </div>
         </div>
     );

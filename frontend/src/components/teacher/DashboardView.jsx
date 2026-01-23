@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
+import { useToast } from '../../context/ToastContext';
 import SessionListItem from './SessionListItem';
 
 const DashboardView = ({ stats, uploads, sessions, quickActions, onAction, teacher }) => {
+    const { showToast } = useToast();
     const announcements = uploads.filter(u => u.category === 'Announcements').sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
     const recentUploads = uploads.filter(u => u.category !== 'Announcements').sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
     const statCards = [
         { icon: 'group', label: 'Total Students', value: 0 },
         { icon: 'video_chat', label: 'Active Sessions', value: stats.activeSessions || 0 },
-        { icon: 'cloud_upload', label: 'Total Uploads', value: stats.totalUploads || 0 },
         { icon: 'payments', label: 'Monthly Earnings', value: `NPR ${(stats.monthlyEarnings || 0).toLocaleString()}` },
     ];
 
@@ -112,8 +113,8 @@ const DashboardView = ({ stats, uploads, sessions, quickActions, onAction, teach
                                     </div>
                                 </div>
                                 <div className="flex gap-2">
-                                    <button className="btn-premium btn-secondary text-xs" onClick={() => alert('Decline clicked')}>Decline</button>
-                                    <button className="btn-premium btn-primary text-xs" onClick={() => alert('Accept clicked')}>Accept Bid</button>
+                                    <button className="btn-premium btn-secondary text-xs" onClick={() => showToast('Inquiry sent to Sarah', 'info')}>Decline</button>
+                                    <button className="btn-premium btn-primary text-xs" onClick={() => showToast('Bid accepted! Preparing session...', 'success')}>Accept Bid</button>
                                 </div>
                             </div>
                         </div>
@@ -233,39 +234,39 @@ const DashboardView = ({ stats, uploads, sessions, quickActions, onAction, teach
                 </div>
 
                 <div className="sessions-section">
-                    <h2 className="section-title">Upcoming Sessions</h2>
+                    <div className="uploads-section-header">
+                        <h2 className="section-title">Upcoming Sessions</h2>
+                        <button className="view-all-btn hover:text-[#ea2a33] transition-colors font-bold text-sm" onClick={() => onAction('sessions')}>View All</button>
+                    </div>
                     {sessions.length === 0 ? (
                         <div className="empty-state">
                             <p className="empty-state-text">No upcoming sessions</p>
                             <button className="view-all-btn hover:text-[#ea2a33] transition-colors" onClick={() => onAction('session')} style={{ marginTop: '10px' }}>Create Session</button>
                         </div>
                     ) : (
-                        <div className="space-y-4">
-                            {/* Hero Session Card (First Item) */}
-                            {sessions.slice(0, 1).map((session, idx) => (
-                                <div key={idx} className="bg-white p-5 rounded-[20px] shadow-sm border border-[#e5dcdc] relative overflow-hidden">
-                                    <div className="flex justify-between items-start mb-4">
-                                        <div>
-                                            <h4 className="text-lg font-bold text-[#181111]">{session.title}</h4>
-                                            <p className="text-sm text-[#886364] mt-1">Starts in 15 mins</p>
+                        <div className="space-y-3">
+                            {sessions.slice(0, 3).map((session, idx) => (
+                                <div key={session.id || idx} className="bg-white p-4 rounded-2xl border border-[#e5dcdc] flex items-center justify-between hover:border-primary/20 transition-all group">
+                                    <div className="flex items-center gap-3">
+                                        <div className="size-10 rounded-xl bg-[#f4f0f0] flex items-center justify-center text-primary group-hover:bg-primary/10 transition-colors">
+                                            <span className="material-symbols-outlined text-xl">calendar_today</span>
                                         </div>
-                                        <div className="flex -space-x-3">
-                                            {[1, 2].map((i) => (
-                                                <div key={i} className="size-8 rounded-full border-2 border-white bg-gray-200 bg-cover bg-center" style={{ backgroundImage: `url('https://i.pravatar.cc/100?img=${i + 10}')` }}></div>
-                                            ))}
-                                            <div className="size-8 rounded-full border-2 border-white bg-[#f4f0f0] flex items-center justify-center text-xs font-bold text-[#886364]">+3</div>
+                                        <div>
+                                            <h4 className="font-bold text-sm text-[#181111]">{session.title}</h4>
+                                            <p className="text-[10px] text-[#886364] mt-0.5">{session.scheduledDate} • {session.scheduledTime}</p>
                                         </div>
                                     </div>
-                                    <button className="btn-premium btn-primary w-full py-4 text-base">
-                                        <span className="material-symbols-outlined">video_call</span>
-                                        Join Session Now
-                                    </button>
+                                    <div className="flex items-center gap-2">
+                                        {session.meetingLink && (
+                                            <a href={session.meetingLink} target="_blank" rel="noopener noreferrer" className="size-8 rounded-lg bg-primary/5 text-primary flex items-center justify-center hover:bg-primary hover:text-white transition-all">
+                                                <span className="material-symbols-outlined text-base">video_call</span>
+                                            </a>
+                                        )}
+                                        <button className="size-8 rounded-lg hover:bg-gray-50 flex items-center justify-center text-[#d1c1c2] hover:text-primary transition-all" onClick={() => onAction('editSession', session)}>
+                                            <span className="material-symbols-outlined text-base">edit</span>
+                                        </button>
+                                    </div>
                                 </div>
-                            ))}
-
-                            {/* Other Sessions List */}
-                            {sessions.slice(1, 3).map((session, idx) => (
-                                <SessionListItem key={session.id || idx} session={session} onCreate={onAction ? (s) => onAction('editSession', s) : undefined} />
                             ))}
                         </div>
                     )}

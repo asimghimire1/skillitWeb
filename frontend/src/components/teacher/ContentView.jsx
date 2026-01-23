@@ -5,8 +5,7 @@ const ContentView = ({ uploads, onUpload, onAction }) => {
 
     return (
         <div>
-            <div className="uploads-section-header">
-                <h2 className="section-title">My Content Library</h2>
+            <div className="uploads-section-header" style={{ justifyContent: 'flex-end', marginBottom: '2rem' }}>
                 <button className="btn-premium btn-primary" onClick={onUpload} style={{ width: 'auto' }}>
                     <span className="material-symbols-outlined">add</span> Upload New
                 </button>

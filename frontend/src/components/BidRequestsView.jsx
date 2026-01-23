@@ -1,22 +1,13 @@
 import React, { useState } from 'react';
+import { useToast } from '../context/ToastContext';
 import CounterOfferModal from './CounterOfferModal';
-import Toast from './Toast';
 
 const BidRequestsView = () => {
+    const { showToast } = useToast();
     const [activeTab, setActiveTab] = useState('All Bids');
     const [searchQuery, setSearchQuery] = useState('');
-    const [toasts, setToasts] = useState([]);
     const [isCounterModalOpen, setIsCounterModalOpen] = useState(false);
     const [selectedBid, setSelectedBid] = useState(null);
-
-    const showToast = (message, type = 'success') => {
-        const id = Date.now();
-        setToasts(prev => [...prev, { id, message, type }]);
-    };
-
-    const handleRemoveToast = (id) => {
-        setToasts(prev => prev.filter(t => t.id !== id));
-    };
 
     // Stats data
     const stats = [
@@ -126,36 +117,8 @@ const BidRequestsView = () => {
 
     return (
         <div className="flex-1 bg-[#fcfafa] min-h-screen font-display text-[#181111]">
-            {/* Header */}
-            <header className="border-b border-[#e5dcdc] bg-white sticky top-0 z-50 px-8">
-                <div className="bids-header-layout">
-                    <h1 className="text-xl font-black tracking-tight">Bid Requests</h1>
-
-                    <div className="flex items-center gap-6">
-                        <div className="search-bar-premium">
-                            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#886364] text-xl">search</span>
-                            <input
-                                placeholder="Search by student or skill..."
-                                type="text"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                            />
-                        </div>
-
-                        <div className="flex items-center gap-4">
-                            <button className="navbar-btn">
-                                <span className="material-symbols-outlined">notifications</span>
-                                <span className="notification-dot"></span>
-                            </button>
-                            <div className="divider-vertical"></div>
-                            <div className="flex items-center gap-2 bg-[#f4f0f0] px-4 py-2 rounded-xl">
-                                <span className="material-symbols-outlined text-[#ea2a33]">monetization_on</span>
-                                <span className="font-black text-sm">NPR 12,450.00</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
+            {/* Tabs Filter - Simplified and integrated */}
+            <div className="bg-white border-b border-[#e5dcdc] px-8 sticky top-0 z-[45]">
                 <div className="tabs-container">
                     {['All Bids', 'Pending', 'Accepted', 'Declined', 'Negotiating'].map((tab) => (
                         <div
@@ -167,7 +130,7 @@ const BidRequestsView = () => {
                         </div>
                     ))}
                 </div>
-            </header>
+            </div>
 
             {/* Content Container */}
             <div className="p-8 max-w-[1200px] mx-auto animate-fade-in">
@@ -254,15 +217,15 @@ const BidRequestsView = () => {
                                             <button
                                                 onClick={() => handleAction(bid.id, 'Accept')}
                                                 className="btn-premium btn-primary text-xs px-6"
-                                                style={{ backgroundColor: '#07885d', shadow: '0 4px 14px 0 rgba(7, 136, 93, 0.39)' }}
+                                                style={{ backgroundColor: '#07885d', boxShadow: '0 4px 14px 0 rgba(7, 136, 93, 0.39)' }}
                                             >
                                                 Accept Bid
                                             </button>
                                         </>
                                     ) : (
                                         <span className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest ${bid.status === 'Accepted' ? 'bg-[#e8f5e9] text-[#07885d]' :
-                                                bid.status === 'Declined' ? 'bg-[#ffebee] text-[#dc2626]' :
-                                                    'bg-[#fff8e1] text-[#f57c00]'
+                                            bid.status === 'Declined' ? 'bg-[#ffebee] text-[#dc2626]' :
+                                                'bg-[#fff8e1] text-[#f57c00]'
                                             }`}>
                                             {bid.status}
                                         </span>
@@ -280,18 +243,6 @@ const BidRequestsView = () => {
                 onSend={handleSendCounter}
                 bid={selectedBid}
             />
-
-            {/* Toast Container */}
-            <div className="fixed bottom-8 right-8 z-[60] flex flex-col gap-3">
-                {toasts.map(toast => (
-                    <Toast
-                        key={toast.id}
-                        message={toast.message}
-                        type={toast.type}
-                        onClose={() => handleRemoveToast(toast.id)}
-                    />
-                ))}
-            </div>
         </div>
     );
 };
