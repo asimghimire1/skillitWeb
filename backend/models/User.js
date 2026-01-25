@@ -31,6 +31,10 @@ const User = sequelize.define('User', {
     type: DataTypes.BOOLEAN,
     defaultValue: false,
   },
+  credits: {
+    type: DataTypes.INTEGER,
+    defaultValue: 1000,
+  },
   phone: DataTypes.STRING,
   location: DataTypes.STRING,
 }, {

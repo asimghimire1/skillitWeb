@@ -10,7 +10,15 @@ const Bid = sequelize.define('Bid', {
     },
     skillId: {
         type: DataTypes.INTEGER,
-        allowNull: false,
+        allowNull: true,
+    },
+    sessionId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+    },
+    contentId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
     },
     learnerId: {
         type: DataTypes.INTEGER,
@@ -37,7 +45,7 @@ const Bid = sequelize.define('Bid', {
         type: DataTypes.STRING,
         defaultValue: 'pending',
     },
-    counterOffer: DataTypes.STRING,
+    counterOffer: DataTypes.TEXT,
 }, {
     timestamps: true,
     createdAt: 'created_at',

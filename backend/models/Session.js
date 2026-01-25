@@ -22,6 +22,14 @@ const Session = sequelize.define('Session', {
         allowNull: true,
     },
     title: DataTypes.STRING,
+    description: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+    },
+    category: {
+        type: DataTypes.STRING,
+        allowNull: true,
+    },
     scheduledDate: DataTypes.DATEONLY,
     scheduledTime: DataTypes.STRING,
     duration: {
@@ -33,6 +41,18 @@ const Session = sequelize.define('Session', {
         defaultValue: 'online',
     },
     price: DataTypes.FLOAT,
+    allowBidding: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+    },
+    maxParticipants: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+    },
+    enrolledCount: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+    },
     status: {
         type: DataTypes.STRING,
         defaultValue: 'scheduled',

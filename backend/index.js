@@ -10,6 +10,8 @@ const authRoutes = require('./routes/auth');
 const contentRoutes = require('./routes/content');
 const sessionRoutes = require('./routes/session');
 const statsRoutes = require('./routes/stats');
+const studentsRoutes = require('./routes/students');
+const bidsRoutes = require('./routes/bids');
 
 
 const app = express();
@@ -97,6 +99,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/content', contentRoutes);
 app.use('/api/sessions', sessionRoutes);
 app.use('/api/stats', statsRoutes);
+app.use('/api/students', studentsRoutes);
+app.use('/api/bids', bidsRoutes);
 app.use('/api/posts', require('./routes/posts'));
 
 // Health Check Route

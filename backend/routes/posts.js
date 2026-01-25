@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const Post = require('../models/Post');
+const User = require('../models/User');
 
-// GET /api/posts - Get all posts (for students)
+// GET /api/posts - Get all posts (for students) with teacher info
 router.get('/', async (req, res) => {
     try {
         const limit = req.query.limit ? parseInt(req.query.limit) : null;
@@ -13,7 +14,24 @@ router.get('/', async (req, res) => {
             options.limit = limit;
         }
         const posts = await Post.findAll(options);
-        res.json(posts);
+        
+        // Enrich posts with teacher info
+        const enrichedPosts = await Promise.all(posts.map(async (post) => {
+            const postData = post.toJSON();
+            if (post.teacherId) {
+                const teacher = await User.findByPk(post.teacherId, {
+                    attributes: ['id', 'fullname', 'profilePicture', 'bio']
+                });
+                if (teacher) {
+                    postData.teacherName = teacher.fullname;
+                    postData.teacherAvatar = teacher.profilePicture;
+                    postData.teacherBio = teacher.bio;
+                }
+            }
+            return postData;
+        }));
+        
+        res.json(enrichedPosts);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

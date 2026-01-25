@@ -375,8 +375,18 @@ export const apiService = {
 
   async getAllContent() {
     try {
+      console.log('[apiService] Fetching content from:', `${API_BASE_URL}/content`);
       const response = await fetch(`${API_BASE_URL}/content`);
-      return await response.json();
+      console.log('[apiService] Response status:', response.status);
+      
+      if (!response.ok) {
+        console.error('[apiService] Failed to fetch content:', response.status, response.statusText);
+        return [];
+      }
+      
+      const data = await response.json();
+      console.log('[apiService] getAllContent response:', data);
+      return Array.isArray(data) ? data : [];
     } catch (error) {
       console.error('Get all content error:', error);
       return [];
@@ -448,6 +458,21 @@ export const apiService = {
       return await response.json();
     } catch (error) {
       console.error('Unlock content error:', error);
+      return { success: false };
+    }
+  },
+
+  // Join content (free, paid, or bid)
+  async joinContent(contentId, studentId, type, bidId = null) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/students/${studentId}/content/join`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contentId, type, bidId }),
+      });
+      return await response.json();
+    } catch (error) {
+      console.error('Join content error:', error);
       return { success: false };
     }
   },

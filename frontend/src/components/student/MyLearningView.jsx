@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import StudentContentCard from './StudentContentCard';
 import {
   Play,
   Calendar,
@@ -7,7 +8,10 @@ import {
   Video,
   CheckCircle,
   Lock,
-  ExternalLink
+  ExternalLink,
+  Sparkles,
+  Gavel,
+  Tag
 } from 'lucide-react';
 
 const MyLearningView = ({
@@ -15,7 +19,8 @@ const MyLearningView = ({
   content,
   enrollments,
   unlockedContent,
-  onUnlockContent
+  onWatchContent,
+  onJoinSession
 }) => {
   // Safe array defaults
   const safeSessions = Array.isArray(sessions) ? sessions : [];
@@ -23,8 +28,9 @@ const MyLearningView = ({
   const safeEnrollments = Array.isArray(enrollments) ? enrollments : [];
   const safeUnlockedContent = Array.isArray(unlockedContent) ? unlockedContent : [];
 
-  const [activeTab, setActiveTab] = useState('sessions');
-  const [filterStatus, setFilterStatus] = useState('all');
+  const [activeTab, setActiveTab] = useState('content');
+  const [sessionFilter, setSessionFilter] = useState('all');
+  const [contentFilter, setContentFilter] = useState('all');
 
   // Get enrolled sessions with status
   const enrolledSessions = useMemo(() => {
@@ -48,23 +54,31 @@ const MyLearningView = ({
 
   // Filter sessions by status
   const filteredSessions = useMemo(() => {
-    if (filterStatus === 'all') return enrolledSessions;
-    return enrolledSessions.filter(s => s.status === filterStatus);
-  }, [enrolledSessions, filterStatus]);
+    if (sessionFilter === 'all') return enrolledSessions;
+    return enrolledSessions.filter(s => s.status === sessionFilter);
+  }, [enrolledSessions, sessionFilter]);
 
-  // Get unlocked content
+  // Get my content (joined/enrolled/purchased/bid-won)
   const myContent = useMemo(() => {
     return safeContent.filter(item => 
       safeUnlockedContent.some(u => u.contentId === item.id || u.id === item.id)
-    );
+    ).map(item => {
+      const unlockRecord = safeUnlockedContent.find(u => 
+        u.contentId === item.id || u.id === item.id
+      );
+      return {
+        ...item,
+        joinType: unlockRecord?.type || 'joined',
+        joinedAt: unlockRecord?.createdAt || unlockRecord?.created_at
+      };
+    });
   }, [safeContent, safeUnlockedContent]);
 
-  // Get locked content (available to unlock)
-  const lockedContent = useMemo(() => {
-    return safeContent.filter(item => 
-      !safeUnlockedContent.some(u => u.contentId === item.id || u.id === item.id)
-    );
-  }, [content, unlockedContent]);
+  // Filter content by join type
+  const filteredContent = useMemo(() => {
+    if (contentFilter === 'all') return myContent;
+    return myContent.filter(c => c.joinType === contentFilter);
+  }, [myContent, contentFilter]);
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -76,10 +90,22 @@ const MyLearningView = ({
     }
   };
 
+  const getJoinTypeBadge = (type) => {
+    switch (type) {
+      case 'free':
+        return { text: 'Free', icon: <Sparkles size={12} />, className: 'badge-free' };
+      case 'paid':
+        return { text: 'Purchased', icon: <Tag size={12} />, className: 'badge-paid' };
+      case 'bid':
+        return { text: 'Won Bid', icon: <Gavel size={12} />, className: 'badge-bid' };
+      default:
+        return { text: 'Joined', icon: <CheckCircle size={12} />, className: 'badge-joined' };
+    }
+  };
+
   const tabs = [
-    { id: 'sessions', label: 'My Sessions', icon: <Calendar size={16} />, count: enrolledSessions.length },
     { id: 'content', label: 'My Content', icon: <Video size={16} />, count: myContent.length },
-    { id: 'discover', label: 'Discover', icon: <BookOpen size={16} />, count: lockedContent.length },
+    { id: 'sessions', label: 'My Sessions', icon: <Calendar size={16} />, count: enrolledSessions.length },
   ];
 
   return (
@@ -105,7 +131,59 @@ const MyLearningView = ({
         ))}
       </div>
 
-      {/* Sessions Tab */}
+      {/* My Content Tab */}
+      {activeTab === 'content' && (
+        <div className="learning-content">
+          {/* Content Filter */}
+          <div className="learning-filter-bar">
+            <span className="filter-label">Filter:</span>
+            {[
+              { id: 'all', label: 'All' },
+              { id: 'free', label: 'Free' },
+              { id: 'paid', label: 'Purchased' },
+              { id: 'bid', label: 'Won Bids' }
+            ].map(filter => (
+              <button
+                key={filter.id}
+                className={`filter-chip ${contentFilter === filter.id ? 'active' : ''}`}
+                onClick={() => setContentFilter(filter.id)}
+              >
+                {filter.label}
+              </button>
+            ))}
+          </div>
+
+          {filteredContent.length === 0 ? (
+            <div className="empty-state">
+              <div className="empty-state-icon">
+                <Video size={24} />
+              </div>
+              <h3 className="empty-state-title">No Content Yet</h3>
+              <p className="empty-state-text">
+                {contentFilter === 'all' 
+                  ? "You haven't joined any content yet. Explore content to start learning!"
+                  : `No ${contentFilter === 'free' ? 'free' : contentFilter === 'paid' ? 'purchased' : 'bid-won'} content found.`}
+              </p>
+            </div>
+          ) : (
+            <div className="student-content-grid">
+              {filteredContent.map((item, idx) => (
+                <StudentContentCard
+                  key={item.id || idx}
+                  content={{
+                    ...item,
+                    joinedAt: item.joinedAt
+                  }}
+                  isUnlocked={true}
+                  onWatchNow={onWatchContent}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* My Sessions Tab */}
       {activeTab === 'sessions' && (
         <div className="learning-content">
           {/* Status Filter */}
@@ -114,8 +192,8 @@ const MyLearningView = ({
             {['all', 'live', 'upcoming', 'completed', 'missed'].map(status => (
               <button
                 key={status}
-                className={`filter-chip ${filterStatus === status ? 'active' : ''}`}
-                onClick={() => setFilterStatus(status)}
+                className={`filter-chip ${sessionFilter === status ? 'active' : ''}`}
+                onClick={() => setSessionFilter(status)}
               >
                 {status === 'all' ? 'All' : status.charAt(0).toUpperCase() + status.slice(1)}
               </button>
@@ -129,9 +207,9 @@ const MyLearningView = ({
               </div>
               <h3 className="empty-state-title">No Sessions Found</h3>
               <p className="empty-state-text">
-                {filterStatus === 'all' 
+                {sessionFilter === 'all' 
                   ? "You haven't enrolled in any sessions yet."
-                  : `No ${filterStatus} sessions found.`}
+                  : `No ${sessionFilter} sessions found.`}
               </p>
             </div>
           ) : (
@@ -184,103 +262,6 @@ const MyLearningView = ({
                       </span>
                     )}
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* My Content Tab */}
-      {activeTab === 'content' && (
-        <div className="learning-content">
-          {myContent.length === 0 ? (
-            <div className="empty-state">
-              <div className="empty-state-icon">
-                <Video size={24} />
-              </div>
-              <h3 className="empty-state-title">No Content Unlocked</h3>
-              <p className="empty-state-text">Unlock content to start learning.</p>
-            </div>
-          ) : (
-            <div className="unlocked-content-grid">
-              {myContent.map((item, idx) => (
-                <div key={item.id || idx} className="unlocked-content-card">
-                  <div 
-                    className="content-thumbnail-learning"
-                    style={{
-                      backgroundImage: `url('${item.thumbnail || 'https://via.placeholder.com/300x170?text=No+Thumbnail'}')`
-                    }}
-                  >
-                    <div className="content-play-overlay">
-                      <Play size={32} />
-                    </div>
-                    {item.duration && (
-                      <span className="content-duration-badge">{item.duration}</span>
-                    )}
-                    <span className="unlocked-badge">
-                      <CheckCircle size={12} /> Unlocked
-                    </span>
-                  </div>
-                  <div className="content-info-learning">
-                    <h4 className="content-title-learning">{item.title}</h4>
-                    <p className="content-teacher-learning">{item.teacherName || 'Teacher'}</p>
-                    {item.category && (
-                      <span className="content-category-badge">{item.category}</span>
-                    )}
-                  </div>
-                  <button className="btn-watch-content">
-                    <Play size={14} /> Watch Now
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Discover Tab */}
-      {activeTab === 'discover' && (
-        <div className="learning-content">
-          {lockedContent.length === 0 ? (
-            <div className="empty-state">
-              <div className="empty-state-icon">
-                <CheckCircle size={24} />
-              </div>
-              <h3 className="empty-state-title">All Content Unlocked!</h3>
-              <p className="empty-state-text">You've unlocked all available content.</p>
-            </div>
-          ) : (
-            <div className="locked-content-grid">
-              {lockedContent.map((item, idx) => (
-                <div key={item.id || idx} className="locked-content-card">
-                  <div 
-                    className="content-thumbnail-learning locked"
-                    style={{
-                      backgroundImage: `url('${item.thumbnail || 'https://via.placeholder.com/300x170?text=No+Thumbnail'}')`
-                    }}
-                  >
-                    <div className="content-lock-overlay">
-                      <Lock size={32} />
-                    </div>
-                    {item.duration && (
-                      <span className="content-duration-badge">{item.duration}</span>
-                    )}
-                  </div>
-                  <div className="content-info-learning">
-                    <h4 className="content-title-learning">{item.title}</h4>
-                    <p className="content-teacher-learning">{item.teacherName || 'Teacher'}</p>
-                    <p className="content-price-learning">
-                      {!item.price || item.price === 0 ? 'Free' : `NPR ${item.price.toLocaleString()}`}
-                    </p>
-                  </div>
-                  <button 
-                    className="btn-unlock-content"
-                    onClick={() => onUnlockContent(item)}
-                  >
-                    <Lock size={14} /> 
-                    {!item.price || item.price === 0 ? 'Unlock Free' : `Unlock for NPR ${item.price}`}
-                  </button>
                 </div>
               ))}
             </div>

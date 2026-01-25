@@ -2,6 +2,9 @@ const express = require('express');
 const router = express.Router();
 const Session = require('../models/Session');
 const Content = require('../models/Content');
+const User = require('../models/User');
+const StudentContent = require('../models/StudentContent');
+const StudentEnrollment = require('../models/StudentEnrollment');
 
 // GET /api/stats/teacher/:teacherId
 router.get('/teacher/:teacherId', async (req, res) => {
@@ -36,16 +39,37 @@ router.get('/student/:studentId', async (req, res) => {
     try {
         const studentId = req.params.studentId;
         
-        // For now, return default stats (can be enhanced later with real tracking)
+        // Get the user to fetch their actual credits
+        const user = await User.findByPk(studentId);
+        const credits = user ? (user.credits || 1000) : 1000;
+        
+        // Get actual enrollments and content
+        const enrollments = await StudentEnrollment.findAll({ where: { studentId } });
+        const studentContent = await StudentContent.findAll({ where: { studentId, status: 'active' } });
+        
+        // Calculate hours learned from completed sessions
+        const completedEnrollments = enrollments.filter(e => e.status === 'completed');
+        let hoursLearned = 0;
+        for (const enrollment of completedEnrollments) {
+            if (enrollment.sessionId) {
+                const session = await Session.findByPk(enrollment.sessionId);
+                if (session) {
+                    hoursLearned += (session.duration || 60) / 60;
+                }
+            }
+        }
+        
         res.json({
-            hoursLearned: 0,
-            sessionsAttended: 0,
-            contentWatched: 0,
-            credits: 1000, // Default starting credits
+            hoursLearned: Math.round(hoursLearned * 10) / 10,
+            sessionsAttended: completedEnrollments.length,
+            sessionsEnrolled: enrollments.length,
+            contentWatched: studentContent.length,
+            credits: credits,
             skillsMastered: 0,
             dayStreak: 0
         });
     } catch (error) {
+        console.error('Get student stats error:', error);
         res.status(500).json({ message: error.message });
     }
 });

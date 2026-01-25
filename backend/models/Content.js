@@ -19,11 +19,40 @@ const Content = sequelize.define('Content', {
     description: DataTypes.TEXT,
     thumbnail: DataTypes.STRING,
     videoUrl: DataTypes.STRING,
+    fileUrl: DataTypes.STRING,
     duration: DataTypes.STRING,
     category: DataTypes.STRING,
+    type: {
+        type: DataTypes.STRING,
+        defaultValue: 'video', // video, course, tutorial
+    },
     tags: {
-        type: DataTypes.ARRAY(DataTypes.STRING),
-        defaultValue: [],
+        type: DataTypes.TEXT,
+        allowNull: true,
+        get() {
+            const rawValue = this.getDataValue('tags');
+            if (!rawValue) return [];
+            try {
+                return JSON.parse(rawValue);
+            } catch (e) {
+                return [];
+            }
+        },
+        set(value) {
+            this.setDataValue('tags', JSON.stringify(value || []));
+        }
+    },
+    price: {
+        type: DataTypes.DECIMAL(10, 2),
+        defaultValue: 0,
+    },
+    allowBidding: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+    },
+    minBidPrice: {
+        type: DataTypes.DECIMAL(10, 2),
+        defaultValue: 0,
     },
     status: {
         type: DataTypes.STRING,
@@ -46,6 +75,10 @@ const Content = sequelize.define('Content', {
         defaultValue: 0,
     },
     likes: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+    },
+    enrollments: {
         type: DataTypes.INTEGER,
         defaultValue: 0,
     },

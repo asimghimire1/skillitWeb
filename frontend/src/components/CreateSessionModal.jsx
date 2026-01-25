@@ -7,30 +7,39 @@ import '../css/teacher.css';
 export default function CreateSessionModal({ isOpen, onClose, onCreate, sessionToEdit = null }) {
     const [formData, setFormData] = useState({
         title: '',
+        description: '',
+        category: '',
         meetingLink: '',
         scheduledDate: '',
         scheduledTime: '',
         duration: 60,
         price: 0,
         paymentType: 'free',
-        linkType: 'google_meet',
-        description: ''
+        allowBidding: false,
+        maxParticipants: '',
+        linkType: 'google_meet'
     });
 
     useEffect(() => {
         if (sessionToEdit) {
-            setFormData(sessionToEdit);
+            setFormData({
+                ...sessionToEdit,
+                paymentType: sessionToEdit.allowBidding ? 'bid' : (sessionToEdit.price > 0 ? 'paid' : 'free')
+            });
         } else {
             setFormData({
                 title: '',
+                description: '',
+                category: '',
                 meetingLink: '',
                 scheduledDate: '',
                 scheduledTime: '',
                 duration: 60,
                 price: 0,
                 paymentType: 'free',
-                linkType: 'google_meet',
-                description: ''
+                allowBidding: false,
+                maxParticipants: '',
+                linkType: 'google_meet'
             });
         }
     }, [sessionToEdit, isOpen]);
@@ -49,7 +58,13 @@ export default function CreateSessionModal({ isOpen, onClose, onCreate, sessionT
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        onCreate(formData);
+        const sessionData = {
+            ...formData,
+            allowBidding: formData.paymentType === 'bid',
+            price: formData.paymentType === 'free' ? 0 : parseFloat(formData.price) || 0,
+            maxParticipants: formData.maxParticipants ? parseInt(formData.maxParticipants) : null
+        };
+        onCreate(sessionData);
         onClose();
     };
 
@@ -99,6 +114,53 @@ export default function CreateSessionModal({ isOpen, onClose, onCreate, sessionT
                                     onChange={handleChange}
                                     required
                                 />
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="modal-label">Description</label>
+                                <textarea
+                                    className="modal-input"
+                                    placeholder="Describe what students will learn..."
+                                    name="description"
+                                    value={formData.description}
+                                    onChange={handleChange}
+                                    rows={3}
+                                    style={{ resize: 'none' }}
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="space-y-2">
+                                    <label className="modal-label">Category</label>
+                                    <div className="premium-select-container">
+                                        <PremiumDropdown
+                                            options={[
+                                                { value: 'programming', label: 'Programming', icon: 'code' },
+                                                { value: 'design', label: 'Design', icon: 'palette' },
+                                                { value: 'business', label: 'Business', icon: 'business' },
+                                                { value: 'marketing', label: 'Marketing', icon: 'campaign' },
+                                                { value: 'music', label: 'Music', icon: 'music_note' },
+                                                { value: 'language', label: 'Language', icon: 'translate' },
+                                                { value: 'other', label: 'Other', icon: 'more_horiz' },
+                                            ]}
+                                            value={formData.category}
+                                            onChange={(val) => handleChange({ target: { name: 'category', value: val } })}
+                                            placeholder="Select category"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="modal-label">Max Participants</label>
+                                    <input
+                                        className="modal-input"
+                                        placeholder="Leave empty for unlimited"
+                                        type="number"
+                                        name="maxParticipants"
+                                        value={formData.maxParticipants}
+                                        onChange={handleChange}
+                                        min="1"
+                                    />
+                                </div>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -185,7 +247,7 @@ export default function CreateSessionModal({ isOpen, onClose, onCreate, sessionT
                             <div className="flex gap-4">
                                 <button
                                     type="button"
-                                    onClick={() => setFormData(prev => ({ ...prev, paymentType: 'free', price: 0 }))}
+                                    onClick={() => setFormData(prev => ({ ...prev, paymentType: 'free', price: 0, allowBidding: false }))}
                                     className={`upload-pricing-btn ${formData.paymentType === 'free' ? 'active' : 'inactive'}`}
                                 >
                                     <span className="material-symbols-outlined text-lg">volunteer_activism</span>
@@ -193,7 +255,15 @@ export default function CreateSessionModal({ isOpen, onClose, onCreate, sessionT
                                 </button>
                                 <button
                                     type="button"
-                                    onClick={() => setFormData(prev => ({ ...prev, paymentType: 'bid' }))}
+                                    onClick={() => setFormData(prev => ({ ...prev, paymentType: 'paid', allowBidding: false }))}
+                                    className={`upload-pricing-btn ${formData.paymentType === 'paid' ? 'active' : 'inactive'}`}
+                                >
+                                    <span className="material-symbols-outlined text-lg">attach_money</span>
+                                    Paid
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setFormData(prev => ({ ...prev, paymentType: 'bid', allowBidding: true }))}
                                     className={`upload-pricing-btn ${formData.paymentType === 'bid' ? 'active' : 'inactive'}`}
                                 >
                                     <span className="material-symbols-outlined text-lg">gavel</span>
@@ -201,9 +271,9 @@ export default function CreateSessionModal({ isOpen, onClose, onCreate, sessionT
                                 </button>
                             </div>
 
-                            {formData.paymentType === 'bid' && (
+                            {(formData.paymentType === 'paid' || formData.paymentType === 'bid') && (
                                 <div className="space-y-2 animate-fade-in">
-                                    <label className="modal-label">Starting Price (NPR)</label>
+                                    <label className="modal-label">{formData.paymentType === 'bid' ? 'Starting Price (NPR)' : 'Price (NPR)'}</label>
                                     <div className="upload-price-input-wrapper">
                                         <span className="absolute left-5 top-1/2 -translate-y-1/2 font-black text-gray-400">Rs.</span>
                                         <input

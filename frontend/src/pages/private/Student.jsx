@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import StudentDashboardView from '../../components/student/DashboardView';
+import ExploreContentView from '../../components/student/ExploreContentView';
 import ExploreSessionsView from '../../components/student/ExploreSessionsView';
+import ExploreTeachersView from '../../components/student/ExploreTeachersView';
 import MyLearningView from '../../components/student/MyLearningView';
 import MyBidsView from '../../components/student/MyBidsView';
-import TeachersView from '../../components/student/TeachersView';
 import AddCreditsModal from '../../components/student/AddCreditsModal';
 import MakeBidModal from '../../components/student/MakeBidModal';
 import apiService from '../../services/apiService';
@@ -25,7 +26,8 @@ import {
   GraduationCap,
   Settings,
   ChevronDown,
-  Trophy
+  Video,
+  Calendar
 } from 'lucide-react';
 import '../../css/student.css';
 import '../../css/teacher.css';
@@ -105,7 +107,13 @@ export default function Student() {
 
     // Fetch all content
     const contentData = await apiService.getAllContent();
-    if (contentData) setContent(contentData);
+    console.log('[Student] Content data received:', contentData);
+    if (contentData && Array.isArray(contentData)) {
+      setContent(contentData);
+    } else {
+      console.warn('[Student] Content data is not an array:', contentData);
+      setContent([]);
+    }
 
     // Fetch teachers
     const teachersData = await apiService.getTeachers();
@@ -181,6 +189,67 @@ export default function Student() {
     }
   };
 
+  // Handle joining content (free, paid, or bidding)
+  const handleJoinContent = async (contentItem, joinType) => {
+    // Check if already unlocked
+    if (unlockedContent.some(c => c.contentId === contentItem.id || c.id === contentItem.id)) {
+      showToast('You already have access to this content!', 'info');
+      return;
+    }
+
+    if (joinType === 'free') {
+      // Free content - join directly
+      const ok = await confirm({
+        title: 'Join Content',
+        message: `Join "${contentItem.title}" for free?`,
+        confirmText: 'Join Now',
+        type: 'default'
+      });
+
+      if (ok) {
+        const result = await apiService.joinContent(contentItem.id, student.id, 'free');
+        if (result.success) {
+          showToast('Successfully joined! Content added to My Learning.', 'success');
+          fetchDashboardData(student.id);
+        } else {
+          showToast(result.message || 'Failed to join. Please try again.', 'error');
+        }
+      }
+    } else if (joinType === 'paid') {
+      // Paid content - check credits and process payment
+      if (contentItem.price > 0 && stats.credits < contentItem.price) {
+        const needed = contentItem.price - stats.credits;
+        showToast(`Insufficient credits. Add NPR ${needed} more.`, 'error');
+        setIsCreditsModalOpen(true);
+        return;
+      }
+
+      const ok = await confirm({
+        title: 'Purchase Content',
+        message: `Purchase "${contentItem.title}" for NPR ${contentItem.price}?`,
+        confirmText: 'Pay & Join',
+        type: 'default'
+      });
+
+      if (ok) {
+        const result = await apiService.joinContent(contentItem.id, student.id, 'paid');
+        if (result.success) {
+          showToast('Purchase successful! Content added to My Learning.', 'success');
+          setStats(prev => ({ ...prev, credits: prev.credits - contentItem.price }));
+          fetchDashboardData(student.id);
+        } else {
+          showToast(result.message || 'Failed to purchase. Please try again.', 'error');
+        }
+      }
+    }
+  };
+
+  // Handle content bidding
+  const handleContentBid = (contentItem) => {
+    setSelectedSession(contentItem); // Reuse session state for content bidding
+    setIsBidModalOpen(true);
+  };
+
   const handleUnlockContent = async (contentItem) => {
     // Check if already unlocked
     if (unlockedContent.some(c => c.contentId === contentItem.id || c.id === contentItem.id)) {
@@ -219,27 +288,28 @@ export default function Student() {
     }
   };
 
-  const handleMakeBid = (session) => {
-    setSelectedSession(session);
+  const handleMakeBid = (item) => {
+    setSelectedSession(item);
     setIsBidModalOpen(true);
   };
 
   const handleSubmitBid = async (bidData) => {
-    // Validate bid amount (40-100% of session price)
+    // Validate bid amount (40-100% of item price)
     const minBid = selectedSession.price * 0.4;
     const maxBid = selectedSession.price;
 
-    if (bidData.amount < minBid || bidData.amount > maxBid) {
+    if (bidData.bidAmount < minBid || bidData.bidAmount > maxBid) {
       showToast(`Bid must be between NPR ${minBid} and NPR ${maxBid}`, 'error');
       return;
     }
 
     const result = await apiService.submitBid({
-      sessionId: selectedSession.id,
-      studentId: student.id,
-      amount: bidData.amount,
+      sessionId: bidData.sessionId,
+      learnerId: student.id,
+      teacherId: selectedSession.teacherId,
+      proposedPrice: bidData.bidAmount,
       message: bidData.message,
-      proposedDate: bidData.proposedDate
+      status: 'pending'
     });
 
     if (result.success) {
@@ -286,6 +356,9 @@ export default function Student() {
       case 'explore':
         setActiveTab('explore');
         break;
+      case 'sessions':
+        setActiveTab('sessions');
+        break;
       case 'mylearning':
         setActiveTab('mylearning');
         break;
@@ -329,10 +402,9 @@ export default function Student() {
     switch(activeTab) {
       case 'dashboard': return { title: `Welcome back, ${student.fullname?.split(' ')[0] || 'Student'} 👋`, subtitle: "Let's continue your learning journey today." };
       case 'explore': return { title: 'Explore Content', subtitle: 'Discover video lessons and courses from expert teachers.' };
-      case 'mylearning': return { title: 'My Learning', subtitle: 'Track your enrolled sessions and unlocked content.' };
-      case 'teachers': return { title: 'Find Teachers', subtitle: 'Discover skilled mentors for your learning journey.' };
-      case 'bids': return { title: 'My Bids', subtitle: 'Track and manage your session bids.' };
-      case 'achievements': return { title: 'Achievements', subtitle: 'Track your progress and earned badges.' };
+      case 'mylearning': return { title: 'My Learning', subtitle: 'Access your enrolled content and sessions.' };
+      case 'teachers': return { title: 'Explore Teachers', subtitle: 'Find skilled mentors and view their content.' };
+      case 'bids': return { title: 'My Bids', subtitle: 'Track and manage your content bids.' };
       default: return { title: 'Dashboard', subtitle: '' };
     }
   };
@@ -370,6 +442,13 @@ export default function Student() {
               <span>Explore Content</span>
             </button>
             <button 
+              className={`nav-item ${activeTab === 'sessions' ? 'active' : ''}`}
+              onClick={() => { setActiveTab('sessions'); setIsMobileMenuOpen(false); }}
+            >
+              <Calendar size={20} />
+              <span>Explore Sessions</span>
+            </button>
+            <button 
               className={`nav-item ${activeTab === 'mylearning' ? 'active' : ''}`}
               onClick={() => { setActiveTab('mylearning'); setIsMobileMenuOpen(false); }}
             >
@@ -384,11 +463,11 @@ export default function Student() {
               <span>My Bids</span>
             </button>
             <button 
-              className={`nav-item ${activeTab === 'achievements' ? 'active' : ''}`}
-              onClick={() => { setActiveTab('achievements'); setIsMobileMenuOpen(false); }}
+              className={`nav-item ${activeTab === 'teachers' ? 'active' : ''}`}
+              onClick={() => { setActiveTab('teachers'); setIsMobileMenuOpen(false); }}
             >
-              <Trophy size={20} />
-              <span>Achievements</span>
+              <Users size={20} />
+              <span>Explore Teachers</span>
             </button>
           </nav>
 
@@ -473,12 +552,30 @@ export default function Student() {
               recentPosts={recentPosts}
               student={student}
               onAction={handleAction}
+              onJoinContent={handleJoinContent}
+              onMakeBid={handleMakeBid}
+              onEnrollSession={handleEnrollSession}
+              onWatchContent={(item) => {
+                if (item.videoUrl || item.fileUrl) {
+                  window.open(item.videoUrl || item.fileUrl, '_blank');
+                }
+              }}
             />
           )}
 
           {activeTab === 'explore' && (
+            <ExploreContentView
+              content={content}
+              unlockedContent={unlockedContent}
+              onJoinContent={handleJoinContent}
+              onMakeBid={handleMakeBid}
+            />
+          )}
+
+          {activeTab === 'sessions' && (
             <ExploreSessionsView
               sessions={sessions}
+              teachers={teachers}
               enrollments={enrollments}
               onEnroll={handleEnrollSession}
               onMakeBid={handleMakeBid}
@@ -491,21 +588,28 @@ export default function Student() {
               content={content}
               enrollments={enrollments}
               unlockedContent={unlockedContent}
-              onUnlockContent={handleUnlockContent}
+              onWatchContent={(item) => {
+                // Open video player or content viewer
+                if (item.videoUrl || item.fileUrl) {
+                  window.open(item.videoUrl || item.fileUrl, '_blank');
+                }
+              }}
             />
           )}
 
           {activeTab === 'teachers' && (
-            <TeachersView
+            <ExploreTeachersView
               teachers={teachers}
-              onViewProfile={() => {}}
-            />
-          )}
-
-          {activeTab === 'achievements' && (
-            <TeachersView
-              teachers={teachers}
-              onViewProfile={() => {}}
+              content={content}
+              onViewTeacherContent={(teacher) => {
+                // Filter to show only this teacher's content
+                setActiveTab('explore');
+                // Could add teacher filter state here
+              }}
+              onViewProfile={(teacher) => {
+                // View teacher profile
+                showToast(`Viewing ${teacher.fullname || teacher.fullName}'s profile`, 'info');
+              }}
             />
           )}
 
