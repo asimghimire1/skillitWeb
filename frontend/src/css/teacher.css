@@ -149,6 +149,22 @@
   text-decoration: none;
   color: var(--text-secondary);
   font-size: 0.95rem;
+  position: relative;
+}
+
+.nav-item .nav-badge {
+  margin-left: auto;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: white;
+  background: var(--primary);
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .nav-item:hover {
@@ -4409,4 +4425,1537 @@
   .empty-state-v2 p {
     font-size: 0.8rem;
   }
+}
+
+/* =========================================
+   NOTIFICATION DROPDOWN - Teacher Dashboard
+   ========================================= */
+
+.teacher-container .notification-dropdown-wrapper {
+  position: relative;
+}
+
+.teacher-container .notification-btn {
+  padding: 0.5rem;
+  border-radius: 0.75rem;
+  background-color: var(--bg-light-hover);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.teacher-container.dark .notification-btn {
+  background-color: var(--bg-dark-hover);
+}
+
+.teacher-container .notification-btn:hover {
+  background-color: var(--border-light);
+}
+
+.teacher-container.dark .notification-btn:hover {
+  background-color: var(--border-dark);
+}
+
+.teacher-container .notification-badge-count {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: white;
+  background: var(--primary);
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: badge-pop 0.3s ease;
+}
+
+@keyframes badge-pop {
+  0% { transform: scale(0); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.teacher-container .notification-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 360px;
+  max-height: 480px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--border-light);
+  z-index: 100;
+  animation: dropdown-slide 0.2s ease;
+  overflow: hidden;
+}
+
+.teacher-container.dark .notification-dropdown {
+  background: var(--bg-dark);
+  border-color: var(--border-dark);
+}
+
+@keyframes dropdown-slide {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.teacher-container .notification-dropdown-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.teacher-container.dark .notification-dropdown-header {
+  border-color: var(--border-dark);
+}
+
+.teacher-container .notification-dropdown-header h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text-light);
+}
+
+.teacher-container.dark .notification-dropdown-header h3 {
+  color: var(--text-dark);
+}
+
+.teacher-container .mark-all-read-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.75rem;
+  color: var(--primary);
+  background: rgba(234, 42, 51, 0.08);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.teacher-container .mark-all-read-btn:hover {
+  background: rgba(234, 42, 51, 0.15);
+}
+
+.teacher-container .notification-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.teacher-container .notification-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
+  color: var(--text-secondary);
+}
+
+.teacher-container .notification-empty svg {
+  opacity: 0.3;
+  margin-bottom: 0.75rem;
+}
+
+.teacher-container .notification-empty p {
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.teacher-container .notification-item {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border-light);
+  transition: background 0.15s;
+}
+
+.teacher-container.dark .notification-item {
+  border-color: var(--border-dark);
+}
+
+.teacher-container .notification-item:hover {
+  background: var(--bg-light-hover);
+}
+
+.teacher-container.dark .notification-item:hover {
+  background: var(--bg-dark-hover);
+}
+
+.teacher-container .notification-item.unread {
+  background: rgba(234, 42, 51, 0.03);
+}
+
+.teacher-container .notification-item.unread:hover {
+  background: rgba(234, 42, 51, 0.06);
+}
+
+.teacher-container .notification-icon-wrapper {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-light-hover);
+  flex-shrink: 0;
+}
+
+.teacher-container.dark .notification-icon-wrapper {
+  background: var(--bg-dark-hover);
+}
+
+.teacher-container .notif-icon.bid { color: #f59e0b; }
+.teacher-container .notif-icon.success { color: #10b981; }
+.teacher-container .notif-icon.error { color: #ef4444; }
+.teacher-container .notif-icon.counter { color: #3b82f6; }
+
+.teacher-container .notification-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.teacher-container .notification-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin: 0 0 0.25rem 0;
+  color: var(--text-light);
+}
+
+.teacher-container.dark .notification-title {
+  color: var(--text-dark);
+}
+
+.teacher-container .notification-message {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: 0 0 0.35rem 0;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.teacher-container .notification-time {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+.teacher-container .notification-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.teacher-container .notif-action-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.teacher-container .notif-action-btn:hover {
+  background: var(--bg-light-hover);
+  color: var(--text-light);
+}
+
+.teacher-container .notif-action-btn.delete:hover {
+  background: #fee2e2;
+  color: #ef4444;
+}
+
+/* =========================================
+   BID REQUESTS VIEW - Teacher Dashboard
+   ========================================= */
+
+.bids-view-container {
+  padding: 1.5rem 0;
+}
+
+.bids-header-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.bids-view-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-light);
+  margin: 0;
+}
+
+.teacher-container.dark .bids-view-title {
+  color: var(--text-dark);
+}
+
+.bids-view-subtitle {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0.25rem 0 0 0;
+}
+
+.refresh-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  background: white;
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-light);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.teacher-container.dark .refresh-btn {
+  background: var(--bg-dark-hover);
+  border-color: var(--border-dark);
+  color: var(--text-dark);
+}
+
+.refresh-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* Bid Stats Grid */
+.bid-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .bid-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.bid-stat-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid var(--border-light);
+}
+
+.teacher-container.dark .bid-stat-card {
+  background: var(--bg-dark-hover);
+  border-color: var(--border-dark);
+}
+
+.bid-stat-card .bid-stat-icon {
+  color: var(--text-secondary);
+}
+
+.bid-stat-card.pending .bid-stat-icon {
+  color: #f59e0b;
+}
+
+.bid-stat-card.accepted .bid-stat-icon {
+  color: #22c55e;
+}
+
+.bid-stat-card .bid-stat-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.bid-stat-card .bid-stat-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-light);
+}
+
+.teacher-container.dark .bid-stat-card .bid-stat-value {
+  color: var(--text-dark);
+}
+
+.bid-stat-card .bid-stat-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+/* Bid Requests List */
+.bid-requests-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+}
+
+@media (max-width: 900px) {
+  .bid-requests-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+.bid-request-card-new {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid var(--border-light);
+  padding: 1.25rem;
+  transition: all 0.2s;
+}
+
+.teacher-container.dark .bid-request-card-new {
+  background: var(--bg-dark-hover);
+  border-color: var(--border-dark);
+}
+
+.bid-request-card-new:hover {
+  border-color: var(--primary);
+  box-shadow: 0 4px 12px rgba(234, 42, 51, 0.08);
+}
+
+/* Bid Request Header */
+.bid-request-card-new .bid-request-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.teacher-container.dark .bid-request-card-new .bid-request-header {
+  border-color: var(--border-dark);
+}
+
+.bid-student-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.bid-student-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  border: 2px solid var(--border-light);
+}
+
+.bid-student-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-light);
+  margin: 0;
+}
+
+.teacher-container.dark .bid-student-name {
+  color: var(--text-dark);
+}
+
+.bid-student-email {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: 0.125rem 0 0 0;
+}
+
+.bid-status-badge-new {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Item Info */
+.bid-item-info {
+  margin-bottom: 1rem;
+}
+
+.bid-item-type {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.625rem;
+  background: var(--bg-light-hover);
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.teacher-container.dark .bid-item-type {
+  background: var(--border-dark);
+}
+
+.bid-item-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-light);
+  margin: 0;
+}
+
+.teacher-container.dark .bid-item-title {
+  color: var(--text-dark);
+}
+
+/* Pricing Section */
+.bid-pricing-section {
+  background: var(--bg-light-hover);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.teacher-container.dark .bid-pricing-section {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.bid-price-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+}
+
+.bid-price-row:not(:last-child) {
+  border-bottom: 1px dashed var(--border-light);
+}
+
+.teacher-container.dark .bid-price-row:not(:last-child) {
+  border-color: var(--border-dark);
+}
+
+.bid-price-row .bid-price-label {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.bid-price-row .bid-price-value {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-light);
+}
+
+.teacher-container.dark .bid-price-row .bid-price-value {
+  color: var(--text-dark);
+}
+
+.bid-price-row.highlight .bid-price-value.bid-amount {
+  color: var(--primary);
+  font-size: 1rem;
+}
+
+.bid-price-row.counter .bid-price-value.counter-amount {
+  color: #3b82f6;
+}
+
+.bid-discount-info {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+}
+
+.bid-discount-badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  background: #fef3c7;
+  color: #d97706;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+/* Message Section */
+.bid-message-section {
+  margin-bottom: 1rem;
+}
+
+.bid-message {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  margin: 0;
+  padding: 0.75rem 1rem;
+  background: var(--bg-light-hover);
+  border-radius: 8px;
+  border-left: 3px solid var(--primary);
+}
+
+.teacher-container.dark .bid-message {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+/* Bid Request Footer */
+.bid-request-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-light);
+}
+
+.teacher-container.dark .bid-request-footer {
+  border-color: var(--border-dark);
+}
+
+.bid-date {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+/* Bid Actions */
+.bid-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.bid-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.bid-action-btn.decline {
+  background: #fee2e2;
+  color: #ef4444;
+}
+
+.bid-action-btn.decline:hover {
+  background: #fecaca;
+}
+
+.bid-action-btn.counter {
+  background: #dbeafe;
+  color: #3b82f6;
+}
+
+.bid-action-btn.counter:hover {
+  background: #bfdbfe;
+}
+
+.bid-action-btn.accept {
+  background: #dcfce7;
+  color: #22c55e;
+}
+
+.bid-action-btn.accept:hover {
+  background: #bbf7d0;
+}
+
+/* Bid Result Labels */
+.bid-result-label {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.bid-result-label.success {
+  color: #22c55e;
+}
+
+.bid-result-label.rejected {
+  color: #ef4444;
+}
+
+.bid-result-label.counter {
+  color: #3b82f6;
+}
+
+/* Bid Filter Tabs */
+.bid-filter-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  background: var(--bg-light-hover);
+  padding: 0.35rem;
+  border-radius: 10px;
+  width: fit-content;
+}
+
+.teacher-container.dark .bid-filter-tabs {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.bid-filter-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.bid-filter-tab:hover {
+  color: var(--text-light);
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.teacher-container.dark .bid-filter-tab:hover {
+  color: var(--text-dark);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.bid-filter-tab.active {
+  background: white;
+  color: var(--primary);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.teacher-container.dark .bid-filter-tab.active {
+  background: var(--bg-dark-hover);
+}
+
+.bid-filter-tab .filter-count {
+  background: var(--border-light);
+  padding: 0.125rem 0.5rem;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.teacher-container.dark .bid-filter-tab .filter-count {
+  background: var(--border-dark);
+}
+
+.bid-filter-tab.active .filter-count {
+  background: var(--primary);
+  color: white;
+}
+
+/* Empty State */
+.bids-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  text-align: center;
+}
+
+.bids-empty-state .empty-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--bg-light-hover);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  color: var(--text-secondary);
+}
+
+.teacher-container.dark .bids-empty-state .empty-icon {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.bids-empty-state h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-light);
+  margin: 0 0 0.5rem 0;
+}
+
+.teacher-container.dark .bids-empty-state h3 {
+  color: var(--text-dark);
+}
+
+.bids-empty-state p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* =========================================
+   BID PROPOSAL CARD - New Design
+   ========================================= */
+
+.bid-proposal-card {
+  background: white;
+  border-radius: 16px;
+  border: 1px solid #f0f0f0;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: all 0.25s ease;
+}
+
+.teacher-container.dark .bid-proposal-card {
+  background: var(--bg-dark-hover);
+  border-color: var(--border-dark);
+}
+
+.bid-proposal-card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+/* Header - Status & Price */
+.bid-proposal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.bid-proposal-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.875rem;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.bid-proposal-price {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.bid-proposal-price .price-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.25rem;
+}
+
+.bid-proposal-price .price-amount {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--primary);
+  line-height: 1.1;
+}
+
+.bid-proposal-price .price-breakdown {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-top: 0.25rem;
+}
+
+/* Student Info */
+.bid-proposal-student {
+  margin-bottom: 1.25rem;
+}
+
+.bid-proposal-student .student-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-light);
+  margin: 0 0 0.375rem 0;
+}
+
+.teacher-container.dark .bid-proposal-student .student-name {
+  color: var(--text-dark);
+}
+
+.bid-proposal-student .student-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.bid-proposal-student .item-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--primary);
+  flex-shrink: 0;
+}
+
+.bid-proposal-student .item-text {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+/* Message Quote */
+.bid-proposal-message {
+  background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.25rem;
+  position: relative;
+}
+
+.teacher-container.dark .bid-proposal-message {
+  background: linear-gradient(135deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.1) 100%);
+}
+
+.bid-proposal-message .message-quote-icon {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  opacity: 0.6;
+}
+
+.bid-proposal-message .message-text {
+  margin: 0;
+  padding-left: 2rem;
+  font-size: 0.9rem;
+  font-style: italic;
+  color: var(--text-light);
+  line-height: 1.6;
+}
+
+.teacher-container.dark .bid-proposal-message .message-text {
+  color: var(--text-dark);
+}
+
+/* Counter Info */
+.bid-counter-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  background: #dbeafe;
+  border-radius: 10px;
+  margin-bottom: 1.25rem;
+}
+
+.teacher-container.dark .bid-counter-info {
+  background: rgba(59, 130, 246, 0.2);
+}
+
+.bid-counter-info .counter-label {
+  font-size: 0.8rem;
+  color: #3b82f6;
+  font-weight: 500;
+}
+
+.bid-counter-info .counter-price {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #3b82f6;
+}
+
+/* Footer Actions */
+.bid-proposal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #f0f0f0;
+}
+
+.teacher-container.dark .bid-proposal-footer {
+  border-color: var(--border-dark);
+}
+
+/* Proposal Buttons */
+.proposal-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.proposal-btn.decline {
+  background: transparent;
+  color: #6b7280;
+  padding-left: 0;
+}
+
+.proposal-btn.decline:hover {
+  color: #ef4444;
+}
+
+.proposal-btn.counter {
+  background: white;
+  color: var(--text-light);
+  border: 1.5px solid #e5e7eb;
+}
+
+.teacher-container.dark .proposal-btn.counter {
+  background: transparent;
+  border-color: var(--border-dark);
+  color: var(--text-dark);
+}
+
+.proposal-btn.counter:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.proposal-btn.accept {
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 4px 12px rgba(234, 42, 51, 0.3);
+}
+
+.proposal-btn.accept:hover {
+  background: #d91f28;
+  box-shadow: 0 6px 16px rgba(234, 42, 51, 0.4);
+  transform: translateY(-1px);
+}
+
+/* Result Labels */
+.proposal-result {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.proposal-result.success {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.proposal-result.rejected {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.proposal-result.counter {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .bid-proposal-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .bid-proposal-price {
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .bid-proposal-footer {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .proposal-btn {
+    flex: 1;
+    min-width: 120px;
+    justify-content: center;
+  }
+
+  .proposal-btn.decline {
+    padding-left: 1.25rem;
+    flex: 0 0 100%;
+    order: 3;
+    justify-content: center;
+    margin-top: 0.5rem;
+  }
+}
+
+/* ========================== */
+/* Modern Bid Cards (Teacher) */
+/* ========================== */
+
+.teacher-container .my-bids-view {
+  padding: 0;
+}
+
+.teacher-container .bids-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+}
+
+.teacher-container .bids-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 0.25rem 0;
+}
+
+.teacher-container.dark .bids-title {
+  color: #f3f4f6;
+}
+
+.teacher-container .bids-subtitle {
+  font-size: 0.95rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* Stats Grid */
+.teacher-container .bid-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .teacher-container .bid-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.teacher-container .bid-stat-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+}
+
+.teacher-container.dark .bid-stat-card {
+  background: var(--card-dark);
+  border-color: var(--border-dark);
+}
+
+.teacher-container .bid-stat-card.pending .bid-stat-icon { color: #f59e0b; }
+.teacher-container .bid-stat-card.countered .bid-stat-icon { color: #374151; }
+.teacher-container .bid-stat-card.accepted .bid-stat-icon { color: #22c55e; }
+
+.teacher-container .bid-stat-icon {
+  color: #886364;
+}
+
+.teacher-container .bid-stat-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.teacher-container .bid-stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.teacher-container.dark .bid-stat-value {
+  color: #f3f4f6;
+}
+
+.teacher-container .bid-stat-label {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+/* Filter Tabs */
+.teacher-container .bids-filter-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.teacher-container .bids-filter-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #f3f4f6;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.teacher-container.dark .bids-filter-tab {
+  background: var(--card-dark);
+  color: #9ca3af;
+}
+
+.teacher-container .bids-filter-tab:hover {
+  background: #e5e7eb;
+}
+
+.teacher-container.dark .bids-filter-tab:hover {
+  background: #374151;
+}
+
+.teacher-container .bids-filter-tab.active {
+  background: var(--primary);
+  color: white;
+}
+
+.teacher-container .bids-filter-tab .filter-count {
+  font-weight: 600;
+}
+
+/* Modern Grid */
+
+.teacher-container .bids-modern-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .teacher-container .bids-modern-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Modern Bid Card */
+.teacher-container .bid-modern-card {
+  background: white;
+  border-radius: 14px;
+  padding: 1.25rem;
+  border: 1px solid #e5e7eb;
+  transition: all 0.2s ease;
+}
+
+.teacher-container.dark .bid-modern-card {
+  background: var(--card-dark);
+  border-color: var(--border-dark);
+}
+
+.teacher-container .bid-modern-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Header */
+.teacher-container .bid-modern-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.teacher-container .bid-modern-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.teacher-container .bid-modern-type {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+/* Title */
+.teacher-container .bid-modern-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 1rem 0;
+  line-height: 1.4;
+}
+
+.teacher-container.dark .bid-modern-title {
+  color: #f3f4f6;
+}
+
+/* Teacher/Student Info */
+.teacher-container .bid-modern-teacher {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.teacher-container .bid-modern-teacher-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  flex-shrink: 0;
+}
+
+.teacher-container .bid-modern-teacher-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.teacher-container .bid-modern-teacher-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.teacher-container.dark .bid-modern-teacher-name {
+  color: #f3f4f6;
+}
+
+.teacher-container .bid-modern-teacher-role {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+.teacher-container .bid-modern-discount-badge {
+  font-size: 0.7rem;
+  padding: 0.25rem 0.5rem;
+  background: #fef3c7;
+  color: #b45309;
+  border-radius: 4px;
+  font-weight: 600;
+  margin-left: auto;
+}
+
+/* Message */
+.teacher-container .bid-modern-message {
+  padding: 0.75rem 1rem;
+  background: #f9fafb;
+  border-radius: 8px;
+  border-left: 3px solid #ea2a33;
+  margin-bottom: 1rem;
+}
+
+.teacher-container.dark .bid-modern-message {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.teacher-container .bid-modern-message-text {
+  font-size: 0.85rem;
+  color: #4b5563;
+  margin: 0;
+  font-style: italic;
+  line-height: 1.5;
+}
+
+.teacher-container.dark .bid-modern-message-text {
+  color: #d1d5db;
+}
+
+/* Pricing */
+.teacher-container .bid-modern-pricing {
+  background: #f9fafb;
+  border-radius: 10px;
+  padding: 0.875rem;
+  margin-bottom: 0.75rem;
+}
+
+.teacher-container.dark .bid-modern-pricing {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.teacher-container .bid-modern-price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.375rem 0;
+}
+
+.teacher-container .bid-modern-price-row.your-bid {
+  padding-top: 0.5rem;
+  margin-top: 0.25rem;
+  border-top: 1px dashed #e5e7eb;
+}
+
+.teacher-container.dark .bid-modern-price-row.your-bid {
+  border-color: #374151;
+}
+
+.teacher-container .bid-modern-price-row.counter {
+  padding-top: 0.5rem;
+  margin-top: 0.25rem;
+  border-top: 1px dashed #e5e7eb;
+}
+
+.teacher-container .bid-modern-price-label {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.teacher-container .bid-modern-price-value {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.teacher-container.dark .bid-modern-price-value {
+  color: #d1d5db;
+}
+
+.teacher-container .bid-modern-price-value.original {
+  text-decoration: line-through;
+  color: #9ca3af;
+}
+
+.teacher-container .bid-modern-price-value.highlight {
+  color: #ea2a33;
+  font-size: 1rem;
+}
+
+.teacher-container .bid-modern-price-value.counter-value {
+  color: #3b82f6;
+}
+
+/* Date */
+.teacher-container .bid-modern-date {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+  color: #9ca3af;
+  margin-bottom: 1rem;
+}
+
+/* Footer */
+.teacher-container .bid-modern-footer {
+  border-top: 1px solid #f0f0f0;
+  padding-top: 1rem;
+}
+
+.teacher-container.dark .bid-modern-footer {
+  border-color: var(--border-dark);
+}
+
+.teacher-container .bid-modern-actions-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.teacher-container .bid-modern-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  flex: 1;
+}
+
+.teacher-container .bid-modern-btn.cancel {
+  background: transparent;
+  color: #ef4444;
+  border: 1px solid #fecaca;
+}
+
+.teacher-container .bid-modern-btn.cancel:hover {
+  background: #fee2e2;
+}
+
+.teacher-container .bid-modern-btn.counter-btn {
+  background: transparent;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+}
+
+.teacher-container.dark .bid-modern-btn.counter-btn {
+  color: #d1d5db;
+  border-color: #4b5563;
+}
+
+.teacher-container .bid-modern-btn.counter-btn:hover {
+  background: #f3f4f6;
+  border-color: #3b82f6;
+  color: #3b82f6;
+}
+
+.teacher-container .bid-modern-btn.accept-counter {
+  background: var(--primary);
+  color: white;
+}
+
+.teacher-container .bid-modern-btn.accept-counter:hover {
+  background: #d91f28;
+}
+
+/* Status Sections */
+.teacher-container .bid-modern-accepted-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.teacher-container .bid-modern-enrolled-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #22c55e;
+}
+
+.teacher-container .bid-modern-rejected-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: #ef4444;
+}
+
+.teacher-container .bid-modern-counter-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: #3b82f6;
 }

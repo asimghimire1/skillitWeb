@@ -2547,6 +2547,77 @@
   transform: translateY(-1px);
 }
 
+.session-explore-btn.rejoin {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+}
+
+.session-explore-btn.rejoin:hover {
+  background: linear-gradient(135deg, #059669, #047857);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.session-explore-card.enrolled {
+  border-color: rgba(16, 185, 129, 0.3);
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.02), rgba(16, 185, 129, 0.05));
+}
+
+.student-container.dark .session-explore-card.enrolled {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(16, 185, 129, 0.1));
+}
+
+.session-date-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  background: rgba(234, 42, 51, 0.1);
+  color: var(--primary);
+  padding: 0.375rem 0.75rem;
+  border-radius: 2rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.session-price-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.session-price-pill.free {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.session-price-pill.paid {
+  background: rgba(234, 42, 51, 0.1);
+  color: var(--primary);
+}
+
+.session-footer-note {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-align: center;
+  margin-top: 0.75rem;
+}
+
+.session-footer-note.enrolled-note {
+  color: #10b981;
+}
+
+.session-explore-footer {
+  padding: 1rem 1.25rem;
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  flex-direction: column;
+}
+
 /* =========================================
    MY LEARNING VIEW
    ========================================= */
@@ -2795,6 +2866,27 @@
 
 .btn-join-live:hover {
   background: #16a34a;
+}
+
+.btn-join-session {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.625rem 1.25rem;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.9rem;
+}
+
+.btn-join-session:hover {
+  background: linear-gradient(135deg, #059669, #047857);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
 
 .upcoming-badge,
@@ -4253,6 +4345,683 @@
 }
 
 /* =========================================
+   MAKE A BID MODAL - NEW DESIGN
+   ========================================= */
+
+.make-bid-modal-new {
+  background: white;
+  border-radius: 1rem;
+  width: 100%;
+  max-width: 400px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  animation: modalSlideIn 0.25s ease-out;
+}
+
+.student-container.dark .make-bid-modal-new {
+  background: #1a0d0d;
+}
+
+.bid-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.student-container.dark .bid-modal-header {
+  border-bottom-color: var(--border-dark);
+}
+
+.bid-modal-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.bid-modal-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bid-modal-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-light);
+  margin: 0;
+}
+
+.student-container.dark .bid-modal-title {
+  color: var(--text-dark);
+}
+
+.bid-modal-subtitle {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.bid-modal-close {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.375rem;
+  transition: all 0.2s;
+}
+
+.bid-modal-close:hover {
+  background: var(--bg-light-hover);
+  color: var(--text-light);
+}
+
+.student-container.dark .bid-modal-close:hover {
+  background: var(--bg-dark-hover);
+  color: var(--text-dark);
+}
+
+/* Content Card */
+.bid-content-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  margin: 1.25rem 1.5rem;
+  background: var(--bg-light-hover);
+  border-radius: 0.75rem;
+}
+
+.student-container.dark .bid-content-card {
+  background: var(--bg-dark-hover);
+}
+
+.bid-content-thumbnail {
+  width: 64px;
+  height: 64px;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.bid-content-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.bid-content-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #4a5568, #2d3748);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.bid-content-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.bid-content-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-light);
+  margin: 0 0 0.375rem 0;
+  line-height: 1.3;
+}
+
+.student-container.dark .bid-content-title {
+  color: var(--text-dark);
+}
+
+.bid-content-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.bid-content-badge {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  background: var(--primary);
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 700;
+  border-radius: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.bid-content-price {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+/* Warning Notice */
+.bid-warning-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  padding: 0.875rem 1rem;
+  margin: 0 1.5rem 1.25rem;
+  background: rgba(245, 158, 11, 0.1);
+  border-radius: 0.5rem;
+  font-size: 0.8rem;
+  color: #d97706;
+  line-height: 1.4;
+}
+
+.bid-warning-notice svg {
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.bid-warning-notice strong {
+  font-weight: 700;
+}
+
+/* Form */
+.make-bid-modal-new form {
+  padding: 0 1.5rem 1.5rem;
+}
+
+.bid-form-group {
+  margin-bottom: 1.25rem;
+}
+
+.bid-form-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-light);
+  margin-bottom: 0.5rem;
+}
+
+.student-container.dark .bid-form-label {
+  color: var(--text-dark);
+}
+
+.bid-amount-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.bid-amount-input {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  padding-right: 5rem;
+  border: 1px solid var(--border-light);
+  border-radius: 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-light);
+  background: white;
+}
+
+.student-container.dark .bid-amount-input {
+  background: #1a0d0d;
+  border-color: var(--border-dark);
+  color: var(--text-dark);
+}
+
+.bid-amount-input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.bid-amount-input::placeholder {
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+.bid-discount-badge {
+  position: absolute;
+  right: 0.75rem;
+  padding: 0.375rem 0.625rem;
+  background: #dcfce7;
+  color: #16a34a;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border-radius: 0.375rem;
+}
+
+/* Preset Buttons */
+.bid-preset-buttons {
+  display: flex;
+  gap: 0.625rem;
+  margin-bottom: 1.25rem;
+}
+
+.bid-preset-btn {
+  flex: 1;
+  padding: 0.625rem 0.75rem;
+  border: 1px solid var(--border-light);
+  border-radius: 0.5rem;
+  background: white;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.student-container.dark .bid-preset-btn {
+  background: #1a0d0d;
+  border-color: var(--border-dark);
+}
+
+.bid-preset-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.bid-preset-btn.active {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: rgba(234, 42, 51, 0.05);
+}
+
+/* Message Textarea */
+.bid-message-textarea {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--border-light);
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--text-light);
+  background: white;
+  resize: vertical;
+  font-family: inherit;
+  line-height: 1.5;
+}
+
+.student-container.dark .bid-message-textarea {
+  background: #1a0d0d;
+  border-color: var(--border-dark);
+  color: var(--text-dark);
+}
+
+.bid-message-textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.bid-message-textarea::placeholder {
+  color: var(--text-secondary);
+}
+
+/* Error Message */
+.bid-error-message {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border-radius: 0.5rem;
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+/* Action Buttons */
+.bid-modal-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.bid-cancel-btn {
+  flex: 1;
+  padding: 0.875rem 1.25rem;
+  border: 1px solid var(--border-light);
+  background: white;
+  color: var(--text-light);
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.student-container.dark .bid-cancel-btn {
+  background: #1a0d0d;
+  border-color: var(--border-dark);
+  color: var(--text-dark);
+}
+
+.bid-cancel-btn:hover {
+  border-color: var(--text-secondary);
+}
+
+.bid-submit-btn {
+  flex: 1.5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.25rem;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.bid-submit-btn:hover:not(:disabled) {
+  background: #c9232b;
+}
+
+.bid-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* =========================================
+   UNIFIED SESSION CARD
+   ========================================= */
+
+.session-card-unified {
+  background: white;
+  border-radius: 1rem;
+  border: 1px solid var(--border-light);
+  overflow: hidden;
+  transition: all 0.25s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.student-container.dark .session-card-unified {
+  background: #1a0d0d;
+  border-color: var(--border-dark);
+}
+
+.session-card-unified:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.session-card-unified.enrolled {
+  border-color: rgba(16, 185, 129, 0.3);
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.02), rgba(16, 185, 129, 0.05));
+}
+
+.student-container.dark .session-card-unified.enrolled {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(16, 185, 129, 0.1));
+}
+
+.session-card-header-unified {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1.25rem 0.75rem;
+}
+
+.session-date-pill-unified {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  background: rgba(234, 42, 51, 0.1);
+  color: var(--primary);
+  padding: 0.375rem 0.75rem;
+  border-radius: 2rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.session-price-pill-unified {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.session-price-pill-unified.free {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.session-price-pill-unified.paid {
+  background: var(--primary);
+  color: white;
+}
+
+.session-card-body-unified {
+  padding: 0 1.25rem 1rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.session-card-title-unified {
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: var(--text-light);
+  margin-bottom: 0.375rem;
+  line-height: 1.3;
+}
+
+.student-container.dark .session-card-title-unified {
+  color: var(--text-dark);
+}
+
+.session-card-desc-unified {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 1rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.session-teacher-unified {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.session-teacher-avatar-unified {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  border: 2px solid white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  flex-shrink: 0;
+}
+
+.session-teacher-info-unified {
+  display: flex;
+  flex-direction: column;
+}
+
+.session-teacher-name-unified {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--text-light);
+}
+
+.student-container.dark .session-teacher-name-unified {
+  color: var(--text-dark);
+}
+
+.session-teacher-title-unified {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.session-meta-unified {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: auto;
+}
+
+.session-meta-item-unified {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.session-meta-item-unified svg {
+  color: var(--text-muted);
+}
+
+.session-card-footer-unified {
+  padding: 1rem 1.25rem;
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.student-container.dark .session-card-footer-unified {
+  border-top-color: var(--border-dark);
+}
+
+.session-btn-unified {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.25rem;
+  border-radius: 2rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.session-btn-unified.free,
+.session-btn-unified.rejoin {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+}
+
+.session-btn-unified.free:hover,
+.session-btn-unified.rejoin:hover {
+  background: linear-gradient(135deg, #059669, #047857);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.session-btn-unified.paid {
+  background: linear-gradient(135deg, var(--primary), #c9232b);
+  color: white;
+}
+
+.session-btn-unified.paid:hover {
+  background: linear-gradient(135deg, #c9232b, #a91d24);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(234, 42, 51, 0.3);
+}
+
+.session-btn-unified.bid {
+  background: white;
+  color: var(--primary);
+  border: 2px solid var(--primary);
+}
+
+.student-container.dark .session-btn-unified.bid {
+  background: transparent;
+}
+
+.session-btn-unified.bid:hover {
+  background: rgba(234, 42, 51, 0.05);
+}
+
+.session-btn-unified.cancel-bid {
+  background: white;
+  color: #ef4444;
+  border: 2px solid #ef4444;
+}
+
+.student-container.dark .session-btn-unified.cancel-bid {
+  background: transparent;
+}
+
+.session-btn-unified.cancel-bid:hover {
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.session-btn-group-unified {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.session-btn-group-unified .session-btn-unified {
+  flex: 1;
+  border-radius: 0.5rem;
+}
+
+.session-footer-text-unified {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-align: center;
+  margin: 0;
+}
+
+.session-footer-text-unified.enrolled {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  color: #10b981;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.session-footer-text-unified.enrolled svg {
+  flex-shrink: 0;
+}
+
+/* Session Cards Grid */
+.session-cards-grid-unified {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .session-cards-grid-unified {
+    grid-template-columns: 1fr;
+  }
+  
+  .session-btn-group-unified {
+    flex-direction: column;
+  }
+}
+
+/* =========================================
    RESPONSIVE STYLES
    ========================================= */
 
@@ -5633,18 +6402,40 @@
   background: linear-gradient(135deg, #d02630, #b91c26);
 }
 
+/* Purchase Button - Premium red gradient */
+.scc-btn.purchase {
+  background: linear-gradient(135deg, var(--primary-color), #d02630);
+  color: white;
+  text-align: center;
+  line-height: 1.3;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(234, 42, 51, 0.25);
+}
+
+.scc-btn.purchase:hover {
+  background: linear-gradient(135deg, #d02630, #b91c26);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(234, 42, 51, 0.35);
+}
+
+/* Bid Button - Outlined style matching primary color */
 .scc-btn.bid {
   background: white;
   color: var(--primary-color);
   border: 2px solid var(--primary-color);
+  text-align: center;
+  line-height: 1.3;
+  font-weight: 600;
 }
 
 .student-container.dark .scc-btn.bid {
   background: transparent;
+  color: var(--primary-color);
 }
 
 .scc-btn.bid:hover {
-  background: rgba(234, 42, 51, 0.05);
+  background: rgba(234, 42, 51, 0.08);
+  transform: translateY(-1px);
 }
 
 /* Info Box */
@@ -5873,6 +6664,7 @@
   padding: 1rem 1.25rem;
   border-top: 1px solid var(--border-light);
   display: flex;
+  flex-wrap: wrap;
   gap: 0.75rem;
 }
 
@@ -5927,6 +6719,36 @@
   background: rgba(234, 42, 51, 0.05);
 }
 
+.session-action-btn.rejoin {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+}
+
+.session-action-btn.rejoin:hover {
+  background: linear-gradient(135deg, #059669, #047857);
+}
+
+.session-card-student.enrolled {
+  border-color: rgba(16, 185, 129, 0.3);
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.02), rgba(16, 185, 129, 0.05));
+}
+
+.student-container.dark .session-card-student.enrolled {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(16, 185, 129, 0.1));
+}
+
+.session-card-actions .session-footer-note {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-align: center;
+  margin-top: 0.5rem;
+  width: 100%;
+}
+
+.session-card-actions .session-footer-note.enrolled-note {
+  color: #10b981;
+}
+
 @media (max-width: 1024px) {
   .session-cards-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -5941,4 +6763,2113 @@
   .session-card-actions {
     flex-direction: column;
   }
+}
+
+/* =========================================
+   SESSION ENROLLMENT MODAL
+   ========================================= */
+
+.enroll-modal {
+  background: white;
+  border-radius: 1rem;
+  width: 100%;
+  max-width: 420px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  animation: modalSlideIn 0.25s ease-out;
+}
+
+.student-container.dark .enroll-modal {
+  background: #1a0d0d;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.enroll-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+}
+
+.enroll-date-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  background: rgba(234, 42, 51, 0.1);
+  color: var(--primary);
+  padding: 0.5rem 0.875rem;
+  border-radius: 2rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.enroll-price-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 0.875rem;
+  background: var(--primary);
+  color: white;
+  border-radius: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.enroll-modal-body {
+  padding: 0 1.5rem 1.5rem;
+}
+
+.enroll-modal-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text-light);
+  line-height: 1.3;
+  margin-bottom: 0.75rem;
+}
+
+.student-container.dark .enroll-modal-title {
+  color: var(--text-dark);
+}
+
+.enroll-modal-desc {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 1.25rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.enroll-instructor {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.enroll-instructor-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  border: 2px solid white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.enroll-instructor-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.enroll-instructor-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.enroll-instructor-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-light);
+}
+
+.student-container.dark .enroll-instructor-name {
+  color: var(--text-dark);
+}
+
+.enroll-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-light);
+}
+
+.student-container.dark .enroll-meta {
+  border-top-color: var(--border-dark);
+}
+
+.enroll-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.enroll-meta-item svg {
+  color: var(--text-muted);
+}
+
+.enroll-modal-footer {
+  padding: 1.25rem 1.5rem;
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.student-container.dark .enroll-modal-footer {
+  border-top-color: var(--border-dark);
+}
+
+.enroll-wallet-balance {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  padding: 0.5rem;
+}
+
+.enroll-wallet-balance svg {
+  color: #10b981;
+}
+
+.enroll-unlock-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, var(--primary), #c9232b);
+  color: white;
+  border: none;
+  border-radius: 2rem;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.enroll-unlock-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #c9232b, #a91d24);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(234, 42, 51, 0.3);
+}
+
+.enroll-unlock-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.enroll-unlock-btn svg {
+  flex-shrink: 0;
+}
+
+.enroll-add-credits-link {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  padding: 0.5rem;
+}
+
+.enroll-add-credits-link:hover {
+  text-decoration: underline;
+}
+
+/* =========================================
+   VIDEO PLAYER MODAL
+   ========================================= */
+
+.video-player-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #000;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease;
+}
+
+.video-player-container {
+  width: 100%;
+  height: 100%;
+  max-width: 1600px;
+  max-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.video-player-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: white;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 100;
+  transition: all 0.2s ease;
+}
+
+.video-player-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+.video-player-layout {
+  display: flex;
+  height: 100%;
+  padding: 1rem;
+  gap: 1.5rem;
+  overflow: hidden;
+}
+
+/* Main Video Section - 75% */
+.video-player-main {
+  flex: 0 0 75%;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.video-player-main::-webkit-scrollbar {
+  display: none;
+}
+
+/* Video Wrapper */
+.video-wrapper {
+  position: relative;
+  width: 100%;
+  background: #000;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  flex-shrink: 0;
+}
+
+.video-element {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  cursor: pointer;
+}
+
+.video-play-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+}
+
+.video-play-btn-large {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(234, 42, 51, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.video-play-btn-large:hover {
+  transform: scale(1.1);
+  background: var(--primary);
+}
+
+.video-play-btn-large svg {
+  margin-left: 4px;
+}
+
+/* Video Controls */
+.video-controls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+  padding: 1rem;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.video-controls.visible {
+  opacity: 1;
+}
+
+.video-progress {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+  cursor: pointer;
+  margin-bottom: 0.75rem;
+  overflow: hidden;
+}
+
+.video-progress:hover {
+  height: 6px;
+}
+
+.video-progress-filled {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 2px;
+  transition: width 0.1s linear;
+}
+
+.video-controls-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.video-controls-left,
+.video-controls-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.video-control-btn {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  border-radius: 0.25rem;
+}
+
+.video-control-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.video-time {
+  color: white;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+/* Video Info Section */
+.video-info {
+  padding: 1.25rem 0;
+  color: white;
+}
+
+.video-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  line-height: 1.3;
+}
+
+.video-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.video-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.video-meta-item svg {
+  opacity: 0.7;
+}
+
+.video-category-badge {
+  background: var(--primary);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 2rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+/* Uploader Info */
+.video-uploader {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+.video-uploader-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.video-uploader-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.video-uploader-name {
+  font-weight: 600;
+  font-size: 1rem;
+  color: white;
+}
+
+.video-uploader-role {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* Video Description */
+.video-description {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1rem;
+  border-radius: 0.75rem;
+}
+
+.video-description p {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Sidebar - 25% */
+.video-sidebar {
+  flex: 0 0 23%;
+  overflow-y: auto;
+  padding-left: 1.5rem;
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.video-sidebar::-webkit-scrollbar {
+  display: none;
+}
+
+.video-sidebar-title {
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  padding-left: 0.25rem;
+}
+
+.video-suggested-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.video-no-suggestions {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.9rem;
+  text-align: center;
+  padding: 2rem;
+}
+
+/* Suggested Video Card */
+.video-suggested-card {
+  display: flex;
+  gap: 0.75rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.video-suggested-card:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.video-suggested-thumb {
+  width: 160px;
+  min-width: 160px;
+  height: 90px;
+  border-radius: 0.5rem;
+  background-size: cover;
+  background-position: center;
+  background-color: #333;
+  position: relative;
+}
+
+.video-suggested-duration {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.video-suggested-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.video-suggested-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: white;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.video-suggested-teacher {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.video-suggested-views {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .video-player-layout {
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  .video-player-main {
+    flex: none;
+  }
+
+  .video-sidebar {
+    flex: none;
+    padding-right: 0;
+  }
+
+  .video-suggested-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+  }
+
+  .video-suggested-card {
+    flex-direction: column;
+  }
+
+  .video-suggested-thumb {
+    width: 100%;
+    height: 140px;
+  }
+}
+
+@media (max-width: 640px) {
+  .video-player-layout {
+    padding: 0.5rem;
+  }
+
+  .video-title {
+    font-size: 1.25rem;
+  }
+
+  .video-actions {
+    flex-wrap: wrap;
+  }
+
+  .video-suggested-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================
+   CONTENT DETAIL MODAL
+   ========================================= */
+
+.content-detail-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  animation: fadeIn 0.2s ease;
+}
+
+.content-detail-modal {
+  background: white;
+  border-radius: 1.25rem;
+  width: 100%;
+  max-width: 380px;
+  max-height: 90vh;
+  overflow: hidden;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+  animation: modalSlideIn 0.25s ease-out;
+  position: relative;
+}
+
+.student-container.dark .content-detail-modal {
+  background: #1a0d0d;
+}
+
+.content-detail-close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  color: #333;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.content-detail-close:hover {
+  background: white;
+  transform: scale(1.1);
+}
+
+/* Thumbnail Section */
+.content-detail-thumbnail-section {
+  position: relative;
+}
+
+.content-detail-thumbnail {
+  width: 100%;
+  height: 200px;
+  background-size: cover;
+  background-position: center;
+  background-color: #1a1a2e;
+  position: relative;
+}
+
+.content-detail-thumbnail.premium {
+  filter: brightness(0.6);
+}
+
+.content-detail-thumbnail.premium::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(26, 26, 46, 0.7), rgba(26, 26, 46, 0.5));
+}
+
+.content-detail-category {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.content-detail-premium-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
+  padding: 0.375rem 0.75rem;
+  border-radius: 2rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.content-detail-lock-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.content-detail-lock-icon {
+  width: 64px;
+  height: 64px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(4px);
+}
+
+/* Body */
+.content-detail-body {
+  padding: 1.25rem;
+}
+
+.content-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.content-detail-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text-light);
+  margin: 0;
+  flex: 1;
+}
+
+.student-container.dark .content-detail-title {
+  color: var(--text-dark);
+}
+
+.content-detail-price {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.content-detail-price-label {
+  display: block;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.125rem;
+}
+
+.content-detail-price-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+/* Teacher Info */
+.content-detail-teacher {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.student-container.dark .content-detail-teacher {
+  border-bottom-color: var(--border-dark);
+}
+
+.content-detail-teacher-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  border: 2px solid white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.content-detail-teacher-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.content-detail-teacher-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-light);
+}
+
+.student-container.dark .content-detail-teacher-name {
+  color: var(--text-dark);
+}
+
+.content-detail-teacher-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+/* Action Buttons */
+.content-detail-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.content-detail-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.content-detail-btn span {
+  line-height: 1.2;
+}
+
+.content-detail-btn.unlock {
+  background: linear-gradient(135deg, var(--primary), #c9232b);
+  color: white;
+  border: none;
+}
+
+.content-detail-btn.unlock.free {
+  background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.content-detail-btn.unlock.free:hover {
+  background: linear-gradient(135deg, #059669, #047857);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.content-detail-btn.unlock:hover:not(:disabled) {
+  background: linear-gradient(135deg, #c9232b, #a91d24);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(234, 42, 51, 0.3);
+}
+
+.content-detail-btn.unlock:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.content-detail-btn.bid {
+  background: white;
+  color: var(--primary);
+  border: 2px solid var(--primary);
+}
+
+.student-container.dark .content-detail-btn.bid {
+  background: transparent;
+}
+
+.content-detail-btn.bid:hover {
+  background: rgba(234, 42, 51, 0.05);
+}
+
+/* Description */
+.content-detail-description {
+  display: flex;
+  gap: 0.75rem;
+  background: rgba(59, 130, 246, 0.08);
+  padding: 1rem;
+  border-radius: 0.75rem;
+  border-left: 3px solid #3b82f6;
+}
+
+.content-detail-info-icon {
+  color: #3b82f6;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.content-detail-description p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* =========================================
+   NOTIFICATION DROPDOWN
+   ========================================= */
+
+.notification-dropdown-wrapper {
+  position: relative;
+}
+
+.notification-badge-count {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: white;
+  background: var(--primary-color);
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: badge-pop 0.3s ease;
+}
+
+@keyframes badge-pop {
+  0% { transform: scale(0); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.notification-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 360px;
+  max-height: 480px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e5e7eb;
+  z-index: 100;
+  animation: dropdown-slide 0.2s ease;
+  overflow: hidden;
+}
+
+.student-container.dark .notification-dropdown {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+@keyframes dropdown-slide {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.notification-dropdown-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.student-container.dark .notification-dropdown-header {
+  border-color: #374151;
+}
+
+.notification-dropdown-header h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text-dark);
+}
+
+.student-container.dark .notification-dropdown-header h3 {
+  color: white;
+}
+
+.mark-all-read-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.75rem;
+  color: var(--primary-color);
+  background: rgba(234, 42, 51, 0.08);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.mark-all-read-btn:hover {
+  background: rgba(234, 42, 51, 0.15);
+}
+
+.notification-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.notification-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
+  color: var(--text-muted);
+}
+
+.notification-empty svg {
+  opacity: 0.3;
+  margin-bottom: 0.75rem;
+}
+
+.notification-empty p {
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.notification-item {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #f3f4f6;
+  transition: background 0.15s;
+}
+
+.student-container.dark .notification-item {
+  border-color: #374151;
+}
+
+.notification-item:hover {
+  background: #f9fafb;
+}
+
+.student-container.dark .notification-item:hover {
+  background: #374151;
+}
+
+.notification-item.unread {
+  background: rgba(234, 42, 51, 0.03);
+}
+
+.notification-item.unread:hover {
+  background: rgba(234, 42, 51, 0.06);
+}
+
+.notification-icon-wrapper {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f3f4f6;
+  flex-shrink: 0;
+}
+
+.student-container.dark .notification-icon-wrapper {
+  background: #374151;
+}
+
+.notif-icon.bid { color: #f59e0b; }
+.notif-icon.success { color: #10b981; }
+.notif-icon.error { color: #ef4444; }
+.notif-icon.counter { color: #3b82f6; }
+
+.notification-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.notification-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin: 0 0 0.25rem 0;
+  color: var(--text-dark);
+}
+
+.student-container.dark .notification-title {
+  color: white;
+}
+
+.notification-message {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 0 0 0.35rem 0;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.notification-time {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  opacity: 0.7;
+}
+
+.notification-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.notif-action-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.notif-action-btn:hover {
+  background: #e5e7eb;
+  color: var(--text-dark);
+}
+
+.notif-action-btn.delete:hover {
+  background: #fee2e2;
+  color: #ef4444;
+}
+
+/* =========================================
+   NAV BADGE (Sidebar notification count)
+   ========================================= */
+
+.nav-badge {
+  margin-left: auto;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: white;
+  background: var(--primary-color);
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* =========================================
+   ENHANCED MY BIDS VIEW
+   ========================================= */
+
+.bids-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.bid-card-enhanced {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.student-container.dark .bid-card-enhanced {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+.bid-card-enhanced:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12);
+}
+
+.bid-card-thumbnail-section {
+  position: relative;
+  height: 160px;
+}
+
+.bid-card-thumbnail {
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-color: #f3f4f6;
+}
+
+.bid-card-thumbnail.placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+  color: #9ca3af;
+}
+
+.bid-card-type-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 600;
+  border-radius: 6px;
+  text-transform: uppercase;
+}
+
+.bid-status-overlay {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 8px;
+}
+
+.bid-card-body-enhanced {
+  padding: 1.25rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.bid-card-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--text-dark);
+  line-height: 1.3;
+}
+
+.student-container.dark .bid-card-title {
+  color: white;
+}
+
+.bid-card-teacher {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.bid-card-teacher-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  background-color: #e5e7eb;
+}
+
+.bid-card-teacher-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.bid-card-teacher-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-dark);
+}
+
+.student-container.dark .bid-card-teacher-name {
+  color: white;
+}
+
+.bid-card-teacher-subtitle {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.bid-card-pricing {
+  background: #f9fafb;
+  border-radius: 10px;
+  padding: 0.875rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.student-container.dark .bid-card-pricing {
+  background: #374151;
+}
+
+.price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.price-row .price-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.price-row .price-value {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.price-row .price-value.original {
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
+.price-row .price-value.bid-amount {
+  color: var(--primary-color);
+}
+
+.price-row .price-value.counter-amount {
+  color: #3b82f6;
+}
+
+.price-row.highlight {
+  background: rgba(234, 42, 51, 0.08);
+  margin: 0 -0.5rem;
+  padding: 0.5rem;
+  border-radius: 6px;
+}
+
+.price-row.counter {
+  background: rgba(59, 130, 246, 0.08);
+  margin: 0 -0.5rem;
+  padding: 0.5rem;
+  border-radius: 6px;
+}
+
+.bid-discount-badge {
+  display: inline-block;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+  border-radius: 6px;
+  margin-top: 0.5rem;
+  width: fit-content;
+}
+
+.bid-card-date {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.bid-card-actions {
+  padding: 1rem 1.25rem;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.student-container.dark .bid-card-actions {
+  border-color: #374151;
+}
+
+.bid-action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.bid-action-btn.cancel {
+  background: #fee2e2;
+  color: #ef4444;
+}
+
+.bid-action-btn.cancel:hover {
+  background: #fecaca;
+}
+
+.bid-action-btn.accept {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+}
+
+.bid-action-btn.accept:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.bid-action-btn.decline {
+  background: #f3f4f6;
+  color: var(--text-dark);
+}
+
+.bid-action-btn.decline:hover {
+  background: #e5e7eb;
+}
+
+.bid-action-btn.watch,
+.bid-action-btn.join {
+  background: linear-gradient(135deg, var(--primary-color), #c9232b);
+  color: white;
+}
+
+.bid-action-btn.watch:hover,
+.bid-action-btn.join:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(234, 42, 51, 0.3);
+}
+
+.counter-action-buttons {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.counter-action-buttons .bid-action-btn {
+  flex: 1;
+}
+
+.bid-success-label,
+.bid-rejected-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 0.5rem;
+  border-radius: 8px;
+}
+
+.bid-success-label {
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.bid-rejected-label {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* =========================================
+   REQUESTED BADGE STYLES
+   ========================================= */
+
+/* Session Card - Requested State */
+.session-card-unified.requested {
+  border-color: #f59e0b;
+  background: linear-gradient(to bottom, rgba(245, 158, 11, 0.03), white);
+}
+
+.student-container.dark .session-card-unified.requested {
+  background: linear-gradient(to bottom, rgba(245, 158, 11, 0.08), #1f2937);
+}
+
+.session-price-pill-unified.requested {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.session-btn-unified.requested {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
+  cursor: not-allowed;
+  opacity: 0.9;
+}
+
+.session-footer-text-unified.requested {
+  color: #f59e0b;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  justify-content: center;
+  font-weight: 500;
+}
+
+/* Student Content Card - Requested State */
+.student-content-card.requested {
+  border-color: #f59e0b;
+}
+
+.scc-badge.requested {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.scc-title-clock {
+  color: #f59e0b;
+  margin-left: 0.5rem;
+  vertical-align: middle;
+}
+
+.scc-btn.requested {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
+  cursor: not-allowed;
+  opacity: 0.9;
+}
+
+.scc-btn.requested.full {
+  width: 100%;
+  margin-top: auto;
+  padding: 0.875rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  border-radius: 0 0 16px 16px;
+  border: none;
+}
+
+.scc-btn.cancel-bid {
+  background: white;
+  color: #ef4444;
+  border: 2px solid #ef4444;
+  cursor: pointer;
+}
+
+.scc-btn.cancel-bid.full {
+  width: 100%;
+  margin-top: auto;
+  padding: 0.875rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  border-radius: 0 0 16px 16px;
+}
+
+.scc-btn.cancel-bid:hover {
+  background: rgba(239, 68, 68, 0.05);
+}
+
+/* =========================================
+   STUDENT BIDS GRID - Dashboard
+   ========================================= */
+
+.student-bids-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .student-bids-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.student-bid-card {
+  background: white;
+  border-radius: 14px;
+  border: 1px solid var(--border-color);
+  padding: 1.25rem;
+  transition: all 0.2s ease;
+}
+
+.student-container.dark .student-bid-card {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+.student-bid-card:hover {
+  border-color: var(--primary-color);
+  box-shadow: 0 4px 12px rgba(234, 42, 51, 0.08);
+}
+
+.student-bid-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.875rem;
+}
+
+.student-bid-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 16px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.student-bid-price {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.student-bid-item {
+  margin-bottom: 0.75rem;
+}
+
+.student-bid-type {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.student-bid-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-dark);
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.student-container.dark .student-bid-title {
+  color: #f9fafb;
+}
+
+.student-bid-message {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin: 0 0 0.75rem 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.student-bid-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.student-container.dark .student-bid-footer {
+  border-color: #374151;
+}
+
+.student-bid-date {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.student-bid-counter {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #3b82f6;
+  background: #dbeafe;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+}
+
+/* =========================================
+   MY BIDS VIEW - Modern Cards
+   ========================================= */
+
+.bids-modern-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+@media (max-width: 1200px) {
+  .bids-modern-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .bids-modern-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.bid-modern-card {
+  background: white;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.2s ease;
+}
+
+.student-container.dark .bid-modern-card {
+  background: #1f2937;
+  border-color: #374151;
+}
+
+.bid-modern-card:hover {
+  border-color: #d1d5db;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+/* Card Header */
+.bid-modern-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.25rem 0 1.25rem;
+}
+
+.bid-modern-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.bid-modern-type {
+  font-size: 0.8rem;
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+/* Title */
+.bid-modern-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 1rem 1.25rem 0.875rem 1.25rem;
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.student-container.dark .bid-modern-title {
+  color: #f9fafb;
+}
+
+/* Teacher Info */
+.bid-modern-teacher {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0 1.25rem;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.bid-modern-teacher-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  background-color: #ea2a33;
+  flex-shrink: 0;
+}
+
+.bid-modern-teacher-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.bid-modern-teacher-name {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.student-container.dark .bid-modern-teacher-name {
+  color: #e5e7eb;
+}
+
+.bid-modern-teacher-role {
+  font-size: 0.7rem;
+  color: #9ca3af;
+}
+
+.bid-modern-discount-badge {
+  position: absolute;
+  right: 1.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #fef3c7;
+  color: #92400e;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Pricing Section */
+.bid-modern-pricing {
+  background: #f9fafb;
+  margin: 0 1.25rem;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  margin-bottom: 0.875rem;
+}
+
+.student-container.dark .bid-modern-pricing {
+  background: #111827;
+}
+
+.bid-modern-price-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.35rem 0;
+}
+
+.bid-modern-price-row.your-bid {
+  background: white;
+  margin: 0.35rem -0.5rem;
+  padding: 0.5rem 0.5rem;
+  border-radius: 6px;
+  border-left: 2px solid #ea2a33;
+}
+
+.student-container.dark .bid-modern-price-row.your-bid {
+  background: #1f2937;
+}
+
+.bid-modern-price-row.counter {
+  margin-top: 0.25rem;
+}
+
+.bid-modern-price-label {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.bid-modern-price-value {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.student-container.dark .bid-modern-price-value {
+  color: #e5e7eb;
+}
+
+.bid-modern-price-value.original {
+  text-decoration: line-through;
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+.bid-modern-price-value.highlight {
+  color: #ea2a33;
+  font-weight: 700;
+}
+
+.bid-modern-price-value.counter-value {
+  color: #6b7280;
+  font-weight: 600;
+}
+
+/* Date */
+.bid-modern-date {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0 1.25rem;
+  margin-bottom: 1rem;
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+/* Footer Actions */
+.bid-modern-footer {
+  margin-top: auto;
+  border-top: 1px solid #f3f4f6;
+  padding: 1rem 1.25rem;
+}
+
+.student-container.dark .bid-modern-footer {
+  background: transparent;
+  border-color: #374151;
+}
+
+/* Buttons */
+.bid-modern-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  width: 100%;
+}
+
+.bid-modern-btn.cancel {
+  background: transparent;
+  color: #ea2a33;
+  border: none;
+  padding: 0;
+  width: auto;
+  justify-content: flex-start;
+  font-weight: 500;
+}
+
+.bid-modern-btn.cancel:hover {
+  color: #dc2626;
+}
+
+.bid-modern-btn.join-session {
+  background: #ea2a33;
+  color: white;
+}
+
+.bid-modern-btn.join-session:hover {
+  background: #dc2626;
+}
+
+/* Counter Actions */
+.bid-modern-counter-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.bid-modern-btn.accept-counter {
+  background: #22c55e;
+  color: white;
+}
+
+.bid-modern-btn.accept-counter:hover {
+  background: #16a34a;
+}
+
+.bid-modern-btn.decline-counter {
+  background: transparent;
+  color: #6b7280;
+  border: 1px solid #e5e7eb;
+}
+
+.bid-modern-btn.decline-counter:hover {
+  border-color: #d1d5db;
+  color: #374151;
+}
+
+/* Accepted Section */
+.bid-modern-accepted-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  align-items: center;
+}
+
+.bid-modern-enrolled-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  color: #22c55e;
+  font-weight: 500;
+}
+
+/* Rejected Section */
+.bid-modern-rejected-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.75rem;
+  background: #fef2f2;
+  border-radius: 10px;
+  color: #dc2626;
+  font-size: 0.8rem;
+  font-weight: 500;
 }

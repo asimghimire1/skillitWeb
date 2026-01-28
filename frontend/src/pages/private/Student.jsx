@@ -8,6 +8,9 @@ import MyLearningView from '../../components/student/MyLearningView';
 import MyBidsView from '../../components/student/MyBidsView';
 import AddCreditsModal from '../../components/student/AddCreditsModal';
 import MakeBidModal from '../../components/student/MakeBidModal';
+import VideoPlayerModal from '../../components/student/VideoPlayerModal';
+import ContentDetailModal from '../../components/student/ContentDetailModal';
+import NotificationDropdown from '../../components/NotificationDropdown';
 import apiService from '../../services/apiService';
 import { useToast } from '../../context/ToastContext';
 import { useConfirm } from '../../context/ConfirmContext';
@@ -27,7 +30,9 @@ import {
   Settings,
   ChevronDown,
   Video,
-  Calendar
+  Calendar,
+  Clock,
+  Lock
 } from 'lucide-react';
 import '../../css/student.css';
 import '../../css/teacher.css';
@@ -45,7 +50,11 @@ export default function Student() {
   // Modal States
   const [isCreditsModalOpen, setIsCreditsModalOpen] = useState(false);
   const [isBidModalOpen, setIsBidModalOpen] = useState(false);
+  const [isEnrollModalOpen, setIsEnrollModalOpen] = useState(false);
+  const [isVideoPlayerOpen, setIsVideoPlayerOpen] = useState(false);
+  const [isContentDetailOpen, setIsContentDetailOpen] = useState(false);
   const [selectedSession, setSelectedSession] = useState(null);
+  const [selectedContent, setSelectedContent] = useState(null);
 
   // Data States
   const [stats, setStats] = useState({
@@ -61,6 +70,8 @@ export default function Student() {
   const [unlockedContent, setUnlockedContent] = useState([]);
   const [bids, setBids] = useState([]);
   const [recentPosts, setRecentPosts] = useState([]);
+  const [notificationCount, setNotificationCount] = useState(0);
+  const [bidNotificationCount, setBidNotificationCount] = useState(0);
 
   // Helper function to generate username URL
   const getUsernameUrl = (userData) => {
@@ -129,7 +140,14 @@ export default function Student() {
 
     // Fetch student's bids
     const bidsData = await apiService.getStudentBids(studentId);
-    if (bidsData) setBids(bidsData);
+    if (bidsData) {
+      setBids(bidsData);
+      // Count pending bids and counter offers as notifications for sidebar badge
+      const activeBidCount = bidsData.filter(b => 
+        b.status === 'pending' || b.status === 'counter' || b.status === 'countered'
+      ).length;
+      setBidNotificationCount(activeBidCount);
+    }
 
     // Fetch recent posts
     const postsData = await apiService.getRecentPosts(2);
@@ -152,40 +170,66 @@ export default function Student() {
   };
 
   const handleEnrollSession = async (session) => {
-    // Check if already enrolled
-    if (enrollments.some(e => e.sessionId === session.id || e.id === session.id)) {
-      showToast('You are already enrolled in this session!', 'info');
+    const isEnrolled = enrollments.some(e => e.sessionId === session.id || e.id === session.id);
+    
+    // If already enrolled, just open the meeting link (allows rejoin)
+    if (isEnrolled) {
+      if (session.meetingLink) {
+        window.open(session.meetingLink, '_blank');
+        showToast('Rejoining session...', 'success');
+      } else {
+        showToast('Meeting link not available yet', 'info');
+      }
       return;
     }
 
+    // For free sessions, enroll and redirect to meeting link directly
+    if (session.price === 0 || !session.price) {
+      const result = await apiService.enrollSession(session.id, student.id);
+      if (result.success) {
+        showToast('Successfully joined!', 'success');
+        fetchDashboardData(student.id);
+        // Redirect to meeting link if available
+        if (session.meetingLink) {
+          window.open(session.meetingLink, '_blank');
+        }
+      } else {
+        showToast(result.message || 'Failed to join. Please try again.', 'error');
+      }
+      return;
+    }
+
+    // For paid sessions, show the enrollment modal
+    setSelectedSession(session);
+    setIsEnrollModalOpen(true);
+  };
+
+  // Confirm enrollment from modal
+  const handleConfirmEnrollment = async () => {
+    if (!selectedSession) return;
+
     // Check credits
-    if (session.price > 0 && stats.credits < session.price) {
-      const needed = session.price - stats.credits;
+    if (stats.credits < selectedSession.price) {
+      const needed = selectedSession.price - stats.credits;
       showToast(`Insufficient credits. Add NPR ${needed} more.`, 'error');
+      setIsEnrollModalOpen(false);
       setIsCreditsModalOpen(true);
       return;
     }
 
-    const ok = await confirm({
-      title: session.price > 0 ? 'Confirm Enrollment' : 'Join Session',
-      message: session.price > 0 
-        ? `Enroll in "${session.title}" for NPR ${session.price}?` 
-        : `Join "${session.title}" for free?`,
-      confirmText: session.price > 0 ? 'Pay & Enroll' : 'Join',
-      type: 'default'
-    });
-
-    if (ok) {
-      const result = await apiService.enrollSession(session.id, student.id);
-      if (result.success) {
-        showToast('Successfully enrolled!', 'success');
-        if (session.price > 0) {
-          setStats(prev => ({ ...prev, credits: prev.credits - session.price }));
-        }
-        fetchDashboardData(student.id);
-      } else {
-        showToast(result.message || 'Failed to enroll. Please try again.', 'error');
+    const result = await apiService.enrollSession(selectedSession.id, student.id);
+    if (result.success) {
+      showToast('Successfully enrolled!', 'success');
+      setStats(prev => ({ ...prev, credits: prev.credits - selectedSession.price }));
+      fetchDashboardData(student.id);
+      setIsEnrollModalOpen(false);
+      setSelectedSession(null);
+      // Redirect to meeting link if available
+      if (selectedSession.meetingLink) {
+        window.open(selectedSession.meetingLink, '_blank');
       }
+    } else {
+      showToast(result.message || 'Failed to enroll. Please try again.', 'error');
     }
   };
 
@@ -294,21 +338,23 @@ export default function Student() {
   };
 
   const handleSubmitBid = async (bidData) => {
-    // Validate bid amount (40-100% of item price)
-    const minBid = selectedSession.price * 0.4;
+    // Validate bid amount (60-100% of item price, max 40% discount)
+    const minBid = selectedSession.price * 0.6;
     const maxBid = selectedSession.price;
 
     if (bidData.bidAmount < minBid || bidData.bidAmount > maxBid) {
-      showToast(`Bid must be between NPR ${minBid} and NPR ${maxBid}`, 'error');
+      showToast(`Bid must be between NPR ${Math.ceil(minBid).toLocaleString()} and NPR ${maxBid.toLocaleString()}`, 'error');
       return;
     }
 
     const result = await apiService.submitBid({
-      sessionId: bidData.sessionId,
+      sessionId: bidData.itemType === 'session' ? bidData.itemId : null,
+      contentId: bidData.itemType === 'content' ? bidData.itemId : null,
       learnerId: student.id,
       teacherId: selectedSession.teacherId,
       proposedPrice: bidData.bidAmount,
       message: bidData.message,
+      itemType: bidData.itemType || 'session',
       status: 'pending'
     });
 
@@ -322,7 +368,21 @@ export default function Student() {
     }
   };
 
-  const handleCancelBid = async (bidId) => {
+  const handleCancelBid = async (bidIdOrSession) => {
+    // If it's a session object, find the pending bid for it
+    let bidId = bidIdOrSession;
+    if (typeof bidIdOrSession === 'object' && bidIdOrSession.id) {
+      const pendingBid = bids.find(b => 
+        (b.sessionId === bidIdOrSession.id || b.contentId === bidIdOrSession.id) && 
+        b.status === 'pending'
+      );
+      if (!pendingBid) {
+        showToast('No pending bid found', 'error');
+        return;
+      }
+      bidId = pendingBid.id;
+    }
+
     const ok = await confirm({
       title: 'Cancel Bid',
       message: 'Are you sure you want to cancel this bid?',
@@ -388,6 +448,18 @@ export default function Student() {
         break;
       case 'declineCounter':
         handleRespondToCounter(data, false);
+        break;
+      case 'viewDetails':
+        // Open content detail modal
+        if (data) {
+          const enrichedContent = {
+            ...data,
+            teacherName: data.teacherName || teachers.find(t => t.id === data.teacherId)?.fullname || 'Expert Teacher',
+            teacherAvatar: data.teacherAvatar || teachers.find(t => t.id === data.teacherId)?.avatar
+          };
+          setSelectedContent(enrichedContent);
+          setIsContentDetailOpen(true);
+        }
         break;
       default:
         break;
@@ -461,6 +533,9 @@ export default function Student() {
             >
               <Gavel size={20} />
               <span>My Bids</span>
+              {bidNotificationCount > 0 && (
+                <span className="nav-badge">{bidNotificationCount > 9 ? '9+' : bidNotificationCount}</span>
+              )}
             </button>
             <button 
               className={`nav-item ${activeTab === 'teachers' ? 'active' : ''}`}
@@ -532,10 +607,10 @@ export default function Student() {
               <Search size={18} />
               <input type="text" placeholder="Search sessions..." />
             </div>
-            <button className="notification-btn">
-              <Bell size={20} />
-              <span className="notification-dot"></span>
-            </button>
+            <NotificationDropdown 
+              userId={student?.id} 
+              onNotificationCountChange={setNotificationCount}
+            />
           </div>
         </header>
 
@@ -551,14 +626,21 @@ export default function Student() {
               unlockedContent={unlockedContent}
               recentPosts={recentPosts}
               student={student}
+              bids={bids}
               onAction={handleAction}
               onJoinContent={handleJoinContent}
               onMakeBid={handleMakeBid}
+              onCancelBid={handleCancelBid}
               onEnrollSession={handleEnrollSession}
               onWatchContent={(item) => {
-                if (item.videoUrl || item.fileUrl) {
-                  window.open(item.videoUrl || item.fileUrl, '_blank');
-                }
+                // Enrich content with teacher info if not present
+                const enrichedItem = {
+                  ...item,
+                  teacherName: item.teacherName || teachers.find(t => t.id === item.teacherId)?.fullname || 'Teacher',
+                  teacherAvatar: item.teacherAvatar || teachers.find(t => t.id === item.teacherId)?.avatar
+                };
+                setSelectedContent(enrichedItem);
+                setIsVideoPlayerOpen(true);
               }}
             />
           )}
@@ -567,8 +649,11 @@ export default function Student() {
             <ExploreContentView
               content={content}
               unlockedContent={unlockedContent}
+              bids={bids}
               onJoinContent={handleJoinContent}
               onMakeBid={handleMakeBid}
+              onCancelBid={handleCancelBid}
+              onAction={handleAction}
             />
           )}
 
@@ -577,8 +662,10 @@ export default function Student() {
               sessions={sessions}
               teachers={teachers}
               enrollments={enrollments}
+              bids={bids}
               onEnroll={handleEnrollSession}
               onMakeBid={handleMakeBid}
+              onCancelBid={handleCancelBid}
             />
           )}
 
@@ -589,11 +676,16 @@ export default function Student() {
               enrollments={enrollments}
               unlockedContent={unlockedContent}
               onWatchContent={(item) => {
-                // Open video player or content viewer
-                if (item.videoUrl || item.fileUrl) {
-                  window.open(item.videoUrl || item.fileUrl, '_blank');
-                }
+                // Enrich content with teacher info if not present
+                const enrichedItem = {
+                  ...item,
+                  teacherName: item.teacherName || teachers.find(t => t.id === item.teacherId)?.fullname || 'Teacher',
+                  teacherAvatar: item.teacherAvatar || teachers.find(t => t.id === item.teacherId)?.avatar
+                };
+                setSelectedContent(enrichedItem);
+                setIsVideoPlayerOpen(true);
               }}
+              onJoinSession={handleEnrollSession}
             />
           )}
 
@@ -616,8 +708,21 @@ export default function Student() {
           {activeTab === 'bids' && (
             <MyBidsView
               bids={bids}
+              sessions={sessions}
+              content={content}
+              teachers={teachers}
               onRespondToCounter={(bid, action) => handleRespondToCounter(bid.id, action === 'accept')}
               onCancelBid={handleCancelBid}
+              onWatchContent={(item) => {
+                const enrichedItem = {
+                  ...item,
+                  teacherName: item.teacherName || teachers.find(t => t.id === item.teacherId)?.fullname || 'Teacher',
+                  teacherAvatar: item.teacherAvatar || teachers.find(t => t.id === item.teacherId)?.avatar
+                };
+                setSelectedContent(enrichedItem);
+                setIsVideoPlayerOpen(true);
+              }}
+              onJoinSession={handleEnrollSession}
             />
           )}
         </div>
@@ -638,6 +743,137 @@ export default function Student() {
         session={selectedSession}
         userBalance={stats.credits}
       />
+
+      {/* Video Player Modal */}
+      {isVideoPlayerOpen && selectedContent && (
+        <VideoPlayerModal
+          content={selectedContent}
+          onClose={() => { setIsVideoPlayerOpen(false); setSelectedContent(null); }}
+          suggestedContent={content
+            .filter(c => c.id !== selectedContent.id && unlockedContent.some(u => u.contentId === c.id || u.id === c.id))
+            .map(c => ({
+              ...c,
+              teacherName: c.teacherName || teachers.find(t => t.id === c.teacherId)?.fullname || 'Teacher',
+              teacherAvatar: c.teacherAvatar || teachers.find(t => t.id === c.teacherId)?.avatar
+            }))
+            .slice(0, 10)
+          }
+          onSelectContent={(item) => {
+            setSelectedContent(item);
+          }}
+          baseUrl={import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000'}
+        />
+      )}
+
+      {/* Content Detail Modal */}
+      {isContentDetailOpen && selectedContent && (
+        <ContentDetailModal
+          content={selectedContent}
+          onClose={() => { setIsContentDetailOpen(false); setSelectedContent(null); }}
+          onUnlock={(item) => {
+            setIsContentDetailOpen(false);
+            handleJoinContent(item);
+          }}
+          onMakeBid={(item) => {
+            setIsContentDetailOpen(false);
+            handleMakeBid(item);
+          }}
+          userBalance={stats.credits}
+          baseUrl={import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000'}
+        />
+      )}
+
+      {/* Session Enrollment Modal */}
+      {isEnrollModalOpen && selectedSession && (
+        <div className="modal-overlay" onClick={() => { setIsEnrollModalOpen(false); setSelectedSession(null); }}>
+          <div className="enroll-modal" onClick={e => e.stopPropagation()}>
+            {/* Header */}
+            <div className="enroll-modal-header">
+              <div className="enroll-date-pill">
+                <Calendar size={14} />
+                {(() => {
+                  const date = new Date(selectedSession.scheduledDate);
+                  const today = new Date();
+                  const tomorrow = new Date(today);
+                  tomorrow.setDate(tomorrow.getDate() + 1);
+                  if (date.toDateString() === today.toDateString()) return 'Today';
+                  if (date.toDateString() === tomorrow.toDateString()) return 'Tomorrow';
+                  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                })()}
+              </div>
+              <div className="enroll-price-badge">
+                NPR {selectedSession.price?.toLocaleString()}
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="enroll-modal-body">
+              <h2 className="enroll-modal-title">{selectedSession.title}</h2>
+              
+              {selectedSession.description && (
+                <p className="enroll-modal-desc">{selectedSession.description}</p>
+              )}
+
+              {/* Instructor */}
+              <div className="enroll-instructor">
+                <div 
+                  className="enroll-instructor-avatar"
+                  style={{
+                    backgroundImage: `url('${selectedSession.teacherAvatar || 
+                      `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedSession.teacherName || 'Teacher')}&background=ea2a33&color=fff`}')`
+                  }}
+                />
+                <div className="enroll-instructor-info">
+                  <span className="enroll-instructor-label">INSTRUCTOR</span>
+                  <span className="enroll-instructor-name">{selectedSession.teacherName || 'Teacher'}</span>
+                </div>
+              </div>
+
+              {/* Meta */}
+              <div className="enroll-meta">
+                <span className="enroll-meta-item">
+                  <Clock size={16} />
+                  {selectedSession.scheduledTime || '10:00'}
+                </span>
+                <span className="enroll-meta-item">
+                  <Video size={16} />
+                  {selectedSession.duration || 60} mins
+                </span>
+                <span className="enroll-meta-item">
+                  <Users size={16} />
+                  {selectedSession.enrolledCount || 0}/{selectedSession.maxParticipants || 22} spots left
+                </span>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="enroll-modal-footer">
+              <div className="enroll-wallet-balance">
+                <Wallet size={16} />
+                Wallet Balance: NPR {stats.credits?.toLocaleString()}
+              </div>
+              
+              <button 
+                className="enroll-unlock-btn"
+                onClick={handleConfirmEnrollment}
+                disabled={stats.credits < selectedSession.price}
+              >
+                <Lock size={18} />
+                Unlock for NPR {selectedSession.price?.toLocaleString()}
+              </button>
+
+              {stats.credits < selectedSession.price && (
+                <button 
+                  className="enroll-add-credits-link"
+                  onClick={() => { setIsEnrollModalOpen(false); setIsCreditsModalOpen(true); }}
+                >
+                  + Add Credits
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

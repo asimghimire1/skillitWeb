@@ -16,10 +16,15 @@ import {
     ChevronUp,
     ChevronDown,
     Edit,
-    VideoIcon
+    VideoIcon,
+    Clock,
+    CheckCircle,
+    XCircle,
+    MessageSquare,
+    Gavel
 } from 'lucide-react';
 
-const DashboardView = ({ stats, uploads, sessions, posts, quickActions, onAction, teacher, onSessionStatusUpdate }) => {
+const DashboardView = ({ stats, uploads, sessions, posts, quickActions, onAction, teacher, onSessionStatusUpdate, bids = [], onRespondToBid }) => {
     const { showToast } = useToast();
     // Use the passed posts, sorted by newest first - show only 2 latest
     const recentPosts = [...(posts || [])].sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 2);
@@ -31,11 +36,16 @@ const DashboardView = ({ stats, uploads, sessions, posts, quickActions, onAction
         return saved ? JSON.parse(saved) : [];
     });
 
-    // Filter sessions - only show upcoming sessions that haven't passed by 30 mins
+    // Filter sessions - show upcoming sessions
     const getFilteredSessions = () => {
         const now = new Date();
+        
+        console.log('[DashboardView] Total sessions:', sessions?.length);
+        
+        if (!sessions || sessions.length === 0) return [];
+        
         return sessions.filter(session => {
-            const sessionDateTime = new Date(`${session.scheduledDate}T${session.scheduledTime}`);
+            const sessionDateTime = new Date(`${session.scheduledDate}T${session.scheduledTime || '00:00'}`);
             const timeDiff = (now - sessionDateTime) / (1000 * 60); // difference in minutes
             
             // If session is more than 30 mins past, it should be moved to sessions view
@@ -49,8 +59,8 @@ const DashboardView = ({ stats, uploads, sessions, posts, quickActions, onAction
             }
             return true;
         }).sort((a, b) => {
-            const dateA = new Date(`${a.scheduledDate}T${a.scheduledTime}`);
-            const dateB = new Date(`${b.scheduledDate}T${b.scheduledTime}`);
+            const dateA = new Date(`${a.scheduledDate}T${a.scheduledTime || '00:00'}`);
+            const dateB = new Date(`${b.scheduledDate}T${b.scheduledTime || '00:00'}`);
             return dateA - dateB; // Sort by nearest first
         });
     };
@@ -78,8 +88,60 @@ const DashboardView = ({ stats, uploads, sessions, posts, quickActions, onAction
         { icon: <Wallet size={24} />, label: 'Monthly Earnings', value: `NPR ${(stats.monthlyEarnings || 0).toLocaleString()}`, color: '#ea2a33' },
     ];
 
-    // TODO: Replace with real API data
-    const bidRequests = [];
+    // Process bids - enrich with session/content data and show latest 2
+    const safeBids = Array.isArray(bids) ? bids : [];
+    const enrichedBids = safeBids.map(bid => {
+        let itemData = null;
+        let itemType = null;
+        let itemTitle = '';
+
+        if (bid.sessionId) {
+            itemData = sessions?.find(s => s.id === bid.sessionId);
+            itemType = 'session';
+            itemTitle = bid.sessionTitle || itemData?.title || 'Session';
+        } else if (bid.contentId) {
+            itemData = uploads?.find(c => c.id === bid.contentId);
+            itemType = 'content';
+            itemTitle = bid.contentTitle || itemData?.title || 'Content';
+        }
+
+        return {
+            ...bid,
+            itemData,
+            itemType,
+            itemTitle,
+            originalPrice: bid.originalPrice || itemData?.price || 0
+        };
+    });
+
+    // Sort by newest first and get latest 2 bids
+    const bidRequests = enrichedBids
+        .sort((a, b) => new Date(b.created_at || b.createdAt) - new Date(a.created_at || a.createdAt))
+        .slice(0, 2);
+
+    const getStatusConfig = (status) => {
+        switch (status) {
+            case 'pending':
+                return { color: '#f59e0b', bg: '#fef3c7', icon: <Clock size={14} />, label: 'Pending' };
+            case 'counter':
+            case 'countered':
+                return { color: '#3b82f6', bg: '#dbeafe', icon: <MessageSquare size={14} />, label: 'Counter Sent' };
+            case 'accepted':
+                return { color: '#22c55e', bg: '#dcfce7', icon: <CheckCircle size={14} />, label: 'Accepted' };
+            case 'rejected':
+                return { color: '#ef4444', bg: '#fee2e2', icon: <XCircle size={14} />, label: 'Declined' };
+            default:
+                return { color: '#6b7280', bg: '#f3f4f6', icon: <Clock size={14} />, label: status };
+        }
+    };
+
+    const handleAcceptBid = (bid) => {
+        onRespondToBid && onRespondToBid(bid.id, 'accept');
+    };
+
+    const handleRejectBid = (bid) => {
+        onRespondToBid && onRespondToBid(bid.id, 'reject');
+    };
 
     return (
         <>
@@ -222,7 +284,7 @@ const DashboardView = ({ stats, uploads, sessions, posts, quickActions, onAction
                     {bidRequests.length === 0 ? (
                         <div className="empty-state">
                             <div className="empty-state-icon">
-                                <Banknote size={24} />
+                                <Gavel size={24} />
                             </div>
                             <h3 className="empty-state-title">No Bids Yet</h3>
                             <p className="empty-state-text">
@@ -230,42 +292,83 @@ const DashboardView = ({ stats, uploads, sessions, posts, quickActions, onAction
                             </p>
                         </div>
                     ) : (
-                        <div className="bids-grid">
-                            {bidRequests.map((bid) => (
-                                <div key={bid.id} className="bid-card">
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                            <div className="bid-student-avatar" style={{ backgroundImage: `url('${bid.avatar}')` }}></div>
-                                            <div>
-                                                <h4 className="bid-student-name">{bid.studentName}</h4>
-                                                <div className="bid-time">
-                                                    <History size={10} />
-                                                    {bid.timeAgo}
-                                                </div>
+                        <div className="bid-requests-list" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1rem' }}>
+                            {bidRequests.map((bid) => {
+                                const statusConfig = getStatusConfig(bid.status);
+                                const discountPercent = bid.originalPrice > 0 
+                                    ? Math.round((1 - (bid.proposedPrice / bid.originalPrice)) * 100)
+                                    : 0;
+
+                                return (
+                                    <div key={bid.id} className="bid-proposal-card">
+                                        {/* Card Header - Status & Price */}
+                                        <div className="bid-proposal-header">
+                                            <div 
+                                                className="bid-proposal-status"
+                                                style={{ backgroundColor: statusConfig.bg, color: statusConfig.color }}
+                                            >
+                                                {statusConfig.icon}
+                                                <span>{statusConfig.label}</span>
                                             </div>
-                                        </div>
-                                        <div style={{ textAlign: 'right' }}>
-                                            <span className="bid-skill-label">Requested Skill</span>
-                                            <p className="bid-skill-value">{bid.skill}</p>
-                                        </div>
-                                    </div>
-                                    <div className="bid-info-box">
-                                        <div>
-                                            <p className="bid-base-price">Base Price: <span style={{ textDecoration: 'line-through' }}>${bid.basePrice.toFixed(2)}</span></p>
-                                            <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem' }}>
-                                                <span className="bid-price">${bid.bidAmount.toFixed(2)}</span>
-                                                <span className="bid-trend">
-                                                    <TrendingUp size={12} /> +{bid.increase}%
+                                            <div className="bid-proposal-price">
+                                                <span className="price-label">PROPOSED TOTAL</span>
+                                                <span className="price-amount">NPR {(bid.proposedPrice || 0).toLocaleString()}</span>
+                                                <span className="price-breakdown">
+                                                    NPR {(bid.originalPrice || 0).toLocaleString()} Base {discountPercent > 0 ? `• ${discountPercent}% off` : ''}
                                                 </span>
                                             </div>
                                         </div>
-                                        <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                            <button className="btn-premium btn-secondary" onClick={() => showToast('Inquiry sent to Sarah', 'info')}>Decline</button>
-                                            <button className="btn-premium btn-primary" onClick={() => showToast('Bid accepted! Preparing session...', 'success')}>Accept Bid</button>
+
+                                        {/* Student Info */}
+                                        <div className="bid-proposal-student">
+                                            <h3 className="student-name">{bid.studentName || 'Student'}</h3>
+                                            <div className="student-item">
+                                                <span className="item-dot"></span>
+                                                <span className="item-text">
+                                                    {bid.itemType === 'session' ? 'Session' : 'Content'}: {bid.itemTitle}
+                                                </span>
+                                            </div>
                                         </div>
+
+                                        {/* Message Quote */}
+                                        {bid.message && (
+                                            <div className="bid-proposal-message">
+                                                <div className="message-quote-icon">
+                                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                                                        <path d="M10 8C10 5.79086 8.20914 4 6 4C3.79086 4 2 5.79086 2 8C2 10.2091 3.79086 12 6 12C6.03043 12 6.06079 11.9997 6.09107 11.9992C6.03099 12.3258 6 12.6594 6 13C6 16.3137 8.68629 19 12 19V17C9.79086 17 8 15.2091 8 13C8 12.6597 8.03088 12.3264 8.09058 12.0002C8.06058 12.0001 8.03032 12 8 12C8.20914 12 10 10.2091 10 8Z" fill="#ea2a33"/>
+                                                        <path d="M22 8C22 5.79086 20.2091 4 18 4C15.7909 4 14 5.79086 14 8C14 10.2091 15.7909 12 18 12C18.0304 12 18.0608 11.9997 18.0911 11.9992C18.031 12.3258 18 12.6594 18 13C18 16.3137 20.6863 19 24 19V17C21.7909 17 20 15.2091 20 13C20 12.6597 20.0309 12.3264 20.0906 12.0002C20.0606 12.0001 20.0303 12 20 12C20.2091 12 22 10.2091 22 8Z" fill="#ea2a33"/>
+                                                    </svg>
+                                                </div>
+                                                <p className="message-text" style={{ 
+                                                    overflow: 'hidden', 
+                                                    textOverflow: 'ellipsis', 
+                                                    display: '-webkit-box', 
+                                                    WebkitLineClamp: 2, 
+                                                    WebkitBoxOrient: 'vertical' 
+                                                }}>"{bid.message}"</p>
+                                            </div>
+                                        )}
+
+                                        {/* Actions - only for pending bids */}
+                                        {bid.status === 'pending' && (
+                                            <div className="bid-proposal-actions">
+                                                <button 
+                                                    className="bid-action-btn decline"
+                                                    onClick={() => handleRejectBid(bid)}
+                                                >
+                                                    Decline
+                                                </button>
+                                                <button 
+                                                    className="bid-action-btn accept"
+                                                    onClick={() => handleAcceptBid(bid)}
+                                                >
+                                                    Accept
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     )}
                 </div>

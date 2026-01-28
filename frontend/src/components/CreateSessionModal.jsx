@@ -58,12 +58,17 @@ export default function CreateSessionModal({ isOpen, onClose, onCreate, sessionT
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        console.log('[CreateSessionModal] Form submitted');
+        console.log('[CreateSessionModal] formData:', formData);
+        
         const sessionData = {
             ...formData,
-            allowBidding: formData.paymentType === 'bid',
+            allowBidding: formData.paymentType === 'paid', // Paid sessions allow bidding
             price: formData.paymentType === 'free' ? 0 : parseFloat(formData.price) || 0,
             maxParticipants: formData.maxParticipants ? parseInt(formData.maxParticipants) : null
         };
+        
+        console.log('[CreateSessionModal] Calling onCreate with:', sessionData);
         onCreate(sessionData);
         onClose();
     };
@@ -223,7 +228,7 @@ export default function CreateSessionModal({ isOpen, onClose, onCreate, sessionT
                                     </div>
                                 </div>
                                 <div className="md:col-span-2 space-y-2">
-                                    <label className="modal-label">Meeting URL</label>
+                                    <label className="modal-label">Meeting URL <span className="text-gray-400 font-normal">(optional)</span></label>
                                     <input
                                         className="modal-input"
                                         placeholder="https://meet.google.com/..."
@@ -231,7 +236,6 @@ export default function CreateSessionModal({ isOpen, onClose, onCreate, sessionT
                                         name="meetingLink"
                                         value={formData.meetingLink}
                                         onChange={handleChange}
-                                        required
                                     />
                                 </div>
                             </div>
@@ -255,25 +259,17 @@ export default function CreateSessionModal({ isOpen, onClose, onCreate, sessionT
                                 </button>
                                 <button
                                     type="button"
-                                    onClick={() => setFormData(prev => ({ ...prev, paymentType: 'paid', allowBidding: false }))}
+                                    onClick={() => setFormData(prev => ({ ...prev, paymentType: 'paid', allowBidding: true }))}
                                     className={`upload-pricing-btn ${formData.paymentType === 'paid' ? 'active' : 'inactive'}`}
                                 >
                                     <span className="material-symbols-outlined text-lg">attach_money</span>
                                     Paid
                                 </button>
-                                <button
-                                    type="button"
-                                    onClick={() => setFormData(prev => ({ ...prev, paymentType: 'bid', allowBidding: true }))}
-                                    className={`upload-pricing-btn ${formData.paymentType === 'bid' ? 'active' : 'inactive'}`}
-                                >
-                                    <span className="material-symbols-outlined text-lg">gavel</span>
-                                    Bidding
-                                </button>
                             </div>
 
-                            {(formData.paymentType === 'paid' || formData.paymentType === 'bid') && (
+                            {formData.paymentType === 'paid' && (
                                 <div className="space-y-2 animate-fade-in">
-                                    <label className="modal-label">{formData.paymentType === 'bid' ? 'Starting Price (NPR)' : 'Price (NPR)'}</label>
+                                    <label className="modal-label">Price (NPR) - Students can also bid</label>
                                     <div className="upload-price-input-wrapper">
                                         <span className="absolute left-5 top-1/2 -translate-y-1/2 font-black text-gray-400">Rs.</span>
                                         <input

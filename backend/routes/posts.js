@@ -20,11 +20,11 @@ router.get('/', async (req, res) => {
             const postData = post.toJSON();
             if (post.teacherId) {
                 const teacher = await User.findByPk(post.teacherId, {
-                    attributes: ['id', 'fullname', 'profilePicture', 'bio']
+                    attributes: ['id', 'fullname', 'avatar', 'bio']
                 });
                 if (teacher) {
                     postData.teacherName = teacher.fullname;
-                    postData.teacherAvatar = teacher.profilePicture;
+                    postData.teacherAvatar = teacher.avatar;
                     postData.teacherBio = teacher.bio;
                 }
             }

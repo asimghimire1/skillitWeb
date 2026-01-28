@@ -13,18 +13,22 @@ import {
   Play
 } from 'lucide-react';
 import PremiumDropdown from '../PremiumDropdown';
+import SessionCard from './SessionCard';
 
 const ExploreSessionsView = ({
   sessions,
   teachers,
   enrollments,
+  bids = [],
   onEnroll,
-  onMakeBid
+  onMakeBid,
+  onCancelBid
 }) => {
   // Safe array defaults
   const safeSessions = Array.isArray(sessions) ? sessions : [];
   const safeTeachers = Array.isArray(teachers) ? teachers : [];
   const safeEnrollments = Array.isArray(enrollments) ? enrollments : [];
+  const safeBids = Array.isArray(bids) ? bids : [];
 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTeacher, setSelectedTeacher] = useState('all');
@@ -86,6 +90,14 @@ const ExploreSessionsView = ({
     );
   };
 
+  // Check if session has a pending bid
+  const hasPendingBid = (session) => {
+    return safeBids.some(b => 
+      (b.sessionId === session.id || b.sessionId === String(session.id) || String(b.sessionId) === String(session.id)) && 
+      (b.status === 'pending' || b.status === 'counter' || b.status === 'countered')
+    );
+  };
+
   // Filter and sort sessions
   const filteredSessions = useMemo(() => {
     const today = new Date();
@@ -104,8 +116,7 @@ const ExploreSessionsView = ({
     endOfNextWeek.setDate(endOfNextWeek.getDate() + 6);
 
     let filtered = safeSessions.filter(session => {
-      // Exclude already enrolled sessions
-      if (isEnrolled(session)) return false;
+      // Keep enrolled sessions visible (don't filter them out)
 
       // Exclude past sessions
       const sessionDate = new Date(`${session.scheduledDate}T${session.scheduledTime || '00:00'}`);
@@ -284,139 +295,18 @@ const ExploreSessionsView = ({
       ) : (
         <div className={viewMode === 'grid' ? 'session-cards-grid' : 'session-cards-list'}>
           {filteredSessions.map((session, idx) => (
-            <SessionExploreCard
+            <SessionCard
               key={session.id || idx}
               session={session}
               onEnroll={onEnroll}
               onMakeBid={onMakeBid}
-              formatDate={formatDate}
+              onCancelBid={onCancelBid}
+              isEnrolled={isEnrolled(session)}
+              hasPendingBid={hasPendingBid(session)}
             />
           ))}
         </div>
       )}
-    </div>
-  );
-};
-
-// Session Explore Card Component
-const SessionExploreCard = ({ session, onEnroll, onMakeBid, formatDate }) => {
-  const isFree = !session.price || session.price === 0;
-  const allowsBidding = session.allowBidding === true;
-
-  return (
-    <div className="session-explore-card">
-      {/* Header */}
-      <div className="session-explore-header">
-        <div className="session-date-time">
-          <div className="session-date-badge-lg">
-            <Calendar size={16} />
-            <span>{formatDate(session.scheduledDate)}</span>
-          </div>
-          <div className="session-time-badge">
-            <Clock size={14} />
-            <span>{session.scheduledTime}</span>
-          </div>
-        </div>
-        
-        {isFree ? (
-          <span className="session-price-badge-lg free">
-            <Sparkles size={14} />
-            Free
-          </span>
-        ) : allowsBidding ? (
-          <span className="session-price-badge-lg bidding">
-            <Gavel size={14} />
-            Bidding
-          </span>
-        ) : (
-          <span className="session-price-badge-lg paid">
-            <Tag size={14} />
-            NPR {session.price?.toLocaleString()}
-          </span>
-        )}
-      </div>
-
-      {/* Body */}
-      <div className="session-explore-body">
-        <h3 className="session-explore-title">{session.title}</h3>
-        
-        {session.description && (
-          <p className="session-explore-desc">{session.description}</p>
-        )}
-
-        {/* Teacher Info */}
-        <div className="session-explore-teacher">
-          <div 
-            className="session-explore-avatar"
-            style={{
-              backgroundImage: `url('${session.teacherAvatar || 
-                `https://ui-avatars.com/api/?name=${encodeURIComponent(session.teacherName || 'Teacher')}&background=ea2a33&color=fff`}')`
-            }}
-          />
-          <div className="session-explore-teacher-info">
-            <span className="session-explore-teacher-name">{session.teacherName}</span>
-            {session.teacherTitle && (
-              <span className="session-explore-teacher-title">{session.teacherTitle}</span>
-            )}
-          </div>
-        </div>
-
-        {/* Meta Info */}
-        <div className="session-explore-meta">
-          <span className="session-meta-tag">
-            <Video size={14} />
-            {session.duration || 60} mins
-          </span>
-          {session.maxParticipants && (
-            <span className="session-meta-tag">
-              <Users size={14} />
-              {session.enrolledCount || 0}/{session.maxParticipants} spots
-            </span>
-          )}
-          {session.type && (
-            <span className="session-meta-tag">
-              <Tag size={14} />
-              {session.type}
-            </span>
-          )}
-        </div>
-      </div>
-
-      {/* Footer */}
-      <div className="session-explore-footer">
-        {isFree ? (
-          <button 
-            className="session-explore-btn enroll-free"
-            onClick={() => onEnroll && onEnroll(session)}
-          >
-            <Play size={16} />
-            Join Free
-          </button>
-        ) : allowsBidding ? (
-          <div className="session-explore-actions">
-            <button 
-              className="session-explore-btn enroll-paid"
-              onClick={() => onEnroll && onEnroll(session)}
-            >
-              Enroll Now
-            </button>
-            <button 
-              className="session-explore-btn make-bid"
-              onClick={() => onMakeBid && onMakeBid(session)}
-            >
-              <Gavel size={16} />
-              Make a Bid
-            </button>
-          </div>
-        ) : (
-          <button 
-            className="session-explore-btn enroll-paid"
-            onClick={() => onEnroll && onEnroll(session)}
-          >
-            Enroll for NPR {session.price?.toLocaleString()}
-          </button>
-        )}
-      </div>
     </div>
   );
 };

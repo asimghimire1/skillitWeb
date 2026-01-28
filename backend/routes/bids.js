@@ -6,6 +6,24 @@ const Session = require('../models/Session');
 const Content = require('../models/Content');
 const StudentEnrollment = require('../models/StudentEnrollment');
 const StudentContent = require('../models/StudentContent');
+const Notification = require('../models/Notification');
+
+// Helper function to create notification
+const createNotification = async (userId, type, title, message, relatedId, relatedType, metadata = null) => {
+    try {
+        await Notification.create({
+            userId,
+            type,
+            title,
+            message,
+            relatedId,
+            relatedType,
+            metadata: metadata ? JSON.stringify(metadata) : null
+        });
+    } catch (error) {
+        console.error('Failed to create notification:', error);
+    }
+};
 
 // GET /api/bids/student/:studentId
 // Returns student's bids with session/content and teacher info
@@ -24,11 +42,11 @@ router.get('/student/:studentId', async (req, res) => {
             // Get teacher info
             if (bid.teacherId) {
                 const teacher = await User.findByPk(bid.teacherId, {
-                    attributes: ['id', 'fullname', 'profilePicture']
+                    attributes: ['id', 'fullname', 'avatar']
                 });
                 if (teacher) {
                     bidData.teacherName = teacher.fullname;
-                    bidData.teacherAvatar = teacher.profilePicture;
+                    bidData.teacherAvatar = teacher.avatar;
                 }
             }
 
@@ -78,11 +96,11 @@ router.get('/teacher/:teacherId', async (req, res) => {
             // Get student info
             if (bid.learnerId) {
                 const student = await User.findByPk(bid.learnerId, {
-                    attributes: ['id', 'fullname', 'profilePicture', 'email']
+                    attributes: ['id', 'fullname', 'avatar', 'email']
                 });
                 if (student) {
                     bidData.studentName = student.fullname;
-                    bidData.studentAvatar = student.profilePicture;
+                    bidData.studentAvatar = student.avatar;
                     bidData.studentEmail = student.email;
                 }
             }
@@ -120,6 +138,32 @@ router.post('/', async (req, res) => {
     try {
         const bidData = req.body;
         const bid = await Bid.create(bidData);
+
+        // Get item name for notification
+        let itemName = 'item';
+        if (bidData.sessionId) {
+            const session = await Session.findByPk(bidData.sessionId);
+            itemName = session?.title || 'session';
+        } else if (bidData.contentId) {
+            const content = await Content.findByPk(bidData.contentId);
+            itemName = content?.title || 'content';
+        }
+
+        // Get student name
+        const student = await User.findByPk(bidData.learnerId);
+        const studentName = student?.fullname || 'A student';
+
+        // Notify teacher about new bid
+        await createNotification(
+            bidData.teacherId,
+            'bid_received',
+            'New Bid Received!',
+            `${studentName} placed a bid of NPR ${bidData.proposedPrice} on "${itemName}"`,
+            bid.id,
+            'bid',
+            { bidAmount: bidData.proposedPrice, itemName }
+        );
+
         res.status(201).json({ success: true, bid });
     } catch (error) {
         console.error('Create bid error:', error);
@@ -263,6 +307,18 @@ router.post('/:id/respond', async (req, res) => {
             return res.status(404).json({ success: false, message: 'Bid not found' });
         }
 
+        // Get item name and student name for notifications
+        let itemName = 'item';
+        if (bid.sessionId) {
+            const session = await Session.findByPk(bid.sessionId);
+            itemName = session?.title || 'session';
+        } else if (bid.contentId) {
+            const content = await Content.findByPk(bid.contentId);
+            itemName = content?.title || 'content';
+        }
+        const student = await User.findByPk(bid.learnerId);
+        const studentName = student?.fullname || 'Student';
+
         if (accept) {
             // Student accepts the counter offer
             let counterData = {};
@@ -303,10 +359,33 @@ router.post('/:id/respond', async (req, res) => {
                 });
             }
 
+            // Notify teacher that counter was accepted
+            await createNotification(
+                bid.teacherId,
+                'counter_accepted',
+                'Counter Offer Accepted! 🎉',
+                `${studentName} accepted your counter offer of NPR ${counterData.price} on "${itemName}"`,
+                bid.id,
+                'bid',
+                { finalPrice: counterData.price, itemName, studentName }
+            );
+
             res.json({ success: true, message: 'Counter offer accepted', bid });
         } else {
             // Student rejects the counter offer
             await bid.update({ status: 'rejected' });
+
+            // Notify teacher that counter was rejected
+            await createNotification(
+                bid.teacherId,
+                'counter_rejected',
+                'Counter Offer Declined',
+                `${studentName} declined your counter offer on "${itemName}"`,
+                bid.id,
+                'bid',
+                { itemName, studentName }
+            );
+
             res.json({ success: true, message: 'Counter offer rejected', bid });
         }
     } catch (error) {
@@ -325,6 +404,18 @@ router.post('/:id/teacher-respond', async (req, res) => {
         if (!bid) {
             return res.status(404).json({ success: false, message: 'Bid not found' });
         }
+
+        // Get item name and teacher name for notifications
+        let itemName = 'item';
+        if (bid.sessionId) {
+            const session = await Session.findByPk(bid.sessionId);
+            itemName = session?.title || 'session';
+        } else if (bid.contentId) {
+            const content = await Content.findByPk(bid.contentId);
+            itemName = content?.title || 'content';
+        }
+        const teacher = await User.findByPk(bid.teacherId);
+        const teacherName = teacher?.fullname || 'Teacher';
 
         if (action === 'accept') {
             await bid.update({ status: 'accepted' });
@@ -355,15 +446,50 @@ router.post('/:id/teacher-respond', async (req, res) => {
                 });
             }
 
+            // Notify student that bid was accepted
+            await createNotification(
+                bid.learnerId,
+                'bid_accepted',
+                'Bid Accepted! 🎉',
+                `${teacherName} accepted your bid of NPR ${bid.proposedPrice} on "${itemName}"`,
+                bid.id,
+                'bid',
+                { bidAmount: bid.proposedPrice, itemName, teacherName }
+            );
+
             res.json({ success: true, message: 'Bid accepted', bid });
         } else if (action === 'reject') {
             await bid.update({ status: 'rejected' });
+
+            // Notify student that bid was rejected
+            await createNotification(
+                bid.learnerId,
+                'bid_rejected',
+                'Bid Declined',
+                `${teacherName} declined your bid on "${itemName}"`,
+                bid.id,
+                'bid',
+                { itemName, teacherName }
+            );
+
             res.json({ success: true, message: 'Bid rejected', bid });
         } else if (action === 'counter') {
             await bid.update({
                 status: 'counter',
                 counterOffer: JSON.stringify({ price: counterPrice, message: counterMessage })
             });
+
+            // Notify student about counter offer
+            await createNotification(
+                bid.learnerId,
+                'counter_offer',
+                'Counter Offer Received!',
+                `${teacherName} made a counter offer of NPR ${counterPrice} on "${itemName}"`,
+                bid.id,
+                'bid',
+                { counterPrice, itemName, teacherName, originalBid: bid.proposedPrice }
+            );
+
             res.json({ success: true, message: 'Counter offer sent', bid });
         } else {
             res.status(400).json({ success: false, message: 'Invalid action' });

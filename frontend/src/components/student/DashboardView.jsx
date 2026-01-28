@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import StudentContentCard from './StudentContentCard';
+import SessionCard from './SessionCard';
 import {
   Users,
   Video,
@@ -15,7 +16,11 @@ import {
   ChevronDown,
   MapPin,
   Play,
-  User
+  User,
+  Gavel,
+  CheckCircle,
+  XCircle,
+  MessageSquare
 } from 'lucide-react';
 
 const DashboardView = ({ 
@@ -26,10 +31,12 @@ const DashboardView = ({
   enrollments, 
   unlockedContent, 
   recentPosts, 
-  student, 
+  student,
+  bids,
   onAction,
   onJoinContent,
   onMakeBid,
+  onCancelBid,
   onWatchContent,
   onEnrollSession
 }) => {
@@ -40,39 +47,30 @@ const DashboardView = ({
   const safeTeachers = Array.isArray(teachers) ? teachers : [];
   const safePosts = Array.isArray(recentPosts) ? recentPosts : [];
   const safeUnlockedContent = Array.isArray(unlockedContent) ? unlockedContent : [];
+  const safeBids = Array.isArray(bids) ? bids : [];
 
   // Debug logging
   console.log('[DashboardView] content prop:', content);
   console.log('[DashboardView] safeContent length:', safeContent.length);
 
-  // Filter upcoming enrolled sessions - show max 1 like teacher dashboard
-  // For now, show all upcoming sessions since enrollment feature is not yet implemented
-  const upcomingSessions = safeSessions
-    .filter(s => {
-      const sessionDate = new Date(`${s.scheduledDate}T${s.scheduledTime}`);
-      const now = new Date();
-      const timeDiff = (now - sessionDate) / (1000 * 60);
-      return timeDiff < 30; // Show sessions not more than 30 mins past
-    })
-    .sort((a, b) => new Date(`${a.scheduledDate}T${a.scheduledTime}`) - new Date(`${b.scheduledDate}T${b.scheduledTime}`))
-    .slice(0, 1);
-
   // Get available sessions (not enrolled) - show 3 for dashboard
+  // Get available sessions (show upcoming sessions, both enrolled and not) - show 3 for dashboard
   const availableSessions = safeSessions
     .filter(s => {
-      const sessionDate = new Date(`${s.scheduledDate}T${s.scheduledTime}`);
+      const sessionDate = new Date(`${s.scheduledDate}T${s.scheduledTime || '00:00'}`);
       const now = new Date();
-      const isNotEnrolled = !safeEnrollments.some(e => e.sessionId === s.id || e.id === s.id);
-      return sessionDate > now && isNotEnrolled;
+      return sessionDate > now; // Only filter by future date
     })
-    .sort((a, b) => new Date(`${a.scheduledDate}T${a.scheduledTime}`) - new Date(`${b.scheduledDate}T${b.scheduledTime}`))
+    .sort((a, b) => new Date(`${a.scheduledDate}T${a.scheduledTime || '00:00'}`) - new Date(`${b.scheduledDate}T${b.scheduledTime || '00:00'}`))
     .slice(0, 3)
     .map(s => {
       const teacher = safeTeachers.find(t => t.id === s.teacherId);
+      const isEnrolled = safeEnrollments.some(e => e.sessionId === s.id || e.id === s.id);
       return {
         ...s,
         teacherName: s.teacherName || teacher?.fullname || teacher?.fullName || 'Teacher',
-        teacherAvatar: s.teacherAvatar || teacher?.profilePicture || teacher?.avatar
+        teacherAvatar: s.teacherAvatar || teacher?.profilePicture || teacher?.avatar,
+        isEnrolled
       };
     });
 
@@ -102,6 +100,43 @@ const DashboardView = ({
   const latestPosts = [...safePosts]
     .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
     .slice(0, 2);
+
+  // Get latest bids - show only 2 on dashboard
+  const latestBids = [...safeBids]
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+    .slice(0, 2)
+    .map(bid => {
+      // Enrich with content/session info
+      let itemTitle = '';
+      let itemType = '';
+      if (bid.sessionId) {
+        const session = safeSessions.find(s => s.id === bid.sessionId);
+        itemTitle = bid.sessionTitle || session?.title || 'Session';
+        itemType = 'session';
+      } else if (bid.contentId) {
+        const contentItem = safeContent.find(c => c.id === bid.contentId);
+        itemTitle = bid.contentTitle || contentItem?.title || 'Content';
+        itemType = 'content';
+      }
+      return { ...bid, itemTitle, itemType };
+    });
+
+  // Get bid status config
+  const getBidStatusConfig = (status) => {
+    switch (status) {
+      case 'pending':
+        return { color: '#f59e0b', bg: '#fef3c7', icon: <Clock size={14} />, label: 'Pending' };
+      case 'counter':
+      case 'countered':
+        return { color: '#3b82f6', bg: '#dbeafe', icon: <MessageSquare size={14} />, label: 'Counter Offer' };
+      case 'accepted':
+        return { color: '#22c55e', bg: '#dcfce7', icon: <CheckCircle size={14} />, label: 'Accepted' };
+      case 'rejected':
+        return { color: '#ef4444', bg: '#fee2e2', icon: <XCircle size={14} />, label: 'Declined' };
+      default:
+        return { color: '#6b7280', bg: '#f3f4f6', icon: <Clock size={14} />, label: status };
+    }
+  };
 
   // Find teacher for content
   const getTeacherForContent = (contentItem) => {
@@ -165,8 +200,10 @@ const DashboardView = ({
                 key={contentItem.id || idx}
                 content={contentItem}
                 isUnlocked={contentItem.isUnlocked}
+                hasPendingBid={safeBids.some(b => b.contentId === contentItem.id && b.status === 'pending')}
                 onJoinContent={onJoinContent}
                 onMakeBid={onMakeBid}
+                onCancelBid={onCancelBid}
                 onViewDetails={(item) => onAction('viewDetails', item)}
                 onNotInterested={(item) => console.log('Not interested:', item.id)}
                 onWatchNow={onWatchContent}
@@ -200,15 +237,76 @@ const DashboardView = ({
                 session={session}
                 onEnroll={onEnrollSession}
                 onMakeBid={onMakeBid}
+                onCancelBid={onCancelBid}
+                isEnrolled={session.isEnrolled}
+                hasPendingBid={safeBids.some(b => b.sessionId === session.id && b.status === 'pending')}
               />
             ))}
           </div>
         )}
       </div>
 
-      {/* Side-by-Side: Recent Posts & Upcoming Sessions - Same as teacher */}
-      <div className="dashboard-main-grid dashboard-section">
-        {/* Recent Posts */}
+      {/* Latest Bids Section */}
+      <div className="uploads-section dashboard-section">
+        <div className="uploads-section-header">
+          <h2 className="section-title">My Latest Bids</h2>
+          <button className="view-all-btn" onClick={() => onAction('bids')}>View All Bids</button>
+        </div>
+        {latestBids.length === 0 ? (
+          <div className="dashboard-card" style={{ padding: '2.5rem', textAlign: 'center' }}>
+            <div className="empty-state">
+              <div className="empty-state-icon" style={{ backgroundColor: '#f9f9f9' }}>
+                <Gavel size={28} style={{ color: '#ccc' }} />
+              </div>
+              <p className="empty-state-text">No bids placed yet</p>
+              <button className="empty-state-link" style={{ marginTop: '0.5rem' }} onClick={() => onAction('explore')}>Browse Content</button>
+            </div>
+          </div>
+        ) : (
+          <div className="student-bids-grid">
+            {latestBids.map((bid, idx) => {
+              const statusConfig = getBidStatusConfig(bid.status);
+              return (
+                <div key={bid.id || idx} className="student-bid-card">
+                  <div className="student-bid-header">
+                    <div 
+                      className="student-bid-status"
+                      style={{ backgroundColor: statusConfig.bg, color: statusConfig.color }}
+                    >
+                      {statusConfig.icon}
+                      <span>{statusConfig.label}</span>
+                    </div>
+                    <span className="student-bid-price">NPR {(bid.proposedPrice || 0).toLocaleString()}</span>
+                  </div>
+                  <div className="student-bid-item">
+                    <span className="student-bid-type">
+                      {bid.itemType === 'session' ? <Calendar size={14} /> : <Video size={14} />}
+                      {bid.itemType === 'session' ? 'Session' : 'Content'}
+                    </span>
+                    <h4 className="student-bid-title">{bid.itemTitle}</h4>
+                  </div>
+                  {bid.message && (
+                    <p className="student-bid-message">"{bid.message}"</p>
+                  )}
+                  <div className="student-bid-footer">
+                    <span className="student-bid-date">
+                      {new Date(bid.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                    </span>
+                    {bid.status === 'countered' && bid.counterOffer && (
+                      <span className="student-bid-counter">
+                        Counter: NPR {JSON.parse(bid.counterOffer).price?.toLocaleString()}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Latest Teacher Posts - Full Width */}
+      <div className="dashboard-section">
         <div className="dashboard-card">
           <div className="dashboard-card-header">
             <h2 className="dashboard-card-title">Latest Teacher Posts</h2>
@@ -238,7 +336,7 @@ const DashboardView = ({
                         <div
                           className="post-avatar"
                           style={{
-                            backgroundImage: `url('${teacher?.profilePicture || "https://ui-avatars.com/api/?name=" + (teacher?.fullname || "Teacher") + "&background=ea2a33&color=fff"}')`
+                            backgroundImage: `url('${teacher?.profilePicture || teacher?.avatar || "https://ui-avatars.com/api/?name=" + (teacher?.fullname || "Teacher") + "&background=ea2a33&color=fff"}')`
                           }}
                         />
                         <div>
@@ -259,41 +357,6 @@ const DashboardView = ({
                     </div>
                   );
                 })}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Upcoming Sessions */}
-        <div className="dashboard-card">
-          <div className="dashboard-card-header">
-            <h2 className="dashboard-card-title">Upcoming Sessions</h2>
-            <button className="view-all-link" onClick={() => onAction('mylearning')}>
-              View All <ArrowRight size={12} strokeWidth={3} />
-            </button>
-          </div>
-          <div className="dashboard-card-body">
-            {upcomingSessions.length === 0 ? (
-              <div className="empty-state">
-                <div className="empty-state-icon">
-                  <Calendar size={24} />
-                </div>
-                <h3 className="empty-state-title">No Enrolled Sessions</h3>
-                <p className="empty-state-text">
-                  Your enrolled sessions will appear here.
-                </p>
-                <button className="empty-state-link" onClick={() => onAction('mylearning')}>Browse Sessions</button>
-              </div>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                {upcomingSessions.map((session, idx) => (
-                  <SessionItemCompact
-                    key={session.id || idx}
-                    session={session}
-                    teacher={getTeacherForContent(session)}
-                    onAction={onAction}
-                  />
-                ))}
               </div>
             )}
           </div>
@@ -369,119 +432,6 @@ const SessionItemCompact = ({ session, teacher, onAction }) => {
           </div>
         </div>
       )}
-    </div>
-  );
-};
-
-// Session Card Component for Available Sessions
-const SessionCard = ({ session, onEnroll, onMakeBid }) => {
-  const isFree = !session.price || session.price === 0;
-  const allowsBidding = session.allowBidding === true;
-
-  // Format date
-  const formatDate = (dateStr) => {
-    if (!dateStr) return '';
-    const date = new Date(dateStr);
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    
-    if (date.toDateString() === today.toDateString()) return 'Today';
-    if (date.toDateString() === tomorrow.toDateString()) return 'Tomorrow';
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-  };
-
-  return (
-    <div className="session-card-student">
-      {/* Header with Date Badge */}
-      <div className="session-card-header">
-        <div className="session-date-badge">
-          <Calendar size={14} />
-          <span>{formatDate(session.scheduledDate)}</span>
-        </div>
-        {isFree ? (
-          <span className="session-price-badge free">Free</span>
-        ) : (
-          <span className="session-price-badge paid">NPR {session.price?.toLocaleString()}</span>
-        )}
-      </div>
-
-      {/* Session Info */}
-      <div className="session-card-body">
-        <h3 className="session-card-title">{session.title}</h3>
-        
-        {session.description && (
-          <p className="session-card-desc">{session.description}</p>
-        )}
-
-        {/* Teacher Info */}
-        <div className="session-teacher-row">
-          <div 
-            className="session-teacher-avatar"
-            style={{
-              backgroundImage: `url('${session.teacherAvatar || 
-                `https://ui-avatars.com/api/?name=${encodeURIComponent(session.teacherName || 'Teacher')}&background=ea2a33&color=fff`}')`
-            }}
-          />
-          <div className="session-teacher-info">
-            <span className="session-teacher-name">{session.teacherName || 'Teacher'}</span>
-            {session.teacherTitle && <span className="session-teacher-title">{session.teacherTitle}</span>}
-          </div>
-        </div>
-
-        {/* Session Meta */}
-        <div className="session-meta-row">
-          <span className="session-meta-item">
-            <Clock size={14} />
-            {session.scheduledTime}
-          </span>
-          <span className="session-meta-item">
-            <VideoIcon size={14} />
-            {session.duration || 60} mins
-          </span>
-          {session.maxParticipants && (
-            <span className="session-meta-item">
-              <User size={14} />
-              {session.enrolledCount || 0}/{session.maxParticipants} spots
-            </span>
-          )}
-        </div>
-      </div>
-
-      {/* Actions */}
-      <div className="session-card-actions">
-        {isFree ? (
-          <button 
-            className="session-action-btn enroll-free"
-            onClick={() => onEnroll && onEnroll(session)}
-          >
-            <Play size={16} />
-            Join Free
-          </button>
-        ) : allowsBidding ? (
-          <>
-            <button 
-              className="session-action-btn enroll-paid"
-              onClick={() => onEnroll && onEnroll(session)}
-            >
-              Enroll Now
-            </button>
-            <button 
-              className="session-action-btn make-bid"
-              onClick={() => onMakeBid && onMakeBid(session)}
-            >
-              Make a Bid
-            </button>
-          </>
-        ) : (
-          <button 
-            className="session-action-btn enroll-paid"
-            onClick={() => onEnroll && onEnroll(session)}
-          >
-            Enroll for NPR {session.price?.toLocaleString()}
-          </button>
-        )}
-      </div>
     </div>
   );
 };

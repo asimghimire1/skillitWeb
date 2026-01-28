@@ -247,9 +247,12 @@ const MyLearningView = ({
                       </a>
                     )}
                     {session.status === 'upcoming' && (
-                      <span className="upcoming-badge">
-                        <Clock size={14} /> Starting Soon
-                      </span>
+                      <button 
+                        className="btn-join-session"
+                        onClick={() => onJoinSession && onJoinSession(session)}
+                      >
+                        <Play size={16} /> Join Session
+                      </button>
                     )}
                     {session.status === 'completed' && (
                       <span className="completed-badge">

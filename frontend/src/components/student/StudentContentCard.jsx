@@ -7,20 +7,25 @@ import {
   Eye,
   Gavel,
   Tag,
-  Info
+  Info,
+  Clock,
+  XCircle
 } from 'lucide-react';
 
 /**
- * StudentContentCard - Content card component for students with three states:
+ * StudentContentCard - Content card component for students with four states:
  * 1. Purchased/Joined - Shows "PURCHASED" badge, checkmark, Watch Now button
- * 2. Free/Browse - Shows content info, Not Interested & View Details buttons  
- * 3. Paid/Premium - Shows lock overlay, price, Unlock with Credits & Make a Bid buttons
+ * 2. Requested/Bid Pending - Shows "REQUESTED" badge, awaiting response
+ * 3. Free/Browse - Shows content info, Not Interested & View Details buttons  
+ * 4. Paid/Premium - Shows lock overlay, price, Unlock with Credits & Make a Bid buttons
  */
 const StudentContentCard = ({
   content,
   isUnlocked = false,
+  hasPendingBid = false,
   onJoinContent,
   onMakeBid,
+  onCancelBid,
   onViewDetails,
   onNotInterested,
   onWatchNow
@@ -115,6 +120,65 @@ const StudentContentCard = ({
   }
 
   // =====================
+  // STATE 2: REQUESTED/BID PENDING
+  // =====================
+  if (hasPendingBid) {
+    return (
+      <div className="student-content-card requested">
+        {/* Thumbnail */}
+        <div 
+          className="scc-thumbnail"
+          style={{ backgroundImage: `url('${getThumbnailUrl()}')` }}
+        >
+          {/* Requested Badge */}
+          <div className="scc-badge requested">
+            <Gavel size={14} />
+            <span>REQUESTED</span>
+          </div>
+        </div>
+
+        {/* Body */}
+        <div className="scc-body">
+          {/* Category */}
+          {content.category && (
+            <span className="scc-category">{content.category}</span>
+          )}
+
+          {/* Title with clock */}
+          <h3 className="scc-title">
+            {content.title}
+            <Clock size={18} className="scc-title-clock" />
+          </h3>
+
+          {/* Teacher Info */}
+          <div className="scc-teacher">
+            <div 
+              className="scc-teacher-avatar"
+              style={{
+                backgroundImage: `url('${content.teacherAvatar || 
+                  `https://ui-avatars.com/api/?name=${encodeURIComponent(content.teacherName || 'Teacher')}&background=ea2a33&color=fff`}')`
+              }}
+            />
+            <div className="scc-teacher-info">
+              <span className="scc-teacher-name">{content.teacherName || 'Teacher'}</span>
+              <span className="scc-joined-date">Bid submitted</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Cancel Bid Button */}
+        <button 
+          className="scc-btn cancel-bid full"
+          onClick={() => onCancelBid && onCancelBid(content)}
+        >
+          <XCircle size={18} />
+          Cancel Bid
+        </button>
+      </div>
+    );
+  }
+
+  // =====================
   // STATE 3: PAID/PREMIUM CONTENT
   // =====================
   if (isPaid) {
@@ -170,24 +234,22 @@ const StudentContentCard = ({
             </div>
           </div>
 
-          {/* Action Buttons */}
+          {/* Action Buttons - Always show both Purchase and Bid */}
           <div className="scc-actions dual">
             <button 
-              className="scc-btn unlock"
+              className="scc-btn purchase"
               onClick={() => onJoinContent && onJoinContent(content, 'paid')}
             >
               <Lock size={16} />
-              <span>Unlock with<br/>Credits</span>
+              <span>Purchase<br/>NPR {content.price?.toLocaleString()}</span>
             </button>
-            {allowsBidding && (
-              <button 
-                className="scc-btn bid"
-                onClick={() => onMakeBid && onMakeBid(content)}
-              >
-                <Gavel size={16} />
-                Make a Bid
-              </button>
-            )}
+            <button 
+              className="scc-btn bid"
+              onClick={() => onMakeBid && onMakeBid(content)}
+            >
+              <Gavel size={16} />
+              <span>Make a<br/>Bid</span>
+            </button>
           </div>
 
           {/* Info Box */}

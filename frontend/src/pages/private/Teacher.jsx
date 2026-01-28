@@ -8,6 +8,7 @@ import DashboardView from '../../components/teacher/DashboardView';
 import ContentView from '../../components/teacher/ContentView';
 import SessionsView from '../../components/teacher/SessionsView';
 import PostsView from '../../components/teacher/PostsView';
+import NotificationDropdown from '../../components/NotificationDropdown';
 import apiService from '../../services/apiService';
 import { useToast } from '../../context/ToastContext';
 import { useConfirm } from '../../context/ConfirmContext';
@@ -58,6 +59,9 @@ export default function Teacher() {
   const [uploads, setUploads] = useState([]);
   const [sessions, setSessions] = useState([]);
   const [posts, setPosts] = useState([]);
+  const [bids, setBids] = useState([]);
+  const [notificationCount, setNotificationCount] = useState(0);
+  const [bidNotificationCount, setBidNotificationCount] = useState(0);
 
   // Helper function to generate username URL
   const getUsernameUrl = (userData) => {
@@ -87,18 +91,25 @@ export default function Teacher() {
   }, [navigate, user, isAuthenticated]);
 
   const fetchDashboardData = async (teacherId) => {
+    console.log('[Teacher] Fetching dashboard data for teacher:', teacherId);
+    
     const statsData = await apiService.getTeacherStats(teacherId);
     if (statsData) setStats(statsData);
 
     const sessionsData = await apiService.getTeacherSessions(teacherId);
-    if (sessionsData) {
+    console.log('[Teacher] Sessions received:', sessionsData);
+    if (sessionsData && Array.isArray(sessionsData)) {
       // Sort by date/time ascending (nearest first)
       const sorted = [...sessionsData].sort((a, b) => {
-        const dateA = new Date(`${a.scheduledDate}T${a.scheduledTime}`);
-        const dateB = new Date(`${b.scheduledDate}T${b.scheduledTime}`);
+        const dateA = new Date(`${a.scheduledDate}T${a.scheduledTime || '00:00'}`);
+        const dateB = new Date(`${b.scheduledDate}T${b.scheduledTime || '00:00'}`);
         return dateA - dateB;
       });
+      console.log('[Teacher] Sessions sorted:', sorted.length);
       setSessions(sorted);
+    } else {
+      console.log('[Teacher] No sessions or invalid data');
+      setSessions([]);
     }
 
     const contentData = await apiService.getTeacherContent(teacherId);
@@ -106,6 +117,14 @@ export default function Teacher() {
 
     const postsData = await apiService.getTeacherPosts(teacherId);
     if (postsData) setPosts(postsData);
+
+    // Fetch bid requests to update notification count
+    const bidsData = await apiService.getBidRequests(teacherId);
+    if (bidsData) {
+      setBids(bidsData);
+      const pendingBids = bidsData.filter(b => b.status === 'pending').length;
+      setBidNotificationCount(pendingBids);
+    }
   };
 
   // Handle session status updates (missed/completed)
@@ -137,25 +156,37 @@ export default function Teacher() {
   };
 
   const handleCreateSession = async (sessionData) => {
+    console.log('[Teacher] Creating session with data:', sessionData);
+    console.log('[Teacher] sessionToEdit:', sessionToEdit);
+    console.log('[Teacher] teacher.id:', teacher?.id);
+    
     if (sessionToEdit) {
       const updated = await apiService.updateSession(sessionToEdit.id, {
         ...sessionData,
         teacherId: teacher.id
       });
+      console.log('[Teacher] Update result:', updated);
       if (updated) {
         showToast('Session updated successfully', 'success');
         fetchDashboardData(teacher.id);
+      } else {
+        showToast('Failed to update session', 'error');
       }
     } else {
       const newSession = await apiService.createSession({
         teacherId: teacher.id,
         ...sessionData
       });
-      if (newSession) {
+      console.log('[Teacher] Create result:', newSession);
+      if (newSession && newSession.id) {
         showToast('Session scheduled successfully', 'success');
         fetchDashboardData(teacher.id);
+      } else {
+        showToast('Failed to create session', 'error');
       }
     }
+    // Reset sessionToEdit after operation
+    setSessionToEdit(null);
   };
 
   const handleCreatePost = async (postData) => {
@@ -253,6 +284,23 @@ export default function Teacher() {
     }
   };
 
+  // Handle bid responses (accept, reject, counter)
+  const handleRespondToBid = async (bidId, action, counterData = null) => {
+    const result = await apiService.respondToBid(bidId, { action, ...counterData });
+    if (result.success) {
+      if (action === 'accept') {
+        showToast('Bid accepted! Student has been enrolled.', 'success');
+      } else if (action === 'reject') {
+        showToast('Bid declined.', 'info');
+      } else if (action === 'counter') {
+        showToast('Counter offer sent!', 'success');
+      }
+      fetchDashboardData(teacher.id);
+    } else {
+      showToast(result.message || 'Failed to respond to bid.', 'error');
+    }
+  };
+
   if (!teacher) {
     return <div className="teacher-loading">Loading...</div>;
   }
@@ -289,6 +337,9 @@ export default function Teacher() {
           <div className={`nav-item ${activeTab === 'bids' ? 'active' : ''}`} onClick={() => { setActiveTab('bids'); setIsMobileMenuOpen(false); }}>
             <ReceiptText size={20} className={activeTab === 'bids' ? 'nav-icon-active' : 'nav-icon-inactive'} />
             Bid Requests
+            {bidNotificationCount > 0 && (
+              <span className="nav-badge">{bidNotificationCount > 9 ? '9+' : bidNotificationCount}</span>
+            )}
           </div>
           <div className={`nav-item ${activeTab === 'content' ? 'active' : ''}`} onClick={() => { setActiveTab('content'); setIsMobileMenuOpen(false); }}>
             <SquarePlay size={20} className={activeTab === 'content' ? 'nav-icon-active' : 'nav-icon-inactive'} />
@@ -346,10 +397,10 @@ export default function Teacher() {
             </h2>
           </div>
           <div className="navbar-right">
-            <button className="navbar-btn">
-              <Bell size={20} />
-              <span className="notification-dot"></span>
-            </button>
+            <NotificationDropdown 
+              userId={teacher?.id}
+              onNotificationCountChange={setNotificationCount}
+            />
             <div className="navbar-divider"></div>
             <div className="earnings-display">
               <Coins size={20} className="nav-icon-active" />
@@ -377,10 +428,20 @@ export default function Teacher() {
               onAction={handleQuickAction}
               teacher={teacher}
               onSessionStatusUpdate={handleSessionStatusUpdate}
+              bids={bids}
+              onRespondToBid={handleRespondToBid}
             />
           )}
 
-          {activeTab === 'bids' && <BidRequestsView />}
+          {activeTab === 'bids' && (
+            <BidRequestsView 
+              bids={bids}
+              sessions={sessions}
+              uploads={uploads}
+              onRespondToBid={handleRespondToBid}
+              onRefresh={() => fetchDashboardData(teacher.id)}
+            />
+          )}
 
           {activeTab === 'content' && (
             <ContentView

@@ -3,35 +3,38 @@ import PremiumDropdown from '../PremiumDropdown';
 import SessionListItem from './SessionListItem';
 
 const SessionsView = ({ sessions, onCreate, onAction }) => {
-    const [filter, setFilter] = useState('newest');
+    const [filter, setFilter] = useState('all');
 
     const filterSessions = () => {
         const now = new Date();
         
+        // Debug logging
+        console.log('[SessionsView] Total sessions:', sessions?.length);
+        console.log('[SessionsView] Filter:', filter);
+        
+        if (!sessions || sessions.length === 0) return [];
+        
         return sessions.filter(session => {
-            const sessionDateTime = new Date(`${session.scheduledDate}T${session.scheduledTime}`);
-            const timeDiff = (now - sessionDateTime) / (1000 * 60); // difference in minutes
+            const sessionDateTime = new Date(`${session.scheduledDate}T${session.scheduledTime || '00:00'}`);
+            const isUpcoming = sessionDateTime > now;
+            const isPast = sessionDateTime <= now;
             
             switch(filter) {
-                case 'newest':
-                    // Upcoming sessions only (not past 30 mins)
-                    return timeDiff <= 30;
-                case 'oldest':
-                    // Farthest upcoming sessions
-                    return timeDiff <= 30;
+                case 'all':
+                    return true;
+                case 'upcoming':
+                    return isUpcoming;
                 case 'completed':
-                    // Sessions marked as completed
                     return session.status === 'completed';
-                case 'missed':
-                    // Sessions that are past 30 mins and weren't joined
-                    return session.status === 'missed' || (timeDiff > 30 && session.status !== 'completed');
+                case 'past':
+                    return isPast || session.status === 'missed';
                 default:
                     return true;
             }
         }).sort((a, b) => {
-            const dateA = new Date(`${a.scheduledDate}T${a.scheduledTime}`);
-            const dateB = new Date(`${b.scheduledDate}T${b.scheduledTime}`);
-            return filter === 'oldest' ? dateB - dateA : dateA - dateB;
+            const dateA = new Date(`${a.scheduledDate}T${a.scheduledTime || '00:00'}`);
+            const dateB = new Date(`${b.scheduledDate}T${b.scheduledTime || '00:00'}`);
+            return dateA - dateB; // Nearest first
         });
     };
 
@@ -53,10 +56,10 @@ const SessionsView = ({ sessions, onCreate, onAction }) => {
                         <div className="premium-select-container" style={{ minWidth: '200px' }}>
                             <PremiumDropdown
                                 options={[
-                                    { value: 'newest', label: 'Upcoming', icon: 'schedule' },
-                                    { value: 'oldest', label: 'Farthest', icon: 'calendar_month' },
+                                    { value: 'all', label: 'All Sessions', icon: 'list' },
+                                    { value: 'upcoming', label: 'Upcoming', icon: 'schedule' },
                                     { value: 'completed', label: 'Completed', icon: 'check_circle' },
-                                    { value: 'missed', label: 'Missed', icon: 'cancel' },
+                                    { value: 'past', label: 'Past/Missed', icon: 'history' },
                                 ]}
                                 value={filter}
                                 onChange={(val) => setFilter(val)}

@@ -9,6 +9,7 @@ const sessionRoutes = require('./routes/session');
 const contentRoutes = require('./routes/content');
 const studentsRoutes = require('./routes/students');
 const bidsRoutes = require('./routes/bids');
+const notificationsRoutes = require('./routes/notifications');
 
 const app = express();
 
@@ -39,6 +40,7 @@ app.use('/api/content', contentRoutes);
 app.use('/api/posts', require('./routes/posts'));
 app.use('/api/students', studentsRoutes);
 app.use('/api/bids', bidsRoutes);
+app.use('/api/notifications', notificationsRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

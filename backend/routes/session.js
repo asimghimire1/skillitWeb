@@ -16,11 +16,11 @@ router.get('/', async (req, res) => {
             const sessionData = session.toJSON();
             if (session.teacherId) {
                 const teacher = await User.findByPk(session.teacherId, {
-                    attributes: ['id', 'fullname', 'profilePicture', 'bio']
+                    attributes: ['id', 'fullname', 'avatar', 'bio']
                 });
                 if (teacher) {
                     sessionData.teacherName = teacher.fullname;
-                    sessionData.teacherAvatar = teacher.profilePicture;
+                    sessionData.teacherAvatar = teacher.avatar;
                     sessionData.teacherBio = teacher.bio;
                 }
             }

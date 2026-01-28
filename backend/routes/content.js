@@ -10,12 +10,16 @@ const upload = require('../middleware/upload');
 // GET /api/content - Get all content (for students) with teacher info
 router.get('/', async (req, res) => {
     try {
-        // Get all content - let the frontend filter if needed
+        // Get only published and public content for student view
         const contents = await Content.findAll({
+            where: {
+                status: 'published',
+                visibility: 'public'
+            },
             order: [['created_at', 'DESC']]
         });
         
-        console.log(`[Content API] Found ${contents.length} content items`);
+        console.log(`[Content API] Found ${contents.length} published content items`);
         
         if (contents.length === 0) {
             console.log('[Content API] No content in database');
@@ -28,12 +32,12 @@ router.get('/', async (req, res) => {
             console.log(`[Content API] Processing content: ${contentData.id} - ${contentData.title}`);
             if (content.teacherId) {
                 const teacher = await User.findByPk(content.teacherId, {
-                    attributes: ['id', 'fullname', 'profilePicture', 'bio']
+                    attributes: ['id', 'fullname', 'avatar', 'bio']
                 });
                 if (teacher) {
                     contentData.teacherName = teacher.fullname;
                     contentData.teacherFullname = teacher.fullname;
-                    contentData.teacherAvatar = teacher.profilePicture;
+                    contentData.teacherAvatar = teacher.avatar;
                     contentData.teacherBio = teacher.bio;
                 }
             }

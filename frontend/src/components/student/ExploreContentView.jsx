@@ -18,12 +18,16 @@ import StudentContentCard from './StudentContentCard';
 const ExploreContentView = ({
   content,
   unlockedContent,
+  bids = [],
   onJoinContent,
-  onMakeBid
+  onMakeBid,
+  onCancelBid,
+  onAction
 }) => {
   // Safe array defaults
   const safeContent = Array.isArray(content) ? content : [];
   const safeUnlockedContent = Array.isArray(unlockedContent) ? unlockedContent : [];
+  const safeBids = Array.isArray(bids) ? bids : [];
 
   // Debug logging
   console.log('[ExploreContentView] content prop:', content);
@@ -93,6 +97,14 @@ const ExploreContentView = ({
   const isUnlocked = (contentItem) => {
     return safeUnlockedContent.some(u => 
       u.contentId === contentItem.id || u.id === contentItem.id
+    );
+  };
+
+  // Check if content has a pending bid
+  const hasPendingBid = (contentItem) => {
+    return safeBids.some(b => 
+      (b.contentId === contentItem.id || b.contentId === String(contentItem.id) || String(b.contentId) === String(contentItem.id)) && 
+      (b.status === 'pending' || b.status === 'counter' || b.status === 'countered')
     );
   };
 
@@ -277,11 +289,13 @@ const ExploreContentView = ({
             <StudentContentCard
               key={item.id || idx}
               content={item}
-              isUnlocked={false}
+              isUnlocked={isUnlocked(item)}
+              hasPendingBid={hasPendingBid(item)}
               onJoinContent={onJoinContent}
               onMakeBid={onMakeBid}
-              onViewDetails={(contentItem) => console.log('View details:', contentItem)}
-              onNotInterested={(contentItem) => console.log('Not interested:', contentItem)}
+              onCancelBid={onCancelBid}
+              onViewDetails={(contentItem) => onAction && onAction('viewDetails', contentItem)}
+              onNotInterested={(contentItem) => onAction && onAction('notInterested', contentItem)}
             />
           ))}
         </div>

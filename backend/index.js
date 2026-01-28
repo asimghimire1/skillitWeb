@@ -12,6 +12,7 @@ const sessionRoutes = require('./routes/session');
 const statsRoutes = require('./routes/stats');
 const studentsRoutes = require('./routes/students');
 const bidsRoutes = require('./routes/bids');
+const notificationsRoutes = require('./routes/notifications');
 
 
 const app = express();
@@ -102,6 +103,7 @@ app.use('/api/stats', statsRoutes);
 app.use('/api/students', studentsRoutes);
 app.use('/api/bids', bidsRoutes);
 app.use('/api/posts', require('./routes/posts'));
+app.use('/api/notifications', notificationsRoutes);
 
 // Health Check Route
 app.get('/api/health', (req, res) => {
@@ -153,9 +155,18 @@ const HOST = process.env.HOST || 'localhost';
 
 const sequelize = require('./config/database');
 
+// Keep process alive and handle errors
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
 sequelize.sync({ alter: true })
   .then(() => {
-    app.listen(PORT, HOST, () => {
+    const server = app.listen(PORT, HOST, () => {
       console.log('\n' + '='.repeat(50));
       console.log('Backend Server Started Successfully');
       console.log('='.repeat(50));
@@ -166,6 +177,10 @@ sequelize.sync({ alter: true })
       console.log(`Skills folder: /uploads/skills`);
       console.log(`API Health: http://${HOST}:${PORT}/api/health`);
       console.log('='.repeat(50) + '\n');
+    });
+    
+    server.on('error', (err) => {
+      console.error('Server error:', err);
     });
   })
   .catch((err) => {

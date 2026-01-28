@@ -110,11 +110,11 @@ router.get('/:studentId/enrollments', async (req, res) => {
                     // Get teacher info
                     if (session.teacherId) {
                         const teacher = await User.findByPk(session.teacherId, {
-                            attributes: ['id', 'fullname', 'profilePicture']
+                            attributes: ['id', 'fullname', 'avatar']
                         });
                         if (teacher) {
                             enrollmentData.teacherName = teacher.fullname;
-                            enrollmentData.teacherAvatar = teacher.profilePicture;
+                            enrollmentData.teacherAvatar = teacher.avatar;
                         }
                     }
                 }
@@ -157,11 +157,11 @@ router.get('/:studentId/content', async (req, res) => {
                     // Get teacher info
                     if (content.teacherId) {
                         const teacher = await User.findByPk(content.teacherId, {
-                            attributes: ['id', 'fullname', 'profilePicture']
+                            attributes: ['id', 'fullname', 'avatar']
                         });
                         if (teacher) {
                             scData.teacherName = teacher.fullname;
-                            scData.teacherAvatar = teacher.profilePicture;
+                            scData.teacherAvatar = teacher.avatar;
                         }
                     }
                 }

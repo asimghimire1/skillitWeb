@@ -128,8 +128,11 @@ export const apiService = {
   // Sessions
   async getTeacherSessions(teacherId) {
     try {
+      console.log('[apiService] Fetching sessions for teacher:', teacherId);
       const response = await fetch(`${API_BASE_URL}/sessions/teacher/${teacherId}`);
-      return await response.json();
+      const data = await response.json();
+      console.log('[apiService] Sessions response:', data);
+      return data;
     } catch (error) {
       console.error('Get sessions error:', error);
       return [];
@@ -138,12 +141,15 @@ export const apiService = {
 
   async createSession(sessionData) {
     try {
+      console.log('[apiService] Creating session:', sessionData);
       const response = await fetch(`${API_BASE_URL}/sessions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(sessionData),
       });
-      return await response.json();
+      const data = await response.json();
+      console.log('[apiService] Create session response:', data);
+      return data;
     } catch (error) {
       console.error('Create session error:', error);
       return null;
@@ -569,6 +575,67 @@ export const apiService = {
       return await res.json();
     } catch (error) {
       console.error('Respond to bid error:', error);
+      return { success: false };
+    }
+  },
+
+  // ═══════════════════════════════════════════════════════════════
+  // NOTIFICATIONS API
+  // ═══════════════════════════════════════════════════════════════
+
+  async getNotifications(userId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/notifications/${userId}`);
+      return await response.json();
+    } catch (error) {
+      console.error('Get notifications error:', error);
+      return [];
+    }
+  },
+
+  async getUnreadNotificationCount(userId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/notifications/${userId}/unread-count`);
+      const data = await response.json();
+      return data.count || 0;
+    } catch (error) {
+      console.error('Get unread count error:', error);
+      return 0;
+    }
+  },
+
+  async markNotificationRead(notificationId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/notifications/${notificationId}/read`, {
+        method: 'PUT',
+      });
+      return await response.json();
+    } catch (error) {
+      console.error('Mark read error:', error);
+      return { success: false };
+    }
+  },
+
+  async markAllNotificationsRead(userId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/notifications/${userId}/read-all`, {
+        method: 'PUT',
+      });
+      return await response.json();
+    } catch (error) {
+      console.error('Mark all read error:', error);
+      return { success: false };
+    }
+  },
+
+  async deleteNotification(notificationId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/notifications/${notificationId}`, {
+        method: 'DELETE',
+      });
+      return await response.json();
+    } catch (error) {
+      console.error('Delete notification error:', error);
       return { success: false };
     }
   }
