@@ -1,0 +1,236 @@
+/* Enhanced Content Bidding Styles */
+
+/* Bid Type Icons for Modern Cards */
+.bid-modern-type-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    margin-right: 4px;
+}
+
+.bid-modern-type-icon.content {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    color: white;
+}
+
+.bid-modern-type-icon.session {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: white;
+}
+
+/* Enhanced Bid Status Indicators */
+.bid-status-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+.bid-status-indicator.pending {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.bid-status-indicator.counter {
+    background: rgba(99, 102, 241, 0.1);
+    color: #6366f1;
+    border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.bid-status-indicator.accepted {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.bid-status-indicator.declined {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* Content Bid Available Badge */
+.content-bid-available-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.625rem;
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    border-radius: 9999px;
+    font-size: 0.625rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+
+    0%,
+    100% {
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
+    }
+
+    50% {
+        box-shadow: 0 4px 16px rgba(16, 185, 129, 0.4);
+    }
+}
+
+/* Bid Modern Card Enhancements */
+.bid-modern-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.bid-modern-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    transition: width 0.3s ease;
+}
+
+.bid-modern-card:hover::before {
+    width: 6px;
+}
+
+/* Content bid color accent */
+.bid-modern-card[data-type="content"]::before {
+    background: linear-gradient(180deg, #8b5cf6, #7c3aed);
+}
+
+/* Session bid color accent */
+.bid-modern-card[data-type="session"]::before {
+    background: linear-gradient(180deg, #3b82f6, #2563eb);
+}
+
+/* Content Thumbnail in Bid Card */
+.bid-content-thumbnail {
+    width: 100%;
+    height: 140px;
+    background-size: cover;
+    background-position: center;
+    background-color: #f0f4f8;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.bid-content-thumbnail::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.1) 100%);
+}
+
+/* Bidding Availability Highlight on Content Cards */
+.student-content-card.bidding-enabled {
+    border: 2px solid transparent;
+    background-image: linear-gradient(white, white),
+        linear-gradient(135deg, #10b981 0%, #059669 100%);
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+}
+
+.student-container.dark .student-content-card.bidding-enabled {
+    background-image: linear-gradient(#1a0d0d, #1a0d0d),
+        linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+/* Bid Button Enhancements */
+.scc-btn.bid {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    border: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.scc-btn.bid::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.scc-btn.bid:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.scc-btn.bid:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+}
+
+/* Bid vs Purchase Side-by-Side Button Styles */
+.scc-actions.dual {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-top: auto;
+}
+
+.scc-btn.purchase,
+.scc-btn.bid {
+    padding: 0.875rem 1rem;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.813rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    line-height: 1.2;
+}
+
+.scc-btn.purchase {
+    background: white;
+    border: 2px solid var(--primary-color);
+    color: var(--primary-color);
+}
+
+.scc-btn.purchase:hover {
+    background: var(--primary-color);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(234, 42, 51, 0.3);
+}
+
+/* Responsive Bid Card Grid */
+@media (max-width: 1024px) {
+    .bids-modern-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .bids-modern-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .scc-actions.dual {
+        grid-template-columns: 1fr;
+    }
+}

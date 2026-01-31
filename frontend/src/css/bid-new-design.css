@@ -1,0 +1,317 @@
+/* New Bid UI Design */
+
+.bid-new-container {
+    padding: 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    font-family: 'Inter', sans-serif;
+}
+
+.bid-section {
+    margin-bottom: 3rem;
+}
+
+.bid-section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.bid-section-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.bid-section-dot.pending {
+    background-color: #ef4444;
+}
+
+.bid-section-dot.history {
+    background-color: #10b981;
+}
+
+.bid-section-title {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #4b5563;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin: 0;
+}
+
+.bid-count-badge {
+    background-color: #fee2e2;
+    color: #ef4444;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.125rem 0.5rem;
+    border-radius: 4px;
+}
+
+.bid-section-dot.history+.bid-section-title+.bid-count-badge {
+    background-color: #d1fae5;
+    color: #10b981;
+}
+
+/* Card Styles */
+.bid-card-new {
+    display: flex;
+    align-items: center;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    gap: 2rem;
+    transition: all 0.2s ease;
+}
+
+.bid-card-new:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border-color: #d1d5db;
+}
+
+/* User Info Column */
+.bid-user-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    min-width: 200px;
+}
+
+.bid-user-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: #111827;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1rem;
+    flex-shrink: 0;
+    background-size: cover;
+    background-position: center;
+}
+
+.bid-user-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.bid-user-name {
+    font-weight: 700;
+    color: #111827;
+    font-size: 1rem;
+}
+
+.bid-user-email {
+    font-size: 0.75rem;
+    color: #9ca3af;
+}
+
+/* Session/Item Column */
+.bid-item-section {
+    flex: 1.5;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.bid-label-micro {
+    font-size: 0.625rem;
+    font-weight: 700;
+    color: #ef4444;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.bid-item-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #374151;
+}
+
+/* Price Column */
+.bid-price-section {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    min-width: 200px;
+}
+
+.price-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+}
+
+.price-label-top {
+    font-size: 0.625rem;
+    font-weight: 700;
+    color: #9ca3af;
+    text-transform: uppercase;
+}
+
+.price-val-original {
+    font-size: 0.875rem;
+    color: #9ca3af;
+    text-decoration: line-through;
+    font-weight: 500;
+}
+
+.price-val-bid {
+    font-size: 1rem;
+    color: #111827;
+    font-weight: 700;
+}
+
+/* Message Column */
+.bid-msg-section {
+    flex: 1;
+    font-style: italic;
+    color: #6b7280;
+    font-size: 0.875rem;
+    border-left: 2px solid #f3f4f6;
+    padding-left: 1rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Actions Column */
+.bid-actions-section {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-left: auto;
+}
+
+.btn-bid-action {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-decline {
+    background: transparent;
+    color: #6b7280;
+    border: none;
+}
+
+.btn-decline:hover {
+    color: #111827;
+    background: #f3f4f6;
+}
+
+.btn-counter {
+    background: white;
+    color: #374151;
+    border: 1px solid #e5e7eb;
+}
+
+.btn-counter:hover {
+    border-color: #d1d5db;
+    background: #f9fafb;
+}
+
+.btn-accept {
+    background: #ef4444;
+    color: white;
+    border: none;
+}
+
+.btn-accept:hover {
+    background: #dc2626;
+}
+
+/* Status Badge for History */
+.status-badge-accepted {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #ecfdf5;
+    color: #10b981;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+}
+
+.status-badge-rejected {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: #fef2f2;
+    color: #ef4444;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+}
+
+.text-time-ago {
+    font-size: 0.75rem;
+    color: #9ca3af;
+    font-style: italic;
+    margin-right: 1rem;
+}
+
+/* Dark Mode Overrides */
+.student-container.dark .bid-card-new {
+    background: #1f2937;
+    border-color: #374151;
+}
+
+.student-container.dark .bid-user-name,
+.student-container.dark .bid-item-title,
+.student-container.dark .price-val-bid {
+    color: #f9fafb;
+}
+
+.student-container.dark .bid-msg-section {
+    border-left-color: #374151;
+}
+
+.student-container.dark .btn-counter {
+    background: transparent;
+    border-color: #4b5563;
+    color: #e5e7eb;
+}
+
+.student-container.dark .btn-decline {
+    color: #9ca3af;
+}
+
+.student-container.dark .status-badge-accepted {
+    background: rgba(16, 185, 129, 0.2);
+}
+
+.student-container.dark .status-badge-rejected {
+    background: rgba(239, 68, 68, 0.2);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .bid-card-new {
+        flex-wrap: wrap;
+    }
+
+    .bid-item-section {
+        min-width: 100%;
+        order: -1;
+    }
+
+    .bid-price-section {
+        margin-left: auto;
+    }
+}

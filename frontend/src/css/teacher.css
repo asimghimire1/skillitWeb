@@ -739,9 +739,8 @@
   font-size: 0.75rem;
   color: #564e4e;
   line-height: 1.6;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  max-height: 3.2em;
+  /* 1.6 * 2 lines */
   overflow: hidden;
 }
 
@@ -1017,22 +1016,19 @@
   font-size: 1.125rem;
   font-weight: 900;
   color: var(--text-light);
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
+  white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis;
   margin-bottom: 0.25rem;
 }
 
 .content-description {
   font-size: 0.75rem;
   color: var(--text-secondary);
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
   overflow: hidden;
   line-height: 1.6;
-  height: 2.5em;
+  height: 3.2em;
+  /* 1.6 * 2 lines */
 }
 
 .content-card-divider {
@@ -1160,9 +1156,8 @@
   font-size: 0.875rem;
   margin-bottom: 1.5rem;
   line-height: 1.6;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
+  max-height: 4.8em;
+  /* 1.6 * 3 lines */
   overflow: hidden;
 }
 
@@ -1777,6 +1772,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -3960,19 +3956,17 @@
   font-size: 1.125rem;
   font-weight: 900;
   color: #171112;
+  white-space: nowrap;
   overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
+  text-overflow: ellipsis;
 }
 
 .upload-preview-description {
   font-size: 0.75rem;
   color: #876467;
   overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  max-height: 3em;
+  /* 1.5 * 2 lines */
   line-height: 1.5;
 }
 
@@ -4314,11 +4308,11 @@
     padding: 0.5rem 0;
   }
 
-  .sessions-v2-container .page-header > div {
+  .sessions-v2-container .page-header>div {
     width: 100%;
   }
 
-  .sessions-v2-container .page-header > div > div {
+  .sessions-v2-container .page-header>div>div {
     flex-direction: column;
     width: 100%;
   }
@@ -4479,9 +4473,17 @@
 }
 
 @keyframes badge-pop {
-  0% { transform: scale(0); }
-  50% { transform: scale(1.2); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(0);
+  }
+
+  50% {
+    transform: scale(1.2);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
 
 .teacher-container .notification-dropdown {
@@ -4509,6 +4511,7 @@
     opacity: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -4623,10 +4626,21 @@
   background: var(--bg-dark-hover);
 }
 
-.teacher-container .notif-icon.bid { color: #f59e0b; }
-.teacher-container .notif-icon.success { color: #10b981; }
-.teacher-container .notif-icon.error { color: #ef4444; }
-.teacher-container .notif-icon.counter { color: #3b82f6; }
+.teacher-container .notif-icon.bid {
+  color: #f59e0b;
+}
+
+.teacher-container .notif-icon.success {
+  color: #10b981;
+}
+
+.teacher-container .notif-icon.error {
+  color: #ef4444;
+}
+
+.teacher-container .notif-icon.counter {
+  color: #3b82f6;
+}
 
 .teacher-container .notification-content {
   flex: 1;
@@ -4649,9 +4663,8 @@
   color: var(--text-secondary);
   margin: 0 0 0.35rem 0;
   line-height: 1.4;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  max-height: 2.8em;
+  /* 1.4 * 2 lines */
   overflow: hidden;
 }
 
@@ -5333,7 +5346,7 @@
 }
 
 .teacher-container.dark .bid-proposal-message {
-  background: linear-gradient(135deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.1) 100%);
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.15) 0%, rgba(0, 0, 0, 0.1) 100%);
 }
 
 .bid-proposal-message .message-quote-icon {
@@ -5569,9 +5582,17 @@
   border-color: var(--border-dark);
 }
 
-.teacher-container .bid-stat-card.pending .bid-stat-icon { color: #f59e0b; }
-.teacher-container .bid-stat-card.countered .bid-stat-icon { color: #374151; }
-.teacher-container .bid-stat-card.accepted .bid-stat-icon { color: #22c55e; }
+.teacher-container .bid-stat-card.pending .bid-stat-icon {
+  color: #f59e0b;
+}
+
+.teacher-container .bid-stat-card.countered .bid-stat-icon {
+  color: #374151;
+}
+
+.teacher-container .bid-stat-card.accepted .bid-stat-icon {
+  color: #22c55e;
+}
 
 .teacher-container .bid-stat-icon {
   color: #886364;

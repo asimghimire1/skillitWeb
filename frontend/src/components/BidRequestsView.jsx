@@ -1,47 +1,40 @@
 import React, { useState, useMemo } from 'react';
 import {
-  Gavel,
-  Clock,
   CheckCircle,
   XCircle,
   MessageSquare,
-  Video,
-  Calendar,
-  DollarSign,
+  Clock,
   RefreshCw,
-  AlertCircle
 } from 'lucide-react';
 import CounterOfferModal from './CounterOfferModal';
+import '../css/bid-new-design.css';
 
-const BidRequestsView = ({ 
-  bids = [], 
-  sessions = [], 
-  uploads = [], 
+const BidRequestsView = ({
+  bids = [],
+  sessions = [],
+  uploads = [],
   onRespondToBid,
-  onRefresh 
+  onRefresh,
+  typeFilter = 'all' // 'all', 'session', 'content'
 }) => {
   const safeBids = Array.isArray(bids) ? bids : [];
   const safeSessions = Array.isArray(sessions) ? sessions : [];
   const safeUploads = Array.isArray(uploads) ? uploads : [];
 
-  const [activeFilter, setActiveFilter] = useState('all');
   const [isCounterModalOpen, setIsCounterModalOpen] = useState(false);
   const [selectedBid, setSelectedBid] = useState(null);
 
-  // Calculate stats
-  const bidStats = useMemo(() => {
-    const total = safeBids.length;
-    const pending = safeBids.filter(b => b.status === 'pending').length;
-    const accepted = safeBids.filter(b => b.status === 'accepted').length;
-    const rejected = safeBids.filter(b => b.status === 'rejected').length;
-    const countered = safeBids.filter(b => b.status === 'counter' || b.status === 'countered').length;
-
-    return { total, pending, accepted, rejected, countered };
-  }, [safeBids]);
-
-  // Enrich bids with session/content data
+  // Enrich bids
   const enrichedBids = useMemo(() => {
-    return safeBids.map(bid => {
+    let filtered = safeBids;
+
+    if (typeFilter === 'session') {
+      filtered = safeBids.filter(b => b.sessionId);
+    } else if (typeFilter === 'content') {
+      filtered = safeBids.filter(b => b.contentId);
+    }
+
+    return filtered.map(bid => {
       let itemData = null;
       let itemType = null;
       let itemTitle = '';
@@ -66,65 +59,26 @@ const BidRequestsView = ({
     });
   }, [safeBids, safeSessions, safeUploads]);
 
-  // Filter bids
-  const filteredBids = useMemo(() => {
-    if (activeFilter === 'all') return enrichedBids;
-    if (activeFilter === 'counter') {
-      return enrichedBids.filter(b => b.status === 'counter' || b.status === 'countered');
-    }
-    return enrichedBids.filter(b => b.status === activeFilter);
-  }, [enrichedBids, activeFilter]);
+  // Split into sections
+  const { pendingBids, historyBids } = useMemo(() => {
+    const pending = [];
+    const history = [];
 
-  // Parse counter offer
-  const getCounterOffer = (bid) => {
-    if (!bid.counterOffer) return null;
-    try {
-      return JSON.parse(bid.counterOffer);
-    } catch (e) {
-      return null;
-    }
-  };
+    enrichedBids.forEach(bid => {
+      if (bid.status === 'pending' || bid.status === 'counter') {
+        pending.push(bid);
+      } else {
+        history.push(bid);
+      }
+    });
 
-  const getStatusConfig = (status) => {
-    switch (status) {
-      case 'pending':
-        return { 
-          color: '#f59e0b', 
-          bg: '#fef3c7', 
-          icon: <Clock size={14} />,
-          label: 'Pending'
-        };
-      case 'counter':
-      case 'countered':
-        return { 
-          color: '#374151', 
-          bg: 'transparent', 
-          icon: <MessageSquare size={14} />,
-          label: 'Counter Sent'
-        };
-      case 'accepted':
-        return { 
-          color: '#22c55e', 
-          bg: 'transparent', 
-          icon: <CheckCircle size={14} />,
-          label: 'Accepted'
-        };
-      case 'rejected':
-        return { 
-          color: '#ef4444', 
-          bg: 'transparent', 
-          icon: <XCircle size={14} />,
-          label: 'Declined'
-        };
-      default:
-        return { 
-          color: '#886364', 
-          bg: '#f3f4f6', 
-          icon: <Clock size={14} />,
-          label: status
-        };
-    }
-  };
+    // Sort: Pending (newest first), History (newest first)
+    pending.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    history.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+    return { pendingBids: pending, historyBids: history };
+  }, [enrichedBids]);
+
 
   const handleAccept = (bid) => {
     onRespondToBid && onRespondToBid(bid.id, 'accept');
@@ -150,242 +104,134 @@ const BidRequestsView = ({
     setSelectedBid(null);
   };
 
-  const filters = [
-    { id: 'all', label: 'All', count: bidStats.total },
-    { id: 'pending', label: 'Pending', count: bidStats.pending },
-    { id: 'counter', label: 'Counter Sent', count: bidStats.countered },
-    { id: 'accepted', label: 'Accepted', count: bidStats.accepted },
-    { id: 'rejected', label: 'Declined', count: bidStats.rejected },
-  ];
+  const getInitials = (name) => {
+    return name ? name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() : 'ST';
+  };
+
+  // Helper for rendering a card
+  const renderBidCard = (bid, isHistory = false) => {
+    const isCounter = bid.status === 'counter' || bid.status === 'countered';
+
+    return (
+      <div key={bid.id} className="bid-card-new">
+        {/* User Info */}
+        <div className="bid-user-section">
+          <div
+            className="bid-user-avatar"
+            style={{
+              backgroundImage: bid.studentAvatar ? `url('${bid.studentAvatar}')` : 'none'
+            }}
+          >
+            {!bid.studentAvatar && getInitials(bid.studentName)}
+          </div>
+          <div className="bid-user-details">
+            <span className="bid-user-name">{bid.studentName || 'Student'}</span>
+            <span className="bid-user-email">{bid.studentEmail || 'student@example.com'}</span>
+          </div>
+        </div>
+
+        {/* Item Title */}
+        <div className="bid-item-section">
+          <span className="bid-label-micro">
+            {bid.itemType === 'session' ? 'SESSION TITLE' : 'CONTENT TITLE'}
+          </span>
+          <span className="bid-item-title">{bid.itemTitle}</span>
+        </div>
+
+        {/* Price Info */}
+        <div className="bid-price-section">
+          <div className="price-group">
+            <span className="price-label-top">ORIGINAL</span>
+            <span className="price-val-original">NPR {bid.originalPrice?.toLocaleString()}</span>
+          </div>
+          <div className="price-group">
+            <span className="bid-label-micro" style={{ color: '#ef4444' }}>
+              {isHistory && bid.status === 'accepted' ? 'FINAL PRICE' : 'BID AMOUNT'}
+            </span>
+            <span className="price-val-bid">NPR {bid.proposedPrice?.toLocaleString()}</span>
+          </div>
+        </div>
+
+        {/* Message */}
+        <div className="bid-msg-section">
+          "{bid.message || 'No message provided'}"
+        </div>
+
+        {/* Actions or Status */}
+        <div className="bid-actions-section">
+          {!isHistory ? (
+            <>
+              <button className="btn-bid-action btn-decline" onClick={() => handleReject(bid)}>Decline</button>
+              <button className="btn-bid-action btn-counter" onClick={() => handleCounter(bid)}>Counter</button>
+              <button className="btn-bid-action btn-accept" onClick={() => handleAccept(bid)}>Accept</button>
+            </>
+          ) : (
+            <>
+              <span className="text-time-ago">
+                {new Date(bid.created_at).toLocaleDateString()}
+              </span>
+              {bid.status === 'accepted' ? (
+                <div className="status-badge-accepted">
+                  <CheckCircle size={14} fill="currentColor" className="text-emerald-500" />
+                  ACCEPTED
+                </div>
+              ) : (
+                <div className="status-badge-rejected">
+                  <XCircle size={14} fill="currentColor" className="text-red-500" />
+                  REJECTED
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+    );
+  };
 
   return (
-    <div className="my-bids-view">
-      {/* Header */}
-      <div className="bids-header">
-        <div>
-          <h1 className="bids-title">Bid Requests</h1>
-          <p className="bids-subtitle">Review and respond to student bid requests</p>
-        </div>
-        <button className="refresh-btn" onClick={onRefresh} style={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          gap: '0.5rem',
-          padding: '0.5rem 1rem',
-          background: '#f3f4f6',
-          border: 'none',
-          borderRadius: '8px',
-          cursor: 'pointer',
-          fontSize: '0.875rem',
-          color: '#374151'
-        }}>
-          <RefreshCw size={16} />
-          Refresh
+    <div className="bid-new-container">
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
+        <button onClick={onRefresh} style={{ display: 'flex', alignItems: 'center', gap: '5px', background: 'transparent', border: 'none', cursor: 'pointer', color: '#6b7280' }}>
+          <RefreshCw size={14} /> Refresh
         </button>
       </div>
 
-      {/* Stats Cards */}
-      <div className="bid-stats-grid">
-        <div className="bid-stat-card">
-          <Gavel size={24} className="bid-stat-icon" />
-          <div className="bid-stat-info">
-            <span className="bid-stat-value">{bidStats.total}</span>
-            <span className="bid-stat-label">Total Bids</span>
-          </div>
+      {/* Pending Section */}
+      <div className="bid-section">
+        <div className="bid-section-header">
+          <div className="bid-section-dot pending"></div>
+          <h2 className="bid-section-title">PENDING REQUESTS</h2>
+          <span className="bid-count-badge">{pendingBids.length}</span>
         </div>
-        <div className="bid-stat-card pending">
-          <Clock size={24} className="bid-stat-icon" />
-          <div className="bid-stat-info">
-            <span className="bid-stat-value">{bidStats.pending}</span>
-            <span className="bid-stat-label">Pending</span>
-          </div>
-        </div>
-        <div className="bid-stat-card countered">
-          <MessageSquare size={24} className="bid-stat-icon" />
-          <div className="bid-stat-info">
-            <span className="bid-stat-value">{bidStats.countered}</span>
-            <span className="bid-stat-label">Counter Sent</span>
-          </div>
-        </div>
-        <div className="bid-stat-card accepted">
-          <CheckCircle size={24} className="bid-stat-icon" />
-          <div className="bid-stat-info">
-            <span className="bid-stat-value">{bidStats.accepted}</span>
-            <span className="bid-stat-label">Accepted</span>
-          </div>
+        <div>
+          {pendingBids.length > 0 ? (
+            pendingBids.map(bid => renderBidCard(bid, false))
+          ) : (
+            <div style={{ padding: '2rem', textAlign: 'center', color: '#9ca3af', background: '#f9fafb', borderRadius: '12px' }}>
+              No pending requests
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Filter Tabs */}
-      <div className="bids-filter-tabs">
-        {filters.map(filter => (
-          <button
-            key={filter.id}
-            className={`bids-filter-tab ${activeFilter === filter.id ? 'active' : ''}`}
-            onClick={() => setActiveFilter(filter.id)}
-          >
-            {filter.label}
-            <span className="filter-count">{filter.count}</span>
-          </button>
-        ))}
+      {/* History Section */}
+      <div className="bid-section">
+        <div className="bid-section-header">
+          <div className="bid-section-dot history"></div>
+          <h2 className="bid-section-title">RECENTLY ACCEPTED / REJECTED</h2>
+          <span className="bid-count-badge" style={{ background: '#d1fae5', color: '#10b981' }}>{historyBids.length}</span>
+        </div>
+        <div>
+          {historyBids.length > 0 ? (
+            historyBids.map(bid => renderBidCard(bid, true))
+          ) : (
+            <div style={{ padding: '2rem', textAlign: 'center', color: '#9ca3af', background: '#f9fafb', borderRadius: '12px' }}>
+              No history yet
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Bids List - Modern Card Style */}
-      {filteredBids.length === 0 ? (
-        <div className="empty-state" style={{ marginTop: '2rem' }}>
-          <div className="empty-state-icon">
-            <Gavel size={24} />
-          </div>
-          <h3 className="empty-state-title">No Bids Found</h3>
-          <p className="empty-state-text">
-            {activeFilter === 'all' 
-              ? "You haven't received any bid requests yet."
-              : `No ${activeFilter} bids found.`}
-          </p>
-        </div>
-      ) : (
-        <div className="bids-modern-grid">
-          {filteredBids.map((bid, idx) => {
-            const statusConfig = getStatusConfig(bid.status);
-            const counterOffer = getCounterOffer(bid);
-            const discountPercent = bid.originalPrice > 0 
-              ? Math.round((1 - (bid.proposedPrice / bid.originalPrice)) * 100)
-              : 0;
-            
-            return (
-              <div key={bid.id || idx} className="bid-modern-card">
-                {/* Card Header - Status & Type */}
-                <div className="bid-modern-header">
-                  <div 
-                    className="bid-modern-status"
-                    style={{ backgroundColor: statusConfig.bg, color: statusConfig.color }}
-                  >
-                    {statusConfig.icon}
-                    <span>{statusConfig.label.toUpperCase()}</span>
-                  </div>
-                  <span className="bid-modern-type">
-                    {bid.itemType === 'session' ? 'Session' : 'Content'}
-                  </span>
-                </div>
-
-                {/* Item Title */}
-                <h3 className="bid-modern-title">{bid.itemTitle}</h3>
-
-                {/* Student Info */}
-                <div className="bid-modern-teacher">
-                  <div 
-                    className="bid-modern-teacher-avatar"
-                    style={{
-                      backgroundImage: `url('${bid.studentAvatar || 
-                        `https://ui-avatars.com/api/?name=${encodeURIComponent(bid.studentName || 'Student')}&background=ea2a33&color=fff`}')`
-                    }}
-                  />
-                  <div className="bid-modern-teacher-info">
-                    <span className="bid-modern-teacher-name">{bid.studentName || 'Student'}</span>
-                    <span className="bid-modern-teacher-role">Student</span>
-                  </div>
-                  {/* Discount Badge */}
-                  {discountPercent > 0 && (
-                    <div className="bid-modern-discount-badge">
-                      {discountPercent}% discount requested
-                    </div>
-                  )}
-                </div>
-
-                {/* Message Quote */}
-                {bid.message && (
-                  <div className="bid-modern-message">
-                    <p className="bid-modern-message-text">"{bid.message}"</p>
-                  </div>
-                )}
-
-                {/* Pricing Section */}
-                <div className="bid-modern-pricing">
-                  <div className="bid-modern-price-row">
-                    <span className="bid-modern-price-label">Original Price</span>
-                    <span className="bid-modern-price-value original">
-                      NPR {(bid.originalPrice || 0).toLocaleString()}
-                    </span>
-                  </div>
-                  <div className="bid-modern-price-row your-bid">
-                    <span className="bid-modern-price-label">Student's Bid</span>
-                    <span className="bid-modern-price-value highlight">
-                      NPR {(bid.proposedPrice || 0).toLocaleString()}
-                    </span>
-                  </div>
-                  {(bid.status === 'counter' || bid.status === 'countered') && counterOffer && (
-                    <div className="bid-modern-price-row counter">
-                      <span className="bid-modern-price-label">Your Counter</span>
-                      <span className="bid-modern-price-value counter-value">
-                        NPR {counterOffer.price?.toLocaleString()}
-                      </span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Submitted Date */}
-                <div className="bid-modern-date">
-                  <Clock size={14} />
-                  <span>Received {new Date(bid.created_at).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' })}</span>
-                </div>
-
-                {/* Card Footer Actions */}
-                <div className="bid-modern-footer">
-                  {bid.status === 'pending' && (
-                    <div className="bid-modern-actions-row">
-                      <button 
-                        className="bid-modern-btn cancel"
-                        onClick={() => handleReject(bid)}
-                      >
-                        <XCircle size={16} />
-                        <span>Decline</span>
-                      </button>
-                      <button 
-                        className="bid-modern-btn counter-btn"
-                        onClick={() => handleCounter(bid)}
-                      >
-                        <MessageSquare size={16} />
-                        <span>Counter</span>
-                      </button>
-                      <button 
-                        className="bid-modern-btn accept-counter"
-                        onClick={() => handleAccept(bid)}
-                      >
-                        <CheckCircle size={16} />
-                        <span>Accept</span>
-                      </button>
-                    </div>
-                  )}
-
-                  {bid.status === 'accepted' && (
-                    <div className="bid-modern-accepted-section">
-                      <span className="bid-modern-enrolled-text">
-                        <CheckCircle size={14} />
-                        Accepted at NPR {(bid.proposedPrice || 0).toLocaleString()}
-                      </span>
-                    </div>
-                  )}
-
-                  {bid.status === 'rejected' && (
-                    <div className="bid-modern-rejected-section">
-                      <AlertCircle size={16} />
-                      <span>You declined this bid</span>
-                    </div>
-                  )}
-
-                  {(bid.status === 'counter' || bid.status === 'countered') && (
-                    <div className="bid-modern-counter-status">
-                      <MessageSquare size={16} />
-                      <span>Counter sent • Awaiting student response</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {/* Counter Offer Modal */}
       <CounterOfferModal
         isOpen={isCounterModalOpen}
         onClose={() => { setIsCounterModalOpen(false); setSelectedBid(null); }}

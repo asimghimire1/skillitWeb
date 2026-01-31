@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import UploadModal from '../../components/UploadModal';
 import CreateSessionModal from '../../components/CreateSessionModal';
 import CreatePostModal from '../../components/CreatePostModal';
@@ -28,9 +28,12 @@ import {
   FileEdit,
   Construction,
   Menu,
-  X
+  X,
+  Users
 } from 'lucide-react';
+import SidebarDropdownItem, { SidebarSubItem } from '../../components/SidebarDropdownItem';
 import '../../css/teacher.css';
+import '../../css/sidebar-dropdown.css';
 
 export default function Teacher() {
   const navigate = useNavigate();
@@ -39,8 +42,24 @@ export default function Teacher() {
   const { user, logout, isAuthenticated } = useAuth();
   const [teacher, setTeacher] = useState(null);
   const [isDark, setIsDark] = useState(false);
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get('tab') || 'dashboard';
+  const bidTypeFilter = searchParams.get('bidType') || 'all';
+
+  const handleTabChange = (tab, extraParams = {}) => {
+    setSearchParams(prev => {
+      const newParams = new URLSearchParams(prev);
+      newParams.set('tab', tab);
+      Object.entries(extraParams).forEach(([key, value]) => {
+        newParams.set(key, value);
+      });
+      return newParams;
+    }, { replace: true });
+    setIsMobileMenuOpen(false);
+  };
+
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [expandedMenus, setExpandedMenus] = useState({});
 
   // Modal States
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
@@ -80,7 +99,7 @@ export default function Teacher() {
       navigate('/dashboard', { replace: true });
       return;
     }
-    
+
     setTeacher(user);
 
     const darkMode = localStorage.getItem('darkMode') === 'true';
@@ -92,7 +111,7 @@ export default function Teacher() {
 
   const fetchDashboardData = async (teacherId) => {
     console.log('[Teacher] Fetching dashboard data for teacher:', teacherId);
-    
+
     const statsData = await apiService.getTeacherStats(teacherId);
     if (statsData) setStats(statsData);
 
@@ -130,10 +149,10 @@ export default function Teacher() {
   // Handle session status updates (missed/completed)
   const handleSessionStatusUpdate = async (sessionId, status) => {
     // Update local state
-    setSessions(prev => prev.map(session => 
+    setSessions(prev => prev.map(session =>
       session.id === sessionId ? { ...session, status } : session
     ));
-    
+
     // Optionally update on server
     try {
       await apiService.updateSession(sessionId, { status });
@@ -159,7 +178,7 @@ export default function Teacher() {
     console.log('[Teacher] Creating session with data:', sessionData);
     console.log('[Teacher] sessionToEdit:', sessionToEdit);
     console.log('[Teacher] teacher.id:', teacher?.id);
-    
+
     if (sessionToEdit) {
       const updated = await apiService.updateSession(sessionToEdit.id, {
         ...sessionData,
@@ -330,30 +349,56 @@ export default function Teacher() {
         </div>
 
         <nav className="sidebar-nav">
-          <div className={`nav-item ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={() => { setActiveTab('dashboard'); setIsMobileMenuOpen(false); }}>
+          <div className={`nav-item ${activeTab === 'dashboard' ? 'active' : ''}`} onClick={() => handleTabChange('dashboard')}>
             <LayoutDashboard size={20} className={activeTab === 'dashboard' ? 'nav-icon-active' : 'nav-icon-inactive'} />
             Dashboard
           </div>
-          <div className={`nav-item ${activeTab === 'bids' ? 'active' : ''}`} onClick={() => { setActiveTab('bids'); setIsMobileMenuOpen(false); }}>
-            <ReceiptText size={20} className={activeTab === 'bids' ? 'nav-icon-active' : 'nav-icon-inactive'} />
+
+          <div style={{ marginTop: '1.5rem', marginBottom: '0.5rem', paddingLeft: '1rem', fontSize: '0.75rem', fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             Bid Requests
-            {bidNotificationCount > 0 && (
-              <span className="nav-badge">{bidNotificationCount > 9 ? '9+' : bidNotificationCount}</span>
-            )}
           </div>
-          <div className={`nav-item ${activeTab === 'content' ? 'active' : ''}`} onClick={() => { setActiveTab('content'); setIsMobileMenuOpen(false); }}>
+
+          <SidebarDropdownItem
+            icon={FileEdit}
+            label="Contents"
+            badge={bids.filter(b => b.status === 'pending' && b.contentId).length}
+            isExpanded={expandedMenus['content_bids']}
+            onToggle={() => setExpandedMenus(prev => ({ ...prev, content_bids: !prev['content_bids'] }))}
+          >
+            <SidebarSubItem
+              label="Active Bids"
+              isActive={activeTab === 'bids' && bidTypeFilter === 'content'}
+              onClick={() => handleTabChange('bids', { bidType: 'content' })}
+            />
+          </SidebarDropdownItem>
+
+          <SidebarDropdownItem
+            icon={Users}
+            label="Sessions"
+            badge={bids.filter(b => b.status === 'pending' && b.sessionId).length}
+            isExpanded={expandedMenus['session_bids']}
+            onToggle={() => setExpandedMenus(prev => ({ ...prev, session_bids: !prev['session_bids'] }))}
+          >
+            <SidebarSubItem
+              label="Session Bids"
+              isActive={activeTab === 'bids' && bidTypeFilter === 'session'}
+              onClick={() => handleTabChange('bids', { bidType: 'session' })}
+            />
+          </SidebarDropdownItem>
+
+          <div className={`nav-item ${activeTab === 'content' ? 'active' : ''}`} onClick={() => handleTabChange('content')}>
             <SquarePlay size={20} className={activeTab === 'content' ? 'nav-icon-active' : 'nav-icon-inactive'} />
             My Content
           </div>
-          <div className={`nav-item ${activeTab === 'sessions' ? 'active' : ''}`} onClick={() => { setActiveTab('sessions'); setIsMobileMenuOpen(false); }}>
+          <div className={`nav-item ${activeTab === 'sessions' ? 'active' : ''}`} onClick={() => handleTabChange('sessions')}>
             <CalendarDays size={20} className={activeTab === 'sessions' ? 'nav-icon-active' : 'nav-icon-inactive'} />
             Sessions
           </div>
-          <div className={`nav-item ${activeTab === 'posts' ? 'active' : ''}`} onClick={() => { setActiveTab('posts'); setIsMobileMenuOpen(false); }}>
+          <div className={`nav-item ${activeTab === 'posts' ? 'active' : ''}`} onClick={() => handleTabChange('posts')}>
             <Megaphone size={20} className={activeTab === 'posts' ? 'nav-icon-active' : 'nav-icon-inactive'} />
             Posts
           </div>
-          <div className={`nav-item ${activeTab === 'earnings' ? 'active' : ''}`} onClick={() => { setActiveTab('earnings'); setIsMobileMenuOpen(false); }}>
+          <div className={`nav-item ${activeTab === 'earnings' ? 'active' : ''}`} onClick={() => handleTabChange('earnings')}>
             <Wallet size={20} className={activeTab === 'earnings' ? 'nav-icon-active' : 'nav-icon-inactive'} />
             Earnings
           </div>
@@ -397,7 +442,7 @@ export default function Teacher() {
             </h2>
           </div>
           <div className="navbar-right">
-            <NotificationDropdown 
+            <NotificationDropdown
               userId={teacher?.id}
               onNotificationCountChange={setNotificationCount}
             />
@@ -434,12 +479,13 @@ export default function Teacher() {
           )}
 
           {activeTab === 'bids' && (
-            <BidRequestsView 
+            <BidRequestsView
               bids={bids}
               sessions={sessions}
               uploads={uploads}
               onRespondToBid={handleRespondToBid}
               onRefresh={() => fetchDashboardData(teacher.id)}
+              typeFilter={bidTypeFilter}
             />
           )}
 

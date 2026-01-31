@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import StudentDashboardView from '../../components/student/DashboardView';
 import ExploreContentView from '../../components/student/ExploreContentView';
 import ExploreSessionsView from '../../components/student/ExploreSessionsView';
@@ -32,10 +32,13 @@ import {
   Video,
   Calendar,
   Clock,
-  Lock
+  Lock,
+  FileText
 } from 'lucide-react';
+import SidebarDropdownItem, { SidebarSubItem } from '../../components/SidebarDropdownItem';
 import '../../css/student.css';
 import '../../css/teacher.css';
+import '../../css/sidebar-dropdown.css';
 
 export default function Student() {
   const navigate = useNavigate();
@@ -44,8 +47,24 @@ export default function Student() {
   const { user, logout, isAuthenticated } = useAuth();
   const [student, setStudent] = useState(null);
   const [isDark, setIsDark] = useState(false);
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get('tab') || 'dashboard';
+  const bidFilter = searchParams.get('bidType') || 'all';
+
+  const handleTabChange = (tab, extraParams = {}) => {
+    setSearchParams(prev => {
+      const newParams = new URLSearchParams(prev);
+      newParams.set('tab', tab);
+      Object.entries(extraParams).forEach(([key, value]) => {
+        newParams.set(key, value);
+      });
+      return newParams;
+    }, { replace: true });
+    setIsMobileMenuOpen(false);
+  };
+
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [expandedMenus, setExpandedMenus] = useState({});
 
   // Modal States
   const [isCreditsModalOpen, setIsCreditsModalOpen] = useState(false);
@@ -143,7 +162,7 @@ export default function Student() {
     if (bidsData) {
       setBids(bidsData);
       // Count pending bids and counter offers as notifications for sidebar badge
-      const activeBidCount = bidsData.filter(b => 
+      const activeBidCount = bidsData.filter(b =>
         b.status === 'pending' || b.status === 'counter' || b.status === 'countered'
       ).length;
       setBidNotificationCount(activeBidCount);
@@ -171,7 +190,7 @@ export default function Student() {
 
   const handleEnrollSession = async (session) => {
     const isEnrolled = enrollments.some(e => e.sessionId === session.id || e.id === session.id);
-    
+
     // If already enrolled, just open the meeting link (allows rejoin)
     if (isEnrolled) {
       if (session.meetingLink) {
@@ -311,8 +330,8 @@ export default function Student() {
 
     const ok = await confirm({
       title: contentItem.price > 0 ? 'Unlock Content' : 'Access Content',
-      message: contentItem.price > 0 
-        ? `Unlock "${contentItem.title}" for NPR ${contentItem.price}?` 
+      message: contentItem.price > 0
+        ? `Unlock "${contentItem.title}" for NPR ${contentItem.price}?`
         : `Access "${contentItem.title}" for free?`,
       confirmText: contentItem.price > 0 ? 'Pay & Unlock' : 'Access',
       type: 'default'
@@ -372,8 +391,8 @@ export default function Student() {
     // If it's a session object, find the pending bid for it
     let bidId = bidIdOrSession;
     if (typeof bidIdOrSession === 'object' && bidIdOrSession.id) {
-      const pendingBid = bids.find(b => 
-        (b.sessionId === bidIdOrSession.id || b.contentId === bidIdOrSession.id) && 
+      const pendingBid = bids.find(b =>
+        (b.sessionId === bidIdOrSession.id || b.contentId === bidIdOrSession.id) &&
         b.status === 'pending'
       );
       if (!pendingBid) {
@@ -471,7 +490,7 @@ export default function Student() {
   }
 
   const getTabTitle = () => {
-    switch(activeTab) {
+    switch (activeTab) {
       case 'dashboard': return { title: `Welcome back, ${student.fullname?.split(' ')[0] || 'Student'} 👋`, subtitle: "Let's continue your learning journey today." };
       case 'explore': return { title: 'Explore Content', subtitle: 'Discover video lessons and courses from expert teachers.' };
       case 'mylearning': return { title: 'My Learning', subtitle: 'Access your enrolled content and sessions.' };
@@ -499,46 +518,70 @@ export default function Student() {
 
           {/* Navigation */}
           <nav className="sidebar-nav">
-            <button 
+            <button
               className={`nav-item ${activeTab === 'dashboard' ? 'active' : ''}`}
-              onClick={() => { setActiveTab('dashboard'); setIsMobileMenuOpen(false); }}
+              onClick={() => handleTabChange('dashboard')}
             >
               <LayoutDashboard size={20} />
               <span>Dashboard</span>
             </button>
-            <button 
+            <button
               className={`nav-item ${activeTab === 'explore' ? 'active' : ''}`}
-              onClick={() => { setActiveTab('explore'); setIsMobileMenuOpen(false); }}
+              onClick={() => handleTabChange('explore')}
             >
               <Search size={20} />
               <span>Explore Content</span>
             </button>
-            <button 
+            <button
               className={`nav-item ${activeTab === 'sessions' ? 'active' : ''}`}
-              onClick={() => { setActiveTab('sessions'); setIsMobileMenuOpen(false); }}
+              onClick={() => handleTabChange('sessions')}
             >
               <Calendar size={20} />
               <span>Explore Sessions</span>
             </button>
-            <button 
+            <button
               className={`nav-item ${activeTab === 'mylearning' ? 'active' : ''}`}
-              onClick={() => { setActiveTab('mylearning'); setIsMobileMenuOpen(false); }}
+              onClick={() => handleTabChange('mylearning')}
             >
               <BookOpen size={20} />
               <span>My Learning</span>
             </button>
-            <button 
-              className={`nav-item ${activeTab === 'bids' ? 'active' : ''}`}
-              onClick={() => { setActiveTab('bids'); setIsMobileMenuOpen(false); }}
+
+            <div style={{ marginTop: '1.5rem', marginBottom: '0.5rem', paddingLeft: '1rem', fontSize: '0.75rem', fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              Bid Requests
+            </div>
+
+            <SidebarDropdownItem
+              icon={FileText}
+              label="Contents"
+              badge={bids.filter(b => b.status === 'pending' && b.contentId).length}
+              isExpanded={expandedMenus['content_bids']}
+              onToggle={() => setExpandedMenus(prev => ({ ...prev, content_bids: !prev['content_bids'] }))}
             >
-              <Gavel size={20} />
-              <span>My Bids</span>
-              {bidNotificationCount > 0 && (
-                <span className="nav-badge">{bidNotificationCount > 9 ? '9+' : bidNotificationCount}</span>
-              )}
-            </button>
-            <button 
-              className={`nav-item ${activeTab === 'teachers' ? 'active' : ''}`}
+              <SidebarSubItem
+                label="Active Bids"
+                isActive={activeTab === 'bids' && bidFilter === 'content'}
+                onClick={() => handleTabChange('bids', { bidType: 'content' })}
+              />
+            </SidebarDropdownItem>
+
+            <SidebarDropdownItem
+              icon={Users}
+              label="Sessions"
+              badge={bids.filter(b => b.status === 'pending' && b.sessionId).length}
+              isExpanded={expandedMenus['session_bids']}
+              onToggle={() => setExpandedMenus(prev => ({ ...prev, session_bids: !prev['session_bids'] }))}
+            >
+              <SidebarSubItem
+                label="Session Bids"
+                isActive={activeTab === 'bids' && bidFilter === 'session'}
+                onClick={() => handleTabChange('bids', { bidType: 'session' })}
+              />
+            </SidebarDropdownItem>
+
+            <button
+              className={`nav-item logout-item`}
+              style={{ display: 'none' }}
               onClick={() => { setActiveTab('teachers'); setIsMobileMenuOpen(false); }}
             >
               <Users size={20} />
@@ -559,7 +602,7 @@ export default function Student() {
               </div>
             </div>
 
-            
+
 
             {/* Logout */}
             <button className="nav-item logout-item" onClick={handleLogout}>
@@ -569,10 +612,10 @@ export default function Student() {
 
             {/* User Profile */}
             <div className="sidebar-user">
-              <div 
+              <div
                 className="user-avatar"
-                style={{ 
-                  backgroundImage: `url('${student.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(student.fullname || 'Student')}&background=ea2a33&color=fff`}')` 
+                style={{
+                  backgroundImage: `url('${student.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(student.fullname || 'Student')}&background=ea2a33&color=fff`}')`
                 }}
               />
               <div className="user-info">
@@ -607,8 +650,8 @@ export default function Student() {
               <Search size={18} />
               <input type="text" placeholder="Search sessions..." />
             </div>
-            <NotificationDropdown 
-              userId={student?.id} 
+            <NotificationDropdown
+              userId={student?.id}
               onNotificationCountChange={setNotificationCount}
             />
           </div>
@@ -695,7 +738,7 @@ export default function Student() {
               content={content}
               onViewTeacherContent={(teacher) => {
                 // Filter to show only this teacher's content
-                setActiveTab('explore');
+                handleTabChange('explore');
                 // Could add teacher filter state here
               }}
               onViewProfile={(teacher) => {
@@ -708,6 +751,7 @@ export default function Student() {
           {activeTab === 'bids' && (
             <MyBidsView
               bids={bids}
+              filter={bidFilter}
               sessions={sessions}
               content={content}
               teachers={teachers}
@@ -809,17 +853,17 @@ export default function Student() {
             {/* Content */}
             <div className="enroll-modal-body">
               <h2 className="enroll-modal-title">{selectedSession.title}</h2>
-              
+
               {selectedSession.description && (
                 <p className="enroll-modal-desc">{selectedSession.description}</p>
               )}
 
               {/* Instructor */}
               <div className="enroll-instructor">
-                <div 
+                <div
                   className="enroll-instructor-avatar"
                   style={{
-                    backgroundImage: `url('${selectedSession.teacherAvatar || 
+                    backgroundImage: `url('${selectedSession.teacherAvatar ||
                       `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedSession.teacherName || 'Teacher')}&background=ea2a33&color=fff`}')`
                   }}
                 />
@@ -852,8 +896,8 @@ export default function Student() {
                 <Wallet size={16} />
                 Wallet Balance: NPR {stats.credits?.toLocaleString()}
               </div>
-              
-              <button 
+
+              <button
                 className="enroll-unlock-btn"
                 onClick={handleConfirmEnrollment}
                 disabled={stats.credits < selectedSession.price}
@@ -863,7 +907,7 @@ export default function Student() {
               </button>
 
               {stats.credits < selectedSession.price && (
-                <button 
+                <button
                   className="enroll-add-credits-link"
                   onClick={() => { setIsEnrollModalOpen(false); setIsCreditsModalOpen(true); }}
                 >

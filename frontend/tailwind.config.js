@@ -8,6 +8,8 @@ export default {
     extend: {
       colors: {
         primary: "#ea2a33",
+        charcoal: "#1a1a1a",
+        "soft-gray": "#f9f9fb",
         "primary-dark": "#c91f27",
         "background-light": "#ffffff",
         "background-alt": "#f9fafb",
@@ -17,14 +19,40 @@ export default {
         "text-muted": "#6b7280",
       },
       fontFamily: {
-        display: ["Inter", "sans-serif"],
         sans: ["Inter", "sans-serif"],
+        display: ["Plus Jakarta Sans", "sans-serif"],
+      },
+      animation: {
+        'marquee': 'marquee 40s linear infinite',
+        'float': 'float 8s ease-in-out infinite',
+        'float-delayed': 'float 8s ease-in-out infinite 4s',
+        'breathe': 'breathe 10s ease-in-out infinite',
+        'gradient-shift': 'gradient-shift 8s ease infinite',
+      },
+      keyframes: {
+        marquee: {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(-50%)' },
+        },
+        float: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-20px)' },
+        },
+        breathe: {
+          '0%, 100%': { opacity: '0.4', transform: 'scale(1)' },
+          '50%': { opacity: '0.7', transform: 'scale(1.1)' },
+        },
+        'gradient-shift': {
+          '0%, 100%': { 'background-position': '0% 50%' },
+          '50%': { 'background-position': '100% 50%' },
+        }
       },
       borderRadius: {
         DEFAULT: "0.5rem",
         lg: "1rem",
         xl: "1.5rem",
         "2xl": "2rem",
+        "3xl": "3rem",
         full: "9999px"
       },
       boxShadow: {
