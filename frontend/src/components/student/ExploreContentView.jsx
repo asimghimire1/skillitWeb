@@ -19,6 +19,7 @@ const ExploreContentView = ({
   content,
   unlockedContent,
   bids = [],
+  searchQuery,
   onJoinContent,
   onMakeBid,
   onCancelBid,
@@ -35,6 +36,14 @@ const ExploreContentView = ({
   console.log('[ExploreContentView] safeContent.length:', safeContent.length);
 
   const [searchTerm, setSearchTerm] = useState('');
+
+  // Sync search query from parent
+  React.useEffect(() => {
+    if (searchQuery !== undefined) {
+      setSearchTerm(searchQuery);
+    }
+  }, [searchQuery]);
+
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedTeacher, setSelectedTeacher] = useState('all');
   const [selectedType, setSelectedType] = useState('all');
@@ -61,10 +70,10 @@ const ExploreContentView = ({
     });
     return [
       { value: 'all', label: 'All', icon: 'person' },
-      ...Array.from(teacherMap.entries()).map(([id, name]) => ({ 
-        value: id.toString(), 
-        label: name, 
-        icon: 'school' 
+      ...Array.from(teacherMap.entries()).map(([id, name]) => ({
+        value: id.toString(),
+        label: name,
+        icon: 'school'
       }))
     ];
   }, [safeContent]);
@@ -95,15 +104,15 @@ const ExploreContentView = ({
 
   // Check if content is already unlocked/joined
   const isUnlocked = (contentItem) => {
-    return safeUnlockedContent.some(u => 
+    return safeUnlockedContent.some(u =>
       u.contentId === contentItem.id || u.id === contentItem.id
     );
   };
 
   // Check if content has a pending bid
   const hasPendingBid = (contentItem) => {
-    return safeBids.some(b => 
-      (b.contentId === contentItem.id || b.contentId === String(contentItem.id) || String(b.contentId) === String(contentItem.id)) && 
+    return safeBids.some(b =>
+      (b.contentId === contentItem.id || b.contentId === String(contentItem.id) || String(b.contentId) === String(contentItem.id)) &&
       (b.status === 'pending' || b.status === 'counter' || b.status === 'countered')
     );
   };
@@ -111,11 +120,11 @@ const ExploreContentView = ({
   // Filter and sort content
   const filteredContent = useMemo(() => {
     let filtered = safeContent.filter(item => {
-      // Exclude already unlocked content
-      if (isUnlocked(item)) return false;
+      // Exclude already unlocked content - COMMENTED OUT to show all content
+      // if (isUnlocked(item)) return false;
 
       // Search filter
-      const matchesSearch = !searchTerm || 
+      const matchesSearch = !searchTerm ||
         item.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.teacherName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -125,11 +134,11 @@ const ExploreContentView = ({
       const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory;
 
       // Teacher filter
-      const matchesTeacher = selectedTeacher === 'all' || 
+      const matchesTeacher = selectedTeacher === 'all' ||
         item.teacherId?.toString() === selectedTeacher;
 
       // Type filter
-      const matchesType = selectedType === 'all' || 
+      const matchesType = selectedType === 'all' ||
         item.type?.toLowerCase() === selectedType;
 
       // Price filter
@@ -214,7 +223,7 @@ const ExploreContentView = ({
           <Search size={18} />
           <input
             type="text"
-            placeholder="Search content, teachers..."
+            placeholder="Search Skills"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="search-input-explore"
@@ -259,13 +268,13 @@ const ExploreContentView = ({
 
         {/* View Toggle */}
         <div className="view-toggle">
-          <button 
+          <button
             className={`view-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
             onClick={() => setViewMode('grid')}
           >
             <Grid size={18} />
           </button>
-          <button 
+          <button
             className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
             onClick={() => setViewMode('list')}
           >

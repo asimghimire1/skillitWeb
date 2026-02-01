@@ -11,21 +11,22 @@ const upload = require('../middleware/upload');
 router.get('/', async (req, res) => {
     try {
         // Get only published and public content for student view
+        // Get ALL content for debugging/dev purposes (ignoring status/visibility filters)
         const contents = await Content.findAll({
-            where: {
-                status: 'published',
-                visibility: 'public'
-            },
+            // where: {
+            //     status: 'published',
+            //     visibility: 'public'
+            // },
             order: [['created_at', 'DESC']]
         });
-        
+
         console.log(`[Content API] Found ${contents.length} published content items`);
-        
+
         if (contents.length === 0) {
             console.log('[Content API] No content in database');
             return res.json([]);
         }
-        
+
         // Enrich content with teacher info
         const enrichedContents = await Promise.all(contents.map(async (content) => {
             const contentData = content.toJSON();
@@ -43,7 +44,7 @@ router.get('/', async (req, res) => {
             }
             return contentData;
         }));
-        
+
         console.log(`[Content API] Returning ${enrichedContents.length} enriched content items`);
         res.json(enrichedContents);
     } catch (error) {
@@ -167,9 +168,9 @@ router.post('/:id/unlock', async (req, res) => {
         });
 
         if (existing) {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'You already have access to this content' 
+            return res.status(400).json({
+                success: false,
+                message: 'You already have access to this content'
             });
         }
 
@@ -182,13 +183,13 @@ router.post('/:id/unlock', async (req, res) => {
         // Handle payment for paid content
         const contentPrice = content.price || 0;
         const isFree = contentPrice === 0;
-        
+
         if (!isFree && type !== 'bid') {
             const user = await User.findByPk(studentId);
             if (!user || (user.credits || 0) < contentPrice) {
-                return res.status(400).json({ 
-                    success: false, 
-                    message: 'Insufficient credits' 
+                return res.status(400).json({
+                    success: false,
+                    message: 'Insufficient credits'
                 });
             }
             // Deduct credits
@@ -205,12 +206,12 @@ router.post('/:id/unlock', async (req, res) => {
         });
 
         // Update content enrollment count
-        await content.update({ 
-            enrollments: (content.enrollments || 0) + 1 
+        await content.update({
+            enrollments: (content.enrollments || 0) + 1
         });
 
-        res.json({ 
-            success: true, 
+        res.json({
+            success: true,
             message: 'Content unlocked successfully',
             studentContent
         });

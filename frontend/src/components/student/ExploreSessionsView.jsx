@@ -49,10 +49,10 @@ const ExploreSessionsView = ({
     });
     return [
       { value: 'all', label: 'All Teachers', icon: 'person' },
-      ...Array.from(teacherMap.entries()).map(([id, name]) => ({ 
-        value: id.toString(), 
-        label: name, 
-        icon: 'school' 
+      ...Array.from(teacherMap.entries()).map(([id, name]) => ({
+        value: id.toString(),
+        label: name,
+        icon: 'school'
       }))
     ];
   }, [safeSessions, safeTeachers]);
@@ -85,15 +85,15 @@ const ExploreSessionsView = ({
 
   // Check if session is already enrolled
   const isEnrolled = (session) => {
-    return safeEnrollments.some(e => 
+    return safeEnrollments.some(e =>
       e.sessionId === session.id || e.id === session.id
     );
   };
 
   // Check if session has a pending bid
   const hasPendingBid = (session) => {
-    return safeBids.some(b => 
-      (b.sessionId === session.id || b.sessionId === String(session.id) || String(b.sessionId) === String(session.id)) && 
+    return safeBids.some(b =>
+      (b.sessionId === session.id || b.sessionId === String(session.id) || String(b.sessionId) === String(session.id)) &&
       (b.status === 'pending' || b.status === 'counter' || b.status === 'countered')
     );
   };
@@ -102,16 +102,16 @@ const ExploreSessionsView = ({
   const filteredSessions = useMemo(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    
+
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
-    
+
     const endOfWeek = new Date(today);
     endOfWeek.setDate(today.getDate() + (7 - today.getDay()));
-    
+
     const startOfNextWeek = new Date(endOfWeek);
     startOfNextWeek.setDate(startOfNextWeek.getDate() + 1);
-    
+
     const endOfNextWeek = new Date(startOfNextWeek);
     endOfNextWeek.setDate(endOfNextWeek.getDate() + 6);
 
@@ -123,20 +123,20 @@ const ExploreSessionsView = ({
       if (sessionDate < new Date()) return false;
 
       // Search filter
-      const matchesSearch = !searchTerm || 
+      const matchesSearch = !searchTerm ||
         session.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         session.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         session.teacherName?.toLowerCase().includes(searchTerm.toLowerCase());
 
       // Teacher filter
-      const matchesTeacher = selectedTeacher === 'all' || 
+      const matchesTeacher = selectedTeacher === 'all' ||
         session.teacherId?.toString() === selectedTeacher;
 
       // Date filter
       let matchesDate = true;
       const sessDate = new Date(session.scheduledDate);
       sessDate.setHours(0, 0, 0, 0);
-      
+
       if (selectedDate === 'today') {
         matchesDate = sessDate.getTime() === today.getTime();
       } else if (selectedDate === 'tomorrow') {
@@ -195,12 +195,12 @@ const ExploreSessionsView = ({
     const today = new Date();
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
-    
+
     today.setHours(0, 0, 0, 0);
     tomorrow.setHours(0, 0, 0, 0);
     const sessDate = new Date(date);
     sessDate.setHours(0, 0, 0, 0);
-    
+
     if (sessDate.getTime() === today.getTime()) return 'Today';
     if (sessDate.getTime() === tomorrow.getTime()) return 'Tomorrow';
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
@@ -223,7 +223,7 @@ const ExploreSessionsView = ({
           <Search size={18} />
           <input
             type="text"
-            placeholder="Search sessions, teachers..."
+            placeholder="Search Skills"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="search-input-explore"
@@ -268,13 +268,13 @@ const ExploreSessionsView = ({
 
         {/* View Toggle */}
         <div className="view-toggle">
-          <button 
+          <button
             className={`view-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
             onClick={() => setViewMode('grid')}
           >
             <Grid size={18} />
           </button>
-          <button 
+          <button
             className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
             onClick={() => setViewMode('list')}
           >

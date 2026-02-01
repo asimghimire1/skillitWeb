@@ -63,14 +63,14 @@ const ExploreTeachersView = ({
       if (teacher.role !== 'teacher' && teacher.role !== 'mentor') return false;
 
       // Search filter
-      const matchesSearch = !searchTerm || 
+      const matchesSearch = !searchTerm ||
         teacher.fullname?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         teacher.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         teacher.bio?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         teacher.skills?.some(s => s.toLowerCase().includes(searchTerm.toLowerCase()));
 
       // Skill filter
-      const matchesSkill = selectedSkill === 'all' || 
+      const matchesSkill = selectedSkill === 'all' ||
         teacher.skills?.includes(selectedSkill);
 
       return matchesSearch && matchesSkill;
@@ -124,7 +124,7 @@ const ExploreTeachersView = ({
           <Search size={18} />
           <input
             type="text"
-            placeholder="Search teachers, skills..."
+            placeholder="Search Skills"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="search-input-explore"
@@ -151,13 +151,13 @@ const ExploreTeachersView = ({
 
         {/* View Toggle */}
         <div className="view-toggle">
-          <button 
+          <button
             className={`view-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
             onClick={() => setViewMode('grid')}
           >
             <Grid size={18} />
           </button>
-          <button 
+          <button
             className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
             onClick={() => setViewMode('list')}
           >
@@ -178,17 +178,17 @@ const ExploreTeachersView = ({
       ) : (
         <div className={viewMode === 'grid' ? 'teachers-explore-grid' : 'teachers-explore-list'}>
           {filteredTeachers.map((teacher, idx) => (
-            <div 
-              key={teacher.id || idx} 
+            <div
+              key={teacher.id || idx}
               className={`teacher-explore-card ${viewMode} ${expandedTeacher === teacher.id ? 'expanded' : ''}`}
             >
               {/* Main Card Content */}
               <div className="teacher-card-main" onClick={() => toggleTeacherExpand(teacher.id)}>
                 {/* Avatar */}
-                <div 
+                <div
                   className="teacher-explore-avatar"
                   style={{
-                    backgroundImage: `url('${teacher.profilePicture || teacher.avatar || 
+                    backgroundImage: `url('${teacher.profilePicture || teacher.avatar ||
                       `https://ui-avatars.com/api/?name=${encodeURIComponent(teacher.fullname || teacher.fullName || 'Teacher')}&background=ea2a33&color=fff&size=128`}')`
                   }}
                 >
@@ -202,7 +202,7 @@ const ExploreTeachersView = ({
                 {/* Info */}
                 <div className="teacher-explore-info">
                   <h3 className="teacher-explore-name">{teacher.fullname || teacher.fullName}</h3>
-                  
+
                   {/* Rating */}
                   <div className="teacher-explore-rating">
                     <Star size={14} fill="#f59e0b" stroke="#f59e0b" />
@@ -248,8 +248,8 @@ const ExploreTeachersView = ({
 
                 {/* Expand Indicator */}
                 <div className="teacher-expand-btn">
-                  <ChevronRight 
-                    size={20} 
+                  <ChevronRight
+                    size={20}
                     className={expandedTeacher === teacher.id ? 'rotated' : ''}
                   />
                 </div>
@@ -260,7 +260,7 @@ const ExploreTeachersView = ({
                 <div className="teacher-content-preview">
                   <div className="preview-header">
                     <h4>Content by {teacher.fullname || teacher.fullName}</h4>
-                    <button 
+                    <button
                       className="view-all-btn"
                       onClick={(e) => {
                         e.stopPropagation();
@@ -273,11 +273,11 @@ const ExploreTeachersView = ({
                   <div className="preview-content-grid">
                     {teacher.contentItems.slice(0, 3).map((item, cidx) => (
                       <div key={item.id || cidx} className="preview-content-card">
-                        <div 
+                        <div
                           className="preview-thumbnail"
                           style={{
-                            backgroundImage: `url('${item.thumbnail ? 
-                              (item.thumbnail.startsWith('http') ? item.thumbnail : `http://localhost:5000${item.thumbnail}`) 
+                            backgroundImage: `url('${item.thumbnail ?
+                              (item.thumbnail.startsWith('http') ? item.thumbnail : `http://localhost:5000${item.thumbnail}`)
                               : 'https://via.placeholder.com/150x85?text=No+Thumbnail'}')`
                           }}
                         >
@@ -307,7 +307,7 @@ const ExploreTeachersView = ({
 
               {/* Action Buttons */}
               <div className="teacher-card-actions">
-                <button 
+                <button
                   className="btn-view-content"
                   onClick={(e) => {
                     e.stopPropagation();
@@ -317,7 +317,7 @@ const ExploreTeachersView = ({
                   <Video size={16} />
                   View Content
                 </button>
-                <button 
+                <button
                   className="btn-view-profile"
                   onClick={(e) => {
                     e.stopPropagation();

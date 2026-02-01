@@ -49,8 +49,8 @@ const StudentContentCard = ({
   // Get thumbnail URL
   const getThumbnailUrl = () => {
     if (!content.thumbnail) return 'https://via.placeholder.com/400x225?text=No+Thumbnail';
-    return content.thumbnail.startsWith('http') 
-      ? content.thumbnail 
+    return content.thumbnail.startsWith('http')
+      ? content.thumbnail
       : `http://localhost:5000${content.thumbnail}`;
   };
 
@@ -67,23 +67,31 @@ const StudentContentCard = ({
     return (
       <div className="student-content-card purchased">
         {/* Thumbnail */}
-        <div 
+        <div
           className="scc-thumbnail"
           style={{ backgroundImage: `url('${getThumbnailUrl()}')` }}
         >
-          {/* Purchased Badge */}
-          <div className="scc-badge purchased">
-            <CheckCircle size={14} />
-            <span>PURCHASED</span>
-          </div>
         </div>
 
         {/* Body */}
         <div className="scc-body">
-          {/* Category */}
-          {content.category && (
-            <span className="scc-category">{content.category}</span>
-          )}
+          {/* Category & Purchased Badge Row */}
+          <div className="scc-category-row" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+            {content.category && (
+              <span className="scc-category">{content.category}</span>
+            )}
+
+            {/* Purchased Badge moved here */}
+            <div className="scc-badge purchased" style={{
+              position: 'static',
+              transform: 'none',
+              padding: '0.25rem 0.5rem',
+              fontSize: '0.7rem'
+            }}>
+              <CheckCircle size={12} />
+              <span>PURCHASED</span>
+            </div>
+          </div>
 
           {/* Title with checkmark */}
           <h3 className="scc-title">
@@ -93,10 +101,10 @@ const StudentContentCard = ({
 
           {/* Teacher Info */}
           <div className="scc-teacher">
-            <div 
+            <div
               className="scc-teacher-avatar"
               style={{
-                backgroundImage: `url('${content.teacherAvatar || 
+                backgroundImage: `url('${content.teacherAvatar ||
                   `https://ui-avatars.com/api/?name=${encodeURIComponent(content.teacherName || 'Teacher')}&background=ea2a33&color=fff`}')`
               }}
             />
@@ -108,7 +116,7 @@ const StudentContentCard = ({
         </div>
 
         {/* Watch Now Button */}
-        <button 
+        <button
           className="scc-btn primary full"
           onClick={() => onWatchNow && onWatchNow(content)}
         >
@@ -117,6 +125,7 @@ const StudentContentCard = ({
         </button>
       </div>
     );
+
   }
 
   // =====================
@@ -126,7 +135,7 @@ const StudentContentCard = ({
     return (
       <div className="student-content-card requested">
         {/* Thumbnail */}
-        <div 
+        <div
           className="scc-thumbnail"
           style={{ backgroundImage: `url('${getThumbnailUrl()}')` }}
         >
@@ -152,10 +161,10 @@ const StudentContentCard = ({
 
           {/* Teacher Info */}
           <div className="scc-teacher">
-            <div 
+            <div
               className="scc-teacher-avatar"
               style={{
-                backgroundImage: `url('${content.teacherAvatar || 
+                backgroundImage: `url('${content.teacherAvatar ||
                   `https://ui-avatars.com/api/?name=${encodeURIComponent(content.teacherName || 'Teacher')}&background=ea2a33&color=fff`}')`
               }}
             />
@@ -167,7 +176,7 @@ const StudentContentCard = ({
         </div>
 
         {/* Cancel Bid Button */}
-        <button 
+        <button
           className="scc-btn cancel-bid full"
           onClick={() => onCancelBid && onCancelBid(content)}
         >
@@ -185,7 +194,7 @@ const StudentContentCard = ({
     return (
       <div className="student-content-card premium">
         {/* Thumbnail with Lock Overlay */}
-        <div 
+        <div
           className="scc-thumbnail locked"
           style={{ backgroundImage: `url('${getThumbnailUrl()}')` }}
         >
@@ -221,10 +230,10 @@ const StudentContentCard = ({
 
           {/* Teacher Info */}
           <div className="scc-teacher premium">
-            <div 
+            <div
               className="scc-teacher-avatar"
               style={{
-                backgroundImage: `url('${content.teacherAvatar || 
+                backgroundImage: `url('${content.teacherAvatar ||
                   `https://ui-avatars.com/api/?name=${encodeURIComponent(content.teacherName || 'Teacher')}&background=ea2a33&color=fff`}')`
               }}
             />
@@ -236,19 +245,19 @@ const StudentContentCard = ({
 
           {/* Action Buttons - Always show both Purchase and Bid */}
           <div className="scc-actions dual">
-            <button 
+            <button
               className="scc-btn purchase"
               onClick={() => onJoinContent && onJoinContent(content, 'paid')}
             >
               <Lock size={16} />
-              <span>Purchase<br/>NPR {content.price?.toLocaleString()}</span>
+              <span>Purchase<br />NPR {content.price?.toLocaleString()}</span>
             </button>
-            <button 
+            <button
               className="scc-btn bid"
               onClick={() => onMakeBid && onMakeBid(content)}
             >
               <Gavel size={16} />
-              <span>Make a<br/>Bid</span>
+              <span>Make a<br />Bid</span>
             </button>
           </div>
 
@@ -256,7 +265,7 @@ const StudentContentCard = ({
           <div className="scc-info-box">
             <Info size={14} />
             <p>
-              {content.description || 
+              {content.description ||
                 `Gain exclusive access to our proprietary content. This module covers advanced strategies for scaling your learning journey.`}
             </p>
           </div>
@@ -271,7 +280,7 @@ const StudentContentCard = ({
   return (
     <div className="student-content-card browse">
       {/* Thumbnail */}
-      <div 
+      <div
         className="scc-thumbnail"
         style={{ backgroundImage: `url('${getThumbnailUrl()}')` }}
       >
@@ -288,10 +297,10 @@ const StudentContentCard = ({
 
         {/* Teacher Info */}
         <div className="scc-teacher">
-          <div 
+          <div
             className="scc-teacher-avatar"
             style={{
-              backgroundImage: `url('${content.teacherAvatar || 
+              backgroundImage: `url('${content.teacherAvatar ||
                 `https://ui-avatars.com/api/?name=${encodeURIComponent(content.teacherName || 'Teacher')}&background=ea2a33&color=fff`}')`
             }}
           />
@@ -308,14 +317,14 @@ const StudentContentCard = ({
 
         {/* Action Buttons */}
         <div className="scc-actions browse">
-          <button 
+          <button
             className="scc-btn secondary"
             onClick={handleNotInterested}
           >
             <X size={16} />
             Not Interested
           </button>
-          <button 
+          <button
             className="scc-btn primary"
             onClick={() => isFree ? (onJoinContent && onJoinContent(content, 'free')) : (onViewDetails && onViewDetails(content))}
           >

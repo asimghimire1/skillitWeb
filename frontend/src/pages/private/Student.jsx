@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import StudentDashboardView from '../../components/student/DashboardView';
 import ExploreContentView from '../../components/student/ExploreContentView';
@@ -29,6 +29,7 @@ import {
   GraduationCap,
   Settings,
   ChevronDown,
+  ChevronRight,
   Video,
   Calendar,
   Clock,
@@ -39,6 +40,7 @@ import SidebarDropdownItem, { SidebarSubItem } from '../../components/SidebarDro
 import '../../css/student.css';
 import '../../css/teacher.css';
 import '../../css/sidebar-dropdown.css';
+
 
 export default function Student() {
   const navigate = useNavigate();
@@ -65,6 +67,14 @@ export default function Student() {
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [expandedMenus, setExpandedMenus] = useState({});
+  const [searchQuery, setSearchQuery] = useState('');
+  const searchInputRef = useRef(null);
+
+  const handleFocusSearch = () => {
+    searchInputRef.current?.focus();
+  };
+
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
 
   // Modal States
   const [isCreditsModalOpen, setIsCreditsModalOpen] = useState(false);
@@ -112,8 +122,8 @@ export default function Student() {
 
     setStudent(user);
 
-    const darkMode = localStorage.getItem('darkMode') === 'true';
-    setIsDark(darkMode);
+    // const darkMode = localStorage.getItem('darkMode') === 'true';
+    // setIsDark(darkMode);
 
     // Fetch Data
     fetchDashboardData(user.id);
@@ -433,20 +443,30 @@ export default function Student() {
   const handleAction = (actionType, data) => {
     switch (actionType) {
       case 'explore':
-        setActiveTab('explore');
+        handleTabChange('explore');
         break;
       case 'sessions':
-        setActiveTab('sessions');
+        handleTabChange('sessions');
         break;
       case 'mylearning':
-        setActiveTab('mylearning');
+        handleTabChange('mylearning');
         break;
       case 'teachers':
-        setActiveTab('teachers');
+        handleTabChange('teachers');
         break;
-      case 'bids':
-        setActiveTab('bids');
+      case 'bids': {
+        const getBidTimestamp = (bid) => {
+          const stamp = bid?.created_at || bid?.createdAt || bid?.updated_at;
+          return stamp ? new Date(stamp).getTime() : 0;
+        };
+        const sortedBids = Array.isArray(bids)
+          ? [...bids].sort((a, b) => getBidTimestamp(b) - getBidTimestamp(a))
+          : [];
+        const latestBid = sortedBids[0];
+        const bidType = latestBid?.contentId ? 'content' : latestBid?.sessionId ? 'session' : 'all';
+        handleTabChange('bids', { bidType });
         break;
+      }
       case 'addCredits':
         setIsCreditsModalOpen(true);
         break;
@@ -508,7 +528,7 @@ export default function Student() {
           {/* Logo Section */}
           <div className="sidebar-header" onClick={() => navigate('/')}>
             <div className="sidebar-logo">
-              <GraduationCap size={24} />
+              <img src="/logo.png" alt="SkillIt Logo" style={{ height: '32px', width: 'auto', objectFit: 'contain' }} />
             </div>
             <div className="sidebar-brand">
               <h1 className="sidebar-title">SkillIt</h1>
@@ -559,7 +579,7 @@ export default function Student() {
               onToggle={() => setExpandedMenus(prev => ({ ...prev, content_bids: !prev['content_bids'] }))}
             >
               <SidebarSubItem
-                label="Active Bids"
+                label="Content Bids"
                 isActive={activeTab === 'bids' && bidFilter === 'content'}
                 onClick={() => handleTabChange('bids', { bidType: 'content' })}
               />
@@ -582,17 +602,18 @@ export default function Student() {
             <button
               className={`nav-item logout-item`}
               style={{ display: 'none' }}
-              onClick={() => { setActiveTab('teachers'); setIsMobileMenuOpen(false); }}
+              onClick={() => handleTabChange('teachers')}
             >
               <Users size={20} />
               <span>Explore Teachers</span>
             </button>
           </nav>
 
+
           {/* Sidebar Footer */}
           <div className="sidebar-footer">
             {/* Wallet Balance */}
-            <div className="wallet-card" onClick={() => setIsCreditsModalOpen(true)}>
+            <div className="wallet-card" onClick={() => setIsCreditsModalOpen(true)} style={{ marginBottom: '1.5rem' }}>
               <div className="wallet-info">
                 <span className="wallet-label">Wallet Balance</span>
                 <span className="wallet-amount">NPR {stats.credits?.toLocaleString() || '0'}</span>
@@ -602,26 +623,44 @@ export default function Student() {
               </div>
             </div>
 
-
-
-            {/* Logout */}
-            <button className="nav-item logout-item" onClick={handleLogout}>
-              <LogOut size={20} />
-              <span>Logout</span>
-            </button>
-
-            {/* User Profile */}
-            <div className="sidebar-user">
+            {/* User Profile with Dropdown */}
+            <div className="sidebar-user-container">
               <div
-                className="user-avatar"
-                style={{
-                  backgroundImage: `url('${student.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(student.fullname || 'Student')}&background=ea2a33&color=fff`}')`
-                }}
-              />
-              <div className="user-info">
-                <span className="user-name">{student.fullname || 'Student'}</span>
-                <span className="user-role">Pro Member</span>
+                className={`sidebar-user ${isProfileDropdownOpen ? 'active' : ''}`}
+                onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
+              >
+                <div
+                  className="user-avatar"
+                  style={{
+                    backgroundImage: `url('${student?.profilePicture || `https://ui-avatars.com/api/?name=${encodeURIComponent(student?.fullname || 'Student')}&background=ea2a33&color=fff`}')`
+                  }}
+                />
+                <div className="user-info">
+                  <span className="user-name">{student?.fullname || 'Student'}</span>
+                </div>
+                <ChevronRight
+                  size={16}
+                  className={`user-chevron ${isProfileDropdownOpen ? 'rotate-90' : ''}`}
+                />
               </div>
+
+              {isProfileDropdownOpen && (
+                <div className="user-profile-dropdown">
+                  <button className="dropdown-item" onClick={() => { setIsProfileDropdownOpen(false); handleTabChange('profile'); }}>
+                    <Users size={16} />
+                    <span>My Profile</span>
+                  </button>
+                  <button className="dropdown-item" onClick={() => { setIsProfileDropdownOpen(false); handleTabChange('settings'); }}>
+                    <Settings size={16} />
+                    <span>Settings</span>
+                  </button>
+                  <div className="dropdown-divider" />
+                  <button className="dropdown-item logout" onClick={handleLogout}>
+                    <LogOut size={16} />
+                    <span>Logout</span>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -648,7 +687,18 @@ export default function Student() {
           <div className="header-right">
             <div className="search-box">
               <Search size={18} />
-              <input type="text" placeholder="Search sessions..." />
+              <input
+                ref={searchInputRef}
+                type="text"
+                placeholder="Search Skills"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleTabChange('explore');
+                  }
+                }}
+              />
             </div>
             <NotificationDropdown
               userId={student?.id}
@@ -671,6 +721,7 @@ export default function Student() {
               student={student}
               bids={bids}
               onAction={handleAction}
+              onFocusSearch={handleFocusSearch}
               onJoinContent={handleJoinContent}
               onMakeBid={handleMakeBid}
               onCancelBid={handleCancelBid}
@@ -693,6 +744,7 @@ export default function Student() {
               content={content}
               unlockedContent={unlockedContent}
               bids={bids}
+              searchQuery={searchQuery}
               onJoinContent={handleJoinContent}
               onMakeBid={handleMakeBid}
               onCancelBid={handleCancelBid}

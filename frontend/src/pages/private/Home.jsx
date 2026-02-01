@@ -50,7 +50,7 @@ const HomePage = () => {
               <a href="#" className="hover:text-primary transition-colors">Browse</a>
               <a href="#" className="hover:text-primary transition-colors">Skills</a>
               <a href="#" className="hover:text-primary transition-colors">Sessions</a>
-              <a href="#" className="hover:text-primary transition-colors">Swap</a>
+              <a href="#" className="hover:text-primary transition-colors">Bid</a>
             </div>
           </div>
           <div className="flex items-center gap-6">
@@ -252,8 +252,8 @@ const HomePage = () => {
                     <img alt="Aarav Bhattarai" className="relative w-28 h-28 rounded-[2.5rem] object-cover ring-8 ring-soft-gray group-hover:scale-105 transition-transform duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCLxjZG4u8bFSrIhRdj1MtOgcFOmhnLRqn5uW2XUH866dFTb51JzrLmpsiNDrAyjnKvYKJQ2kl1HIssu3tBMqWjXJIfN31n74XiKla2AK30KPekazOxPGE4nxhczIWm_moI6IkMbhmsMTbbP7QYGsHaU11ssf6w5CLQIdVq7blzApYGCSjzOWnKv3wDkHqS8gsgp1U-Fs82ykO_fKAGopW2iF1zfQTkVBl2xNjULRn-M96-3qWysJ8cdFbq_ocHZiT11yr2PQ6F6A8" />
                     <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-green-500 border-4 border-white rounded-full shadow-lg"></div>
                   </div>
-                  <h4 className="text-xl font-bold mb-2 text-charcoal">Aarav Bhattarai</h4>
-                  <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-6">Principal Engineer @ Cotiviti</p>
+                  <h4 className="text-xl font-bold mb-2 text-charcoal">Asim Ghimire</h4>
+                  <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-6">CEO @ XOVENTRA</p>
                   <p className="text-charcoal/60 mb-8 leading-relaxed italic text-sm font-light">
                     "Specializing in high-scale distributed systems and architecture."
                   </p>

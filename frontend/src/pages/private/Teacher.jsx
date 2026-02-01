@@ -366,7 +366,7 @@ export default function Teacher() {
             onToggle={() => setExpandedMenus(prev => ({ ...prev, content_bids: !prev['content_bids'] }))}
           >
             <SidebarSubItem
-              label="Active Bids"
+              label="Content Bids"
               isActive={activeTab === 'bids' && bidTypeFilter === 'content'}
               onClick={() => handleTabChange('bids', { bidType: 'content' })}
             />
@@ -405,6 +405,14 @@ export default function Teacher() {
         </nav>
 
         <div className="sidebar-footer">
+          {/* Earnings / Wallet */}
+          <div className="wallet-card" style={{ marginBottom: '1.5rem', background: 'var(--primary)', color: 'white', padding: '1.25rem', borderRadius: '1rem', cursor: 'default' }}>
+            <div className="wallet-info">
+              <span className="wallet-label" style={{ fontSize: '0.75rem', opacity: 0.9, display: 'block', marginBottom: '0.25rem' }}>Monthly Earnings</span>
+              <span className="wallet-amount" style={{ fontSize: '1.25rem', fontWeight: 700 }}>NPR {stats.monthlyEarnings.toLocaleString()}</span>
+            </div>
+          </div>
+
           <div className="sidebar-user">
             <div className="user-avatar" style={{ backgroundImage: `url('${teacher.profilePicture || "https://ui-avatars.com/api/?name=" + (teacher.fullname || "Teacher") + "&background=ea2a33&color=fff"}')` }} />
             <div className="user-info">
@@ -446,11 +454,6 @@ export default function Teacher() {
               userId={teacher?.id}
               onNotificationCountChange={setNotificationCount}
             />
-            <div className="navbar-divider"></div>
-            <div className="earnings-display">
-              <Coins size={20} className="nav-icon-active" />
-              <span>NPR {stats.monthlyEarnings.toLocaleString()}</span>
-            </div>
           </div>
         </header>
 
