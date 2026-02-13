@@ -1,16 +1,39 @@
-# React + Vite
+# SkillIt - Skill Exchange Platform
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+SkillIt is a modern web application designed for skill sharing and learning. It connects students and expert teachers through a premium, interactive interface.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Explore Teachers**: Find expert mentors across various skills.
+- **Skill-Based Search**: Easily find content and teachers for specific topics.
+- **Premium UI**: A sleek, dark-themed interface built with React and Vite.
+- **Course Content**: Access high-quality educational videos and materials.
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Frontend**: React, Vite, Lucide React (Icons), Vanilla CSS
+- **Backend**: Node.js, Express, MongoDB
+- **Authentication**: JWT-based secure login
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Prerequisites
+
+- Node.js (v18 or higher)
+- npm or yarn
+
+### Installation
+
+1. Clone the repository
+2. Install dependencies for both frontend and backend
+   ```bash
+   cd frontend && npm install
+   cd ../backend && npm install
+   ```
+3. Run the development servers
+   ```bash
+   # In frontend directory
+   npm run dev
+   # In backend directory
+   npm start
+   ```
