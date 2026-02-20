@@ -125,6 +125,16 @@ export const apiService = {
     }
   },
 
+  async getTeacherEarnings(teacherId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/stats/teacher/${teacherId}/earnings`);
+      return await response.json();
+    } catch (error) {
+      console.error('Get earnings error:', error);
+      return null;
+    }
+  },
+
   // Sessions
   async getTeacherSessions(teacherId) {
     try {
@@ -384,12 +394,12 @@ export const apiService = {
       console.log('[apiService] Fetching content from:', `${API_BASE_URL}/content`);
       const response = await fetch(`${API_BASE_URL}/content`);
       console.log('[apiService] Response status:', response.status);
-      
+
       if (!response.ok) {
         console.error('[apiService] Failed to fetch content:', response.status, response.statusText);
         return [];
       }
-      
+
       const data = await response.json();
       console.log('[apiService] getAllContent response:', data);
       return Array.isArray(data) ? data : [];

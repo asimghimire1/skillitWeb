@@ -8,6 +8,7 @@ import DashboardView from '../../components/teacher/DashboardView';
 import ContentView from '../../components/teacher/ContentView';
 import SessionsView from '../../components/teacher/SessionsView';
 import PostsView from '../../components/teacher/PostsView';
+import EarningsView from '../../components/teacher/EarningsView';
 import NotificationDropdown from '../../components/NotificationDropdown';
 import apiService from '../../services/apiService';
 import { useToast } from '../../context/ToastContext';
@@ -26,7 +27,6 @@ import {
   UploadCloud,
   Video,
   FileEdit,
-  Construction,
   Menu,
   X,
   Users
@@ -81,6 +81,8 @@ export default function Teacher() {
   const [bids, setBids] = useState([]);
   const [notificationCount, setNotificationCount] = useState(0);
   const [bidNotificationCount, setBidNotificationCount] = useState(0);
+  const [earnings, setEarnings] = useState(null);
+  const [earningsLoading, setEarningsLoading] = useState(false);
 
   // Helper function to generate username URL
   const getUsernameUrl = (userData) => {
@@ -136,6 +138,10 @@ export default function Teacher() {
 
     const postsData = await apiService.getTeacherPosts(teacherId);
     if (postsData) setPosts(postsData);
+
+    // Fetch real earnings (content purchases + session enrollments)
+    const earningsData = await apiService.getTeacherEarnings(teacherId);
+    if (earningsData) setEarnings(earningsData);
 
     // Fetch bid requests to update notification count
     const bidsData = await apiService.getBidRequests(teacherId);
@@ -238,10 +244,10 @@ export default function Teacher() {
   const handleQuickAction = async (actionType, data) => {
     if (actionType === 'upload') setIsUploadModalOpen(true);
     else if (actionType === 'session') setIsSessionModalOpen(true);
-    else if (actionType === 'content') setActiveTab('content');
-    else if (actionType === 'bids') setActiveTab('bids');
-    else if (actionType === 'sessions') setActiveTab('sessions');
-    else if (actionType === 'posts') setActiveTab('posts'); // Navigate to tab, or open modal if meant to be "New Post" logic
+    else if (actionType === 'content') handleTabChange('content');
+    else if (actionType === 'bids') handleTabChange('bids');
+    else if (actionType === 'sessions') handleTabChange('sessions');
+    else if (actionType === 'posts') handleTabChange('posts');
     else if (actionType === 'post') setIsPostModalOpen(true); // "New Post" from dashboard
     else if (actionType === 'deleteContent') {
       const ok = await confirm({
@@ -408,8 +414,8 @@ export default function Teacher() {
           {/* Earnings / Wallet */}
           <div className="wallet-card" style={{ marginBottom: '1.5rem', background: 'var(--primary)', color: 'white', padding: '1.25rem', borderRadius: '1rem', cursor: 'default' }}>
             <div className="wallet-info">
-              <span className="wallet-label" style={{ fontSize: '0.75rem', opacity: 0.9, display: 'block', marginBottom: '0.25rem' }}>Monthly Earnings</span>
-              <span className="wallet-amount" style={{ fontSize: '1.25rem', fontWeight: 700 }}>NPR {stats.monthlyEarnings.toLocaleString()}</span>
+              <span className="wallet-label" style={{ fontSize: '0.75rem', opacity: 0.9, display: 'block', marginBottom: '0.25rem' }}>Total Earnings</span>
+              <span className="wallet-amount" style={{ fontSize: '1.25rem', fontWeight: 700 }}>NPR {(earnings?.totalEarnings || 0).toLocaleString()}</span>
             </div>
           </div>
 
@@ -522,11 +528,8 @@ export default function Teacher() {
             />
           )}
 
-          {(activeTab === 'earnings') && (
-            <div className="empty-state" style={{ padding: '4rem' }}>
-              <Construction size={64} className="text-gray-300" />
-              <p style={{ marginTop: '1rem', fontSize: '1.2rem', color: '#666' }}>This feature is coming soon!</p>
-            </div>
+          {activeTab === 'earnings' && (
+            <EarningsView earnings={earnings} loading={earningsLoading} />
           )}
         </div>
       </main>
