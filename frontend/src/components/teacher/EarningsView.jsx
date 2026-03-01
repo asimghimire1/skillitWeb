@@ -51,7 +51,7 @@ export default function EarningsView({ earnings, loading }) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', animation: 'page-fade-in 0.4s ease-out' }}>
 
             {/* Summary cards */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.25rem' }}>
+            <div className="earnings-stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 220px), 1fr))', gap: '1.25rem' }}>
                 {summaryCards.map((card) => (
                     <div key={card.label} className="stat-card" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                         <div style={{ width: 48, height: 48, borderRadius: '0.75rem', background: card.bg, color: card.color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>

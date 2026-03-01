@@ -37,11 +37,11 @@ function Home() {
       
       <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-[#211111] dark:via-[#2a1515] dark:to-[#211111] text-gray-900 dark:text-gray-100 relative overflow-hidden">
         {/* Background Elements */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
           {/* Gradient Orbs */}
-          <div className="absolute -top-[20%] -left-[10%] w-[800px] h-[800px] bg-red-500/10 rounded-full blur-3xl animate-pulse-slow"></div>
-          <div className="absolute top-[10%] right-[5%] w-[600px] h-[600px] bg-blue-500/10 rounded-full blur-3xl animate-pulse-slow" style={{animationDelay: '2s'}}></div>
-          <div className="absolute bottom-[10%] left-[15%] w-[500px] h-[500px] bg-purple-500/10 rounded-full blur-3xl animate-pulse-slow" style={{animationDelay: '4s'}}></div>
+          <div className="absolute -top-[20%] -left-[10%] w-[40vw] max-w-[800px] aspect-square bg-red-500/10 rounded-full blur-3xl animate-pulse-slow"></div>
+          <div className="absolute top-[10%] right-[5%] w-[30vw] max-w-[600px] aspect-square bg-blue-500/10 rounded-full blur-3xl animate-pulse-slow" style={{animationDelay: '2s'}}></div>
+          <div className="absolute bottom-[10%] left-[15%] w-[25vw] max-w-[500px] aspect-square bg-purple-500/10 rounded-full blur-3xl animate-pulse-slow" style={{animationDelay: '4s'}}></div>
           
           {/* Floating Skill Icons */}
           <div className="absolute top-[15%] right-[12%] text-red-500/20 animate-float">
@@ -67,24 +67,24 @@ function Home() {
         </div>
 
         {/* Navigation */}
-        <nav className="relative z-20 flex items-center justify-between px-8 lg:px-16 py-6 backdrop-blur-sm bg-white/50 dark:bg-gray-900/50 border-b border-gray-200/50 dark:border-gray-700/50">
+        <nav className="relative z-20 flex items-center justify-between px-4 sm:px-8 lg:px-16 py-4 sm:py-6 backdrop-blur-sm bg-white/50 dark:bg-gray-900/50 border-b border-gray-200/50 dark:border-gray-700/50">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-gradient-to-tr from-[#ea2a33] to-[#ff5c63] rounded-xl shadow-lg flex items-center justify-center">
-              <svg className="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-tr from-[#ea2a33] to-[#ff5c63] rounded-xl shadow-lg flex items-center justify-center">
+              <svg className="w-6 h-6 sm:w-7 sm:h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
               </svg>
             </div>
-            <span className="text-2xl font-bold tracking-wide">Skillit</span>
+            <span className="text-xl sm:text-2xl font-bold tracking-wide">Skillit</span>
           </div>
           
-          <div className="flex items-center gap-6">
-            <button className="text-gray-700 dark:text-gray-300 hover:text-[#ea2a33] dark:hover:text-[#ea2a33] font-semibold transition-colors">
+          <div className="flex items-center gap-3 sm:gap-6">
+            <button className="hidden sm:block text-gray-700 dark:text-gray-300 hover:text-[#ea2a33] dark:hover:text-[#ea2a33] font-semibold transition-colors">
               Browse Skills
             </button>
-            <button className="text-gray-700 dark:text-gray-300 hover:text-[#ea2a33] dark:hover:text-[#ea2a33] font-semibold transition-colors">
+            <button className="hidden sm:block text-gray-700 dark:text-gray-300 hover:text-[#ea2a33] dark:hover:text-[#ea2a33] font-semibold transition-colors">
               Teach
             </button>
-            <button className="text-gray-700 dark:text-gray-300 hover:text-[#ea2a33] dark:hover:text-[#ea2a33] font-semibold transition-colors">
+            <button className="hidden sm:block text-gray-700 dark:text-gray-300 hover:text-[#ea2a33] dark:hover:text-[#ea2a33] font-semibold transition-colors">
               About
             </button>
             <button
@@ -97,12 +97,12 @@ function Home() {
         </nav>
 
         {/* Hero Section */}
-        <div className="relative z-10 max-w-7xl mx-auto px-8 lg:px-16">
-          <div className="grid lg:grid-cols-2 gap-16 items-center min-h-[calc(100vh-88px)] py-16">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-8 lg:px-16">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center min-h-[calc(100vh-88px)] py-8 sm:py-16">
             {/* Left Column - Content */}
-            <div className="space-y-8">
+            <div className="space-y-6 sm:space-y-8">
               <div className="space-y-4">
-                <h1 className="text-6xl lg:text-7xl font-extrabold leading-tight tracking-tight">
+                <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-tight tracking-tight">
                   <span className="block">Learn Skills.</span>
                   <span className="block">Share Knowledge.</span>
                   <span className="block text-[#ea2a33] drop-shadow-sm">Set Your Price.</span>
@@ -156,20 +156,20 @@ function Home() {
         </div>
 
         {/* Stats Section */}
-        <div className="relative z-10 max-w-7xl mx-auto px-8 lg:px-16 pb-16">
-          <div className="backdrop-blur-xl bg-white/60 dark:bg-gray-800/60 border border-gray-200/50 dark:border-gray-700/50 rounded-3xl p-8 shadow-2xl">
-            <div className="grid grid-cols-3 gap-8 text-center">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-8 lg:px-16 pb-8 sm:pb-16">
+          <div className="backdrop-blur-xl bg-white/60 dark:bg-gray-800/60 border border-gray-200/50 dark:border-gray-700/50 rounded-2xl sm:rounded-3xl p-4 sm:p-8 shadow-2xl">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-8 text-center">
               <div>
-                <div className="text-4xl font-bold text-[#ea2a33] mb-2">10K+</div>
-                <div className="text-gray-600 dark:text-gray-400 font-semibold">Expert Teachers</div>
+                <div className="text-2xl sm:text-4xl font-bold text-[#ea2a33] mb-1 sm:mb-2">10K+</div>
+                <div className="text-sm sm:text-base text-gray-600 dark:text-gray-400 font-semibold">Expert Teachers</div>
               </div>
               <div>
-                <div className="text-4xl font-bold text-[#ea2a33] mb-2">50K+</div>
-                <div className="text-gray-600 dark:text-gray-400 font-semibold">Active Learners</div>
+                <div className="text-2xl sm:text-4xl font-bold text-[#ea2a33] mb-1 sm:mb-2">50K+</div>
+                <div className="text-sm sm:text-base text-gray-600 dark:text-gray-400 font-semibold">Active Learners</div>
               </div>
               <div>
-                <div className="text-4xl font-bold text-[#ea2a33] mb-2">200+</div>
-                <div className="text-gray-600 dark:text-gray-400 font-semibold">Skill Categories</div>
+                <div className="text-2xl sm:text-4xl font-bold text-[#ea2a33] mb-1 sm:mb-2">200+</div>
+                <div className="text-sm sm:text-base text-gray-600 dark:text-gray-400 font-semibold">Skill Categories</div>
               </div>
             </div>
           </div>

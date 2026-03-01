@@ -225,7 +225,7 @@ const BidRequestsView = ({
         ) : (
           <div style={{
             gridColumn: '1 / -1',
-            padding: '4rem',
+            padding: 'clamp(1.5rem, 4vw, 4rem)',
             textAlign: 'center',
             background: 'white',
             borderRadius: '1.5rem',

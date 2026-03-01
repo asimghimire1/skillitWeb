@@ -51,9 +51,9 @@ const SessionsView = ({ sessions, onCreate, onAction }) => {
                     <h2>View Sessions</h2>
                     <p>Manage your upcoming classes.</p>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                    <div style={{ display: 'flex', gap: '1rem' }}>
-                        <div className="premium-select-container" style={{ minWidth: '200px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', flexWrap: 'wrap', gap: '0.75rem' }}>
+                    <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                        <div className="premium-select-container" style={{ minWidth: 'min(200px, 100%)' }}>
                             <PremiumDropdown
                                 options={[
                                     { value: 'all', label: 'All Sessions', icon: 'list' },

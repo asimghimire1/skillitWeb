@@ -321,7 +321,7 @@ const DashboardView = ({
           <button className="view-all-btn" onClick={() => onAction('explore')}>View All Content</button>
         </div>
         {recentContent.length === 0 ? (
-          <div className="dashboard-card" style={{ padding: '2.5rem', textAlign: 'center' }}>
+          <div className="dashboard-card" style={{ padding: 'clamp(1.25rem, 4vw, 2.5rem)', textAlign: 'center' }}>
             <div className="empty-state">
               <div className="empty-state-icon" style={{ backgroundColor: '#f9f9f9' }}>
                 <Video size={28} style={{ color: '#ccc' }} />
@@ -357,7 +357,7 @@ const DashboardView = ({
           <button className="view-all-btn" onClick={() => onAction('sessions')}>View All Sessions</button>
         </div>
         {availableSessions.length === 0 ? (
-          <div className="dashboard-card" style={{ padding: '2.5rem', textAlign: 'center' }}>
+          <div className="dashboard-card" style={{ padding: 'clamp(1.25rem, 4vw, 2.5rem)', textAlign: 'center' }}>
             <div className="empty-state">
               <div className="empty-state-icon" style={{ backgroundColor: '#f9f9f9' }}>
                 <Calendar size={28} style={{ color: '#ccc' }} />
@@ -390,7 +390,7 @@ const DashboardView = ({
           <button className="view-all-btn" onClick={() => onAction('bids')}>View All Bids</button>
         </div>
         {latestBids.length === 0 ? (
-          <div className="dashboard-card" style={{ padding: '2.5rem', textAlign: 'center' }}>
+          <div className="dashboard-card" style={{ padding: 'clamp(1.25rem, 4vw, 2.5rem)', textAlign: 'center' }}>
             <div className="empty-state">
               <div className="empty-state-icon" style={{ backgroundColor: '#f9f9f9' }}>
                 <Gavel size={28} style={{ color: '#ccc' }} />

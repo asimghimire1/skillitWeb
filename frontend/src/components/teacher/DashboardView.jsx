@@ -273,14 +273,14 @@ const DashboardView = ({ stats, uploads, sessions, posts, quickActions, onAction
 
             {/* Latest Bid Requests Section */}
             <div className="dashboard-card dashboard-section">
-                <div className="dashboard-card-header" style={{ padding: '1rem 2.5rem' }}>
+                <div className="dashboard-card-header" style={{ padding: '1rem clamp(1rem, 4vw, 2.5rem)' }}>
                     <h2 className="dashboard-card-title">Latest Bid Requests</h2>
                     <button className="view-all-link" onClick={() => onAction('bids')}>
                         View All <ArrowRight size={14} strokeWidth={3} />
                     </button>
                 </div>
 
-                <div style={{ padding: '1.5rem 2.5rem' }}>
+                <div style={{ padding: '1.5rem clamp(1rem, 4vw, 2.5rem)' }}>
                     {bidRequests.length === 0 ? (
                         <div className="empty-state">
                             <div className="empty-state-icon">
@@ -292,7 +292,7 @@ const DashboardView = ({ stats, uploads, sessions, posts, quickActions, onAction
                             </p>
                         </div>
                     ) : (
-                        <div className="bid-requests-list" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1rem' }}>
+                        <div className="bid-requests-list" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: '1rem' }}>
                             {bidRequests.map((bid) => {
                                 const statusConfig = getStatusConfig(bid.status);
                                 const discountPercent = bid.originalPrice > 0 
@@ -510,7 +510,7 @@ const SessionItemWithDetails = ({ session, onAction, compact, onLinkClick }) => 
             {/* Expanded Details */}
             {isExpanded && (
                 <div style={{ padding: '0 1rem 1rem 1rem' }}>
-                    <div style={{ paddingTop: '0.75rem', borderTop: '1px solid #f3f4f6', display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' }}>
+                    <div className="session-expanded-grid" style={{ paddingTop: '0.75rem', borderTop: '1px solid #f3f4f6', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 200px), 1fr))', gap: '1rem' }}>
                         <div>
                             <p className="session-detail-label">Description</p>
                             <p className="session-detail-value" style={{ marginTop: '0.25rem' }}>{session.notes || session.description || 'No description provided'}</p>

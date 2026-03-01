@@ -34,6 +34,7 @@ import {
 import SidebarDropdownItem, { SidebarSubItem } from '../../components/SidebarDropdownItem';
 import '../../css/teacher.css';
 import '../../css/sidebar-dropdown.css';
+import '../../css/responsive.css';
 
 export default function Teacher() {
   const navigate = useNavigate();

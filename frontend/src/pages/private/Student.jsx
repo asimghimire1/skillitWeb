@@ -40,6 +40,7 @@ import SidebarDropdownItem, { SidebarSubItem } from '../../components/SidebarDro
 import '../../css/student.css';
 import '../../css/teacher.css';
 import '../../css/sidebar-dropdown.css';
+import '../../css/responsive.css';
 
 
 export default function Student() {
