@@ -6,7 +6,6 @@ import {
   Clock,
   BookOpen,
   Video,
-  CheckCircle,
   Lock,
   ExternalLink,
   Sparkles,
@@ -99,7 +98,7 @@ const MyLearningView = ({
       case 'bid':
         return { text: 'Won Bid', icon: <Gavel size={12} />, className: 'badge-bid' };
       default:
-        return { text: 'Joined', icon: <CheckCircle size={12} />, className: 'badge-joined' };
+        return { text: 'Joined', icon: <Sparkles size={12} />, className: 'badge-joined' };
     }
   };
 
@@ -256,7 +255,7 @@ const MyLearningView = ({
                     )}
                     {session.status === 'completed' && (
                       <span className="completed-badge">
-                        <CheckCircle size={14} /> Completed
+                        Completed
                       </span>
                     )}
                     {session.status === 'missed' && (

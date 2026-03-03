@@ -1,11 +1,9 @@
 import React from 'react';
 import { 
-  X, 
-  Lock, 
-  Sparkles,
   Gavel,
-  Star,
-  Info
+  Video,
+  Lock,
+  Wallet
 } from 'lucide-react';
 
 const ContentDetailModal = ({ 
@@ -13,141 +11,106 @@ const ContentDetailModal = ({
   onClose, 
   onUnlock,
   onMakeBid,
+  onAddCredits,
   userBalance = 0,
   baseUrl = 'http://localhost:5000'
 }) => {
   if (!content) return null;
 
-  // Parse price properly - could be string or number
   const contentPrice = parseFloat(content.price) || 0;
   const isPaid = contentPrice > 0;
+  const hasEnoughCredits = userBalance >= contentPrice;
 
-  const getThumbnailUrl = () => {
-    if (!content.thumbnail) {
-      return `https://ui-avatars.com/api/?name=${encodeURIComponent(content.title || 'Content')}&background=1a1a2e&color=fff&size=400`;
+  const getAvatarUrl = () => {
+    if (content.teacherAvatar) {
+      return content.teacherAvatar.startsWith('http')
+        ? content.teacherAvatar
+        : `${baseUrl}${content.teacherAvatar}`;
     }
-    return content.thumbnail.startsWith('http') ? content.thumbnail : `${baseUrl}${content.thumbnail}`;
-  };
-
-  const formatDate = (dateStr) => {
-    if (!dateStr) return '';
-    return new Date(dateStr).toLocaleDateString('en-US', { 
-      month: 'numeric', 
-      day: 'numeric', 
-      year: 'numeric' 
-    });
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(content.teacherName || 'Teacher')}&background=ea2a33&color=fff`;
   };
 
   return (
-    <div className="content-detail-overlay" onClick={onClose}>
-      <div className="content-detail-modal" onClick={e => e.stopPropagation()}>
-        {/* Close Button */}
-        <button className="content-detail-close" onClick={onClose}>
-          <X size={20} />
-        </button>
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="enroll-modal" onClick={e => e.stopPropagation()}>
+        {/* Header */}
+        <div className="enroll-modal-header">
+          <div className="enroll-date-pill">
+            <Video size={14} />
+            {content.category || 'Video Content'}
+          </div>
+          {isPaid ? (
+            <div className="enroll-price-badge">
+              NPR {contentPrice.toLocaleString()}
+            </div>
+          ) : (
+            <div className="enroll-price-badge free">Free</div>
+          )}
+        </div>
 
-        {/* Thumbnail Section */}
-        <div className="content-detail-thumbnail-section">
-          <div 
-            className={`content-detail-thumbnail ${isPaid ? 'premium' : ''}`}
-            style={{ backgroundImage: `url('${getThumbnailUrl()}')` }}
-          >
-            {/* Category Badge */}
-            {content.category && (
-              <span className="content-detail-category">{content.category.toUpperCase()}</span>
-            )}
-            
-            {/* Premium Badge - always show for paid */}
-            {isPaid && (
-              <span className="content-detail-premium-badge">
-                <Sparkles size={14} />
-                Premium Content
-              </span>
-            )}
+        {/* Body */}
+        <div className="enroll-modal-body">
+          <h2 className="enroll-modal-title">{content.title}</h2>
 
-            {/* Lock Overlay - always show for paid */}
-            {isPaid && (
-              <div className="content-detail-lock-overlay">
-                <div className="content-detail-lock-icon">
-                  <Lock size={32} />
-                </div>
-              </div>
-            )}
+          {content.description && (
+            <p className="enroll-modal-desc">{content.description}</p>
+          )}
+
+          {/* Instructor */}
+          <div className="enroll-instructor">
+            <div
+              className="enroll-instructor-avatar"
+              style={{ backgroundImage: `url('${getAvatarUrl()}')` }}
+            />
+            <div className="enroll-instructor-info">
+              <span className="enroll-instructor-label">INSTRUCTOR</span>
+              <span className="enroll-instructor-name">{content.teacherName || 'Teacher'}</span>
+            </div>
           </div>
         </div>
 
-        {/* Content Info */}
-        <div className="content-detail-body">
-          {/* Title and Price Row */}
-          <div className="content-detail-header">
-            <h2 className="content-detail-title">{content.title}</h2>
-            {isPaid && (
-              <div className="content-detail-price">
-                <span className="content-detail-price-label">BASE PRICE</span>
-                <span className="content-detail-price-value">NPR {contentPrice.toLocaleString()}</span>
+        {/* Footer */}
+        <div className="enroll-modal-footer">
+          {isPaid ? (
+            <>
+              <div className="enroll-wallet-balance">
+                <Wallet size={16} />
+                Wallet Balance: NPR {userBalance.toLocaleString()}
               </div>
-            )}
-          </div>
 
-          {/* Teacher Info */}
-          <div className="content-detail-teacher">
-            <div 
-              className="content-detail-teacher-avatar"
-              style={{
-                backgroundImage: `url('${content.teacherAvatar || 
-                  `https://ui-avatars.com/api/?name=${encodeURIComponent(content.teacherName || 'Teacher')}&background=ea2a33&color=fff`}')`
-              }}
-            />
-            <div className="content-detail-teacher-info">
-              <span className="content-detail-teacher-name">{content.teacherName || 'Expert Teacher'}</span>
-              <span className="content-detail-teacher-meta">
-                <Star size={12} fill="#fbbf24" color="#fbbf24" />
-                Top Rated Mentor • {formatDate(content.created_at)}
-              </span>
-            </div>
-          </div>
-
-          {/* Action Buttons - Show for paid content */}
-          {isPaid && (
-            <div className="content-detail-actions">
-              <button 
-                className="content-detail-btn unlock"
+              <button
+                className="enroll-unlock-btn"
                 onClick={() => onUnlock && onUnlock(content)}
-                disabled={userBalance < contentPrice}
+                disabled={!hasEnoughCredits}
               >
                 <Lock size={18} />
-                <span>Unlock with<br/>Credits</span>
+                Unlock for NPR {contentPrice.toLocaleString()}
               </button>
-              
-              <button 
-                className="content-detail-btn bid"
+
+              {!hasEnoughCredits && onAddCredits && (
+                <button
+                  className="enroll-add-credits-link"
+                  onClick={onAddCredits}
+                >
+                  + Add Credits
+                </button>
+              )}
+
+              <button
+                className="enroll-bid-link"
                 onClick={() => onMakeBid && onMakeBid(content)}
               >
-                <Gavel size={18} />
-                Make a Bid
+                <Gavel size={14} />
+                Or Make a Bid
               </button>
-            </div>
-          )}
-
-          {/* Free content - show join button */}
-          {!isPaid && (
-            <div className="content-detail-actions">
-              <button 
-                className="content-detail-btn unlock free"
-                onClick={() => onUnlock && onUnlock(content)}
-              >
-                <Sparkles size={18} />
-                <span>Join Free</span>
-              </button>
-            </div>
-          )}
-
-          {/* Description */}
-          {content.description && (
-            <div className="content-detail-description">
-              <Info size={16} className="content-detail-info-icon" />
-              <p>{content.description}</p>
-            </div>
+            </>
+          ) : (
+            <button
+              className="enroll-unlock-btn free"
+              onClick={() => onUnlock && onUnlock(content)}
+            >
+              Join Free
+            </button>
           )}
         </div>
       </div>

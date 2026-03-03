@@ -129,17 +129,6 @@ const MakeBidModal = ({ isOpen, onClose, session, onSubmitBid, userBalance }) =>
 
         {/* Session/Content Card */}
         <div className="bid-content-card">
-          <div className="bid-content-thumbnail">
-            {session.thumbnail ? (
-              <img src={session.thumbnail} alt={session.title} />
-            ) : (
-              <div className="bid-content-placeholder">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" opacity="0.5">
-                  <path d="M8 5v14l11-7z"/>
-                </svg>
-              </div>
-            )}
-          </div>
           <div className="bid-content-info">
             <h3 className="bid-content-title">{session.title}</h3>
             <div className="bid-content-meta">

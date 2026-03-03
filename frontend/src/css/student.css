@@ -29,6 +29,7 @@
   color: var(--text-dark);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   animation: page-fade-in 0.4s ease-out;
+  overflow-x: hidden;
 }
 
 @keyframes page-fade-in {
@@ -952,6 +953,7 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 /* =========================================
@@ -1112,6 +1114,7 @@
   flex: 1;
   padding: 2rem;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 /* =========================================
@@ -4783,6 +4786,7 @@
   max-width: 400px;
   max-height: 90vh;
   overflow-y: auto;
+  overflow-x: hidden;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
   animation: modalSlideIn 0.25s ease-out;
 }
@@ -4795,7 +4799,7 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  padding: 1.25rem 1.5rem;
+  padding: 1.25rem 1.25rem;
   border-bottom: 1px solid var(--border-light);
 }
 
@@ -4863,8 +4867,8 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  padding: 1rem;
-  margin: 1.25rem 1.5rem;
+  padding: 0.875rem;
+  margin: 1rem 1.25rem;
   background: var(--bg-light-hover);
   border-radius: 0.75rem;
 }
@@ -4942,8 +4946,8 @@
   display: flex;
   align-items: flex-start;
   gap: 0.625rem;
-  padding: 0.875rem 1rem;
-  margin: 0 1.5rem 1.25rem;
+  padding: 0.75rem 0.875rem;
+  margin: 0 1.25rem 1rem;
   background: rgba(245, 158, 11, 0.1);
   border-radius: 0.5rem;
   font-size: 0.8rem;
@@ -4962,7 +4966,7 @@
 
 /* Form */
 .make-bid-modal-new form {
-  padding: 0 1.5rem 1.5rem;
+  padding: 0 1.25rem 1.25rem;
 }
 
 .bid-form-group {
@@ -5350,24 +5354,24 @@
 
 .session-btn-unified.free,
 .session-btn-unified.rejoin {
-  background: linear-gradient(135deg, #10b981, #059669);
+  background: #10b981;
   color: white;
 }
 
 .session-btn-unified.free:hover,
 .session-btn-unified.rejoin:hover {
-  background: linear-gradient(135deg, #059669, #047857);
+  background: #059669;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
 
 .session-btn-unified.paid {
-  background: linear-gradient(135deg, var(--primary), #c9232b);
+  background: var(--primary);
   color: white;
 }
 
 .session-btn-unified.paid:hover {
-  background: linear-gradient(135deg, #c9232b, #a91d24);
+  background: #c9232b;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(234, 42, 51, 0.3);
 }
@@ -6511,7 +6515,7 @@
 }
 
 /* =========================================
-   STUDENT CONTENT CARD (SCC) - 3 States
+   STUDENT CONTENT CARD (SCC) - Clean Design
    ========================================= */
 
 .student-content-card {
@@ -6544,43 +6548,7 @@
   background-color: #f0f4f8;
 }
 
-.scc-thumbnail.locked::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, rgba(60, 80, 90, 0.85), rgba(40, 60, 70, 0.9));
-  z-index: 1;
-}
-
-/* Badges */
-.scc-badge {
-  position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-  padding: 0.5rem 0.875rem;
-  border-radius: 2rem;
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.025em;
-  z-index: 2;
-}
-
-.scc-badge.purchased {
-  background: linear-gradient(135deg, #10b981, #059669);
-  color: white;
-  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
-}
-
-.scc-badge.premium {
-  background: linear-gradient(135deg, var(--primary-color), #d02630);
-  color: white;
-  box-shadow: 0 2px 8px rgba(234, 42, 51, 0.3);
-}
-
+/* Category Badge - on thumbnail */
 .scc-category-badge {
   position: absolute;
   top: 0.75rem;
@@ -6596,27 +6564,33 @@
   z-index: 2;
 }
 
-/* Lock Overlay */
-.scc-lock-overlay {
+/* Status Badges (purchased / bid pending) - on thumbnail top-right */
+.scc-status-badge {
   position: absolute;
-  inset: 0;
+  top: 0.75rem;
+  right: 0.75rem;
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 2rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
   z-index: 2;
 }
 
-.scc-lock-icon {
-  width: 64px;
-  height: 64px;
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.scc-status-badge.purchased {
+  background: linear-gradient(135deg, #10b981, #059669);
   color: white;
-  backdrop-filter: blur(4px);
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+.scc-status-badge.requested {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: white;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
 }
 
 /* Body */
@@ -6625,141 +6599,88 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 0.625rem;
+  gap: 0.5rem;
 }
 
-.scc-category {
-  display: inline-block;
-  padding: 0.25rem 0.625rem;
-  background: rgba(234, 42, 51, 0.1);
-  color: var(--primary-color);
-  border-radius: 0.25rem;
-  font-size: 0.7rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.025em;
-  width: fit-content;
-}
-
+/* Title */
 .scc-title {
-  font-size: 1.125rem;
+  font-size: 0.9rem;
   font-weight: 600;
   color: var(--text-light);
   line-height: 1.4;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex: 1;
+  min-width: 0;
 }
 
 .student-container.dark .scc-title {
   color: var(--text-dark);
 }
 
-.scc-title-check {
-  color: #10b981;
-  flex-shrink: 0;
-}
-
-.scc-title-price-row {
+/* Title + Price Row */
+.scc-title-row {
   display: flex;
-  justify-content: space-between;
   align-items: flex-start;
-  gap: 1rem;
+  justify-content: space-between;
+  gap: 0.75rem;
 }
 
-.scc-title-price-row .scc-title {
-  flex: 1;
-}
-
-.scc-price-tag {
-  text-align: right;
+/* Price */
+.scc-price {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  white-space: nowrap;
   flex-shrink: 0;
 }
 
-.scc-price-label {
-  display: block;
-  font-size: 0.65rem;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 0.125rem;
+.scc-price.free {
+  color: #10b981;
 }
 
-.scc-price-value {
-  display: block;
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: var(--text-light);
-}
-
-.student-container.dark .scc-price-value {
-  color: var(--text-dark);
-}
-
-/* Teacher Info */
-.scc-teacher {
+/* Teacher Row */
+.scc-teacher-row {
   display: flex;
   align-items: center;
-  gap: 0.625rem;
+  gap: 0.5rem;
 }
 
-.scc-teacher-avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background-size: cover;
-  background-position: center;
+.scc-teacher-icon {
+  color: var(--text-muted);
   flex-shrink: 0;
 }
 
-.scc-teacher-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.125rem;
+.scc-teacher-label {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
 }
 
-.scc-teacher-name {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--text-light);
-}
-
-.student-container.dark .scc-teacher-name {
-  color: var(--text-dark);
-}
-
-.scc-joined-date,
-.scc-teacher-subtitle {
-  font-size: 0.75rem;
+.student-container.dark .scc-teacher-label {
   color: var(--text-muted);
 }
 
 /* Description */
 .scc-description {
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   color: var(--text-secondary);
-  line-height: 1.6;
+  line-height: 1.5;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  margin: 0;
 }
 
 /* Action Buttons */
 .scc-actions {
   display: flex;
   gap: 0.75rem;
-  margin-top: 0.5rem;
-}
-
-.scc-actions.browse {
   margin-top: auto;
   padding-top: 0.75rem;
-  border-top: 1px solid var(--border-light);
-}
-
-.student-container.dark .scc-actions.browse {
-  border-color: var(--border-dark);
 }
 
 .scc-actions.dual {
@@ -6768,125 +6689,64 @@
   gap: 0.75rem;
 }
 
+/* Enroll / Watch Now button (filled red) */
 .scc-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1rem;
+  gap: 0.4rem;
+  padding: 0.55rem 0.75rem;
   border-radius: 0.5rem;
-  font-size: 0.875rem;
+  font-size: 0.78rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
   border: none;
+  text-align: center;
+}
+
+.scc-btn.enroll {
+  background: var(--primary-color);
+  color: white;
   flex: 1;
 }
 
-.scc-btn.primary {
-  background: linear-gradient(135deg, var(--primary-color), #d02630);
-  color: white;
-}
-
-.scc-btn.primary:hover {
-  background: linear-gradient(135deg, #d02630, #b91c26);
+.scc-btn.enroll:hover {
+  background: #d02630;
   transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(234, 42, 51, 0.25);
 }
 
-.scc-btn.primary.full {
-  margin: 0 1rem 1rem;
-  width: calc(100% - 2rem);
-}
-
-.scc-btn.secondary {
-  background: transparent;
-  color: var(--text-secondary);
-  border: 1px solid var(--border-light);
-}
-
-.student-container.dark .scc-btn.secondary {
-  border-color: var(--border-dark);
-  color: var(--text-muted);
-}
-
-.scc-btn.secondary:hover {
-  background: var(--bg-light-hover);
-  color: var(--text-light);
-}
-
-.student-container.dark .scc-btn.secondary:hover {
-  background: var(--bg-dark-hover);
-  color: var(--text-dark);
-}
-
-.scc-btn.unlock {
-  background: linear-gradient(135deg, var(--primary-color), #d02630);
-  color: white;
-  text-align: center;
-  line-height: 1.3;
-}
-
-.scc-btn.unlock:hover {
-  background: linear-gradient(135deg, #d02630, #b91c26);
-}
-
-/* Purchase Button - Premium red gradient */
-.scc-btn.purchase {
-  background: linear-gradient(135deg, var(--primary-color), #d02630);
-  color: white;
-  text-align: center;
-  line-height: 1.3;
-  font-weight: 600;
-  box-shadow: 0 2px 8px rgba(234, 42, 51, 0.25);
-}
-
-.scc-btn.purchase:hover {
-  background: linear-gradient(135deg, #d02630, #b91c26);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(234, 42, 51, 0.35);
-}
-
-/* Bid Button - Outlined style matching primary color */
-.scc-btn.bid {
+/* Make a Bid button (outlined) */
+.scc-btn.bid-outline {
   background: white;
   color: var(--primary-color);
   border: 2px solid var(--primary-color);
-  text-align: center;
-  line-height: 1.3;
-  font-weight: 600;
+  flex: 1;
 }
 
-.student-container.dark .scc-btn.bid {
+.student-container.dark .scc-btn.bid-outline {
   background: transparent;
   color: var(--primary-color);
 }
 
-.scc-btn.bid:hover {
+.scc-btn.bid-outline:hover {
   background: rgba(234, 42, 51, 0.08);
   transform: translateY(-1px);
 }
 
-/* Info Box */
-.scc-info-box {
-  display: flex;
-  gap: 0.625rem;
-  padding: 0.875rem;
-  background: rgba(59, 130, 246, 0.08);
-  border-radius: 0.5rem;
-  margin-top: 0.5rem;
+/* Cancel Bid button */
+.scc-btn.cancel-bid {
+  background: transparent;
+  color: #ef4444;
+  border: 1.5px solid #ef4444;
+  flex: 1;
+  font-size: 0.78rem;
 }
 
-.scc-info-box svg {
-  color: #3b82f6;
-  flex-shrink: 0;
-  margin-top: 0.125rem;
-}
-
-.scc-info-box p {
-  font-size: 0.8rem;
-  color: var(--text-secondary);
-  line-height: 1.5;
-  margin: 0;
+.scc-btn.cancel-bid:hover {
+  background: rgba(239, 68, 68, 0.08);
+  transform: translateY(-1px);
 }
 
 /* Student Content Card Grid */
@@ -6908,16 +6768,7 @@
   }
 
   .scc-actions.dual {
-    grid-template-columns: 1fr;
-  }
-
-  .scc-title-price-row {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .scc-price-tag {
-    text-align: left;
+    grid-template-columns: 1fr 1fr;
   }
 }
 
@@ -7379,7 +7230,7 @@
   justify-content: center;
   gap: 0.5rem;
   padding: 1rem 1.5rem;
-  background: linear-gradient(135deg, var(--primary), #c9232b);
+  background: var(--primary);
   color: white;
   border: none;
   border-radius: 2rem;
@@ -7390,7 +7241,7 @@
 }
 
 .enroll-unlock-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, #c9232b, #a91d24);
+  background: #c9232b;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(234, 42, 51, 0.3);
 }
@@ -7416,6 +7267,42 @@
 }
 
 .enroll-add-credits-link:hover {
+  text-decoration: underline;
+}
+
+/* Free variant for price badge */
+.enroll-price-badge.free {
+  background: #10b981;
+}
+
+/* Free variant for unlock button */
+.enroll-unlock-btn.free {
+  background: #10b981;
+}
+
+.enroll-unlock-btn.free:hover {
+  background: #059669;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+/* Bid link in enrollment modal */
+.enroll-bid-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.enroll-bid-link:hover {
   text-decoration: underline;
 }
 
@@ -7860,7 +7747,7 @@
 }
 
 /* =========================================
-   CONTENT DETAIL MODAL
+   CONTENT DETAIL MODAL - Clean Design
    ========================================= */
 
 .content-detail-overlay {
@@ -7882,9 +7769,10 @@
   background: white;
   border-radius: 1.25rem;
   width: 100%;
-  max-width: 380px;
+  max-width: 420px;
   max-height: 90vh;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
   box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
   animation: modalSlideIn 0.25s ease-out;
   position: relative;
@@ -7932,171 +7820,141 @@
   position: relative;
 }
 
-.content-detail-thumbnail.premium {
-  filter: brightness(0.6);
-}
-
-.content-detail-thumbnail.premium::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, rgba(26, 26, 46, 0.7), rgba(26, 26, 46, 0.5));
-}
-
 .content-detail-category {
   position: absolute;
   top: 1rem;
   left: 1rem;
-  background: rgba(0, 0, 0, 0.7);
+  background: var(--primary-color);
   color: white;
   padding: 0.375rem 0.75rem;
   border-radius: 0.375rem;
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.05em;
-}
-
-.content-detail-premium-badge {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: linear-gradient(135deg, #f59e0b, #d97706);
-  color: white;
-  padding: 0.375rem 0.75rem;
-  border-radius: 2rem;
-  font-size: 0.7rem;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-}
-
-.content-detail-lock-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.content-detail-lock-icon {
-  width: 64px;
-  height: 64px;
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(4px);
+  z-index: 2;
 }
 
 /* Body */
 .content-detail-body {
-  padding: 1.25rem;
-}
-
-.content-detail-header {
+  padding: 1.5rem;
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 1rem;
-  margin-bottom: 1rem;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
 .content-detail-title {
-  font-size: 1.35rem;
+  font-size: 1.25rem;
   font-weight: 700;
   color: var(--text-light);
   margin: 0;
-  flex: 1;
+  line-height: 1.4;
 }
 
 .student-container.dark .content-detail-title {
   color: var(--text-dark);
 }
 
-.content-detail-price {
-  text-align: right;
-  flex-shrink: 0;
-}
-
-.content-detail-price-label {
-  display: block;
-  font-size: 0.65rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 0.125rem;
+/* Price Row */
+.content-detail-price-row {
+  display: flex;
+  align-items: center;
 }
 
 .content-detail-price-value {
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-color);
 }
 
-/* Teacher Info */
-.content-detail-teacher {
+.content-detail-price-value.free {
+  color: #10b981;
+}
+
+/* Teacher Row */
+.content-detail-teacher-row {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 1.25rem;
-  padding-bottom: 1.25rem;
-  border-bottom: 1px solid var(--border-light);
+  gap: 0.5rem;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
 }
 
-.student-container.dark .content-detail-teacher {
-  border-bottom-color: var(--border-dark);
+.content-detail-teacher-row svg {
+  flex-shrink: 0;
+  color: var(--text-muted);
 }
 
-.content-detail-teacher-avatar {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background-size: cover;
-  background-position: center;
-  border: 2px solid white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+/* Description */
+.content-detail-desc {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
 }
 
-.content-detail-teacher-info {
+/* Balance Info */
+.content-detail-balance {
+  background: #f9fafb;
+  border-radius: 0.75rem;
+  padding: 1rem;
   display: flex;
   flex-direction: column;
-  gap: 0.125rem;
+  gap: 0.5rem;
+  border: 1px solid var(--border-light);
 }
 
-.content-detail-teacher-name {
+.student-container.dark .content-detail-balance {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--border-dark);
+}
+
+.content-detail-balance-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.content-detail-balance-row.remaining {
+  padding-top: 0.5rem;
+  border-top: 1px dashed var(--border-light);
   font-weight: 600;
-  font-size: 0.95rem;
   color: var(--text-light);
 }
 
-.student-container.dark .content-detail-teacher-name {
+.student-container.dark .content-detail-balance-row.remaining {
+  color: var(--text-dark);
+  border-color: var(--border-dark);
+}
+
+.content-detail-balance-value {
+  font-weight: 600;
+  color: var(--text-light);
+}
+
+.student-container.dark .content-detail-balance-value {
   color: var(--text-dark);
 }
 
-.content-detail-teacher-meta {
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
+.content-detail-balance-value.cost {
+  color: var(--primary-color);
+}
+
+.content-detail-insufficient {
   font-size: 0.8rem;
-  color: var(--text-secondary);
+  color: #ef4444;
+  text-align: center;
+  padding: 0.5rem;
+  background: rgba(239, 68, 68, 0.08);
+  border-radius: 0.5rem;
 }
 
 /* Action Buttons */
 .content-detail-actions {
   display: flex;
   gap: 0.75rem;
-  margin-bottom: 1rem;
+  margin-top: 0.25rem;
 }
 
 .content-detail-btn {
@@ -8111,75 +7969,48 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  text-align: left;
-}
-
-.content-detail-btn span {
-  line-height: 1.2;
-}
-
-.content-detail-btn.unlock {
-  background: linear-gradient(135deg, var(--primary), #c9232b);
-  color: white;
   border: none;
 }
 
-.content-detail-btn.unlock.free {
-  background: linear-gradient(135deg, #10b981, #059669);
+.content-detail-btn.enroll {
+  background: var(--primary-color);
+  color: white;
 }
 
-.content-detail-btn.unlock.free:hover {
-  background: linear-gradient(135deg, #059669, #047857);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-}
-
-.content-detail-btn.unlock:hover:not(:disabled) {
-  background: linear-gradient(135deg, #c9232b, #a91d24);
+.content-detail-btn.enroll:hover:not(:disabled) {
+  background: #b91c26;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(234, 42, 51, 0.3);
 }
 
-.content-detail-btn.unlock:disabled {
+.content-detail-btn.enroll:disabled {
   background: #ccc;
   cursor: not-allowed;
 }
 
-.content-detail-btn.bid {
-  background: white;
-  color: var(--primary);
-  border: 2px solid var(--primary);
+.content-detail-btn.enroll.free {
+  background: #10b981;
 }
 
-.student-container.dark .content-detail-btn.bid {
+.content-detail-btn.enroll.free:hover {
+  background: #047857;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.content-detail-btn.bid-outline {
+  background: white;
+  color: var(--primary-color);
+  border: 2px solid var(--primary-color);
+}
+
+.student-container.dark .content-detail-btn.bid-outline {
   background: transparent;
 }
 
-.content-detail-btn.bid:hover {
-  background: rgba(234, 42, 51, 0.05);
-}
-
-/* Description */
-.content-detail-description {
-  display: flex;
-  gap: 0.75rem;
-  background: rgba(59, 130, 246, 0.08);
-  padding: 1rem;
-  border-radius: 0.75rem;
-  border-left: 3px solid #3b82f6;
-}
-
-.content-detail-info-icon {
-  color: #3b82f6;
-  flex-shrink: 0;
-  margin-top: 2px;
-}
-
-.content-detail-description p {
-  margin: 0;
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  line-height: 1.5;
+.content-detail-btn.bid-outline:hover {
+  background: rgba(234, 42, 51, 0.08);
+  transform: translateY(-1px);
 }
 
 /* =========================================

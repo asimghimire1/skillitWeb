@@ -23,7 +23,8 @@ const ExploreContentView = ({
   onJoinContent,
   onMakeBid,
   onCancelBid,
-  onAction
+  onAction,
+  onWatchContent
 }) => {
   // Safe array defaults
   const safeContent = Array.isArray(content) ? content : [];
@@ -305,6 +306,7 @@ const ExploreContentView = ({
               onCancelBid={onCancelBid}
               onViewDetails={(contentItem) => onAction && onAction('viewDetails', contentItem)}
               onNotInterested={(contentItem) => onAction && onAction('notInterested', contentItem)}
+              onWatchNow={onWatchContent}
             />
           ))}
         </div>

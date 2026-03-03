@@ -290,31 +290,14 @@ export default function Student() {
         }
       }
     } else if (joinType === 'paid') {
-      // Paid content - check credits and process payment
-      if (contentItem.price > 0 && stats.credits < contentItem.price) {
-        const needed = contentItem.price - stats.credits;
-        showToast(`Insufficient credits. Add NPR ${needed} more.`, 'error');
-        setIsCreditsModalOpen(true);
-        return;
-      }
-
-      const ok = await confirm({
-        title: 'Purchase Content',
-        message: `Purchase "${contentItem.title}" for NPR ${contentItem.price}?`,
-        confirmText: 'Pay & Join',
-        type: 'default'
-      });
-
-      if (ok) {
-        const result = await apiService.joinContent(contentItem.id, student.id, 'paid');
-        if (result.success) {
-          showToast('Purchase successful! Content added to My Learning.', 'success');
-          setStats(prev => ({ ...prev, credits: prev.credits - contentItem.price }));
-          fetchDashboardData(student.id);
-        } else {
-          showToast(result.message || 'Failed to purchase. Please try again.', 'error');
-        }
-      }
+      // Open enrollment modal for paid content (similar to session enrollment modal)
+      const enrichedContent = {
+        ...contentItem,
+        teacherName: contentItem.teacherName || teachers.find(t => t.id === contentItem.teacherId)?.fullname || 'Teacher',
+        teacherAvatar: contentItem.teacherAvatar || teachers.find(t => t.id === contentItem.teacherId)?.avatar
+      };
+      setSelectedContent(enrichedContent);
+      setIsContentDetailOpen(true);
     }
   };
 
@@ -750,6 +733,15 @@ export default function Student() {
               onMakeBid={handleMakeBid}
               onCancelBid={handleCancelBid}
               onAction={handleAction}
+              onWatchContent={(item) => {
+                const enrichedItem = {
+                  ...item,
+                  teacherName: item.teacherName || teachers.find(t => t.id === item.teacherId)?.fullname || 'Teacher',
+                  teacherAvatar: item.teacherAvatar || teachers.find(t => t.id === item.teacherId)?.avatar
+                };
+                setSelectedContent(enrichedItem);
+                setIsVideoPlayerOpen(true);
+              }}
             />
           )}
 
@@ -862,18 +854,33 @@ export default function Student() {
         />
       )}
 
-      {/* Content Detail Modal */}
+      {/* Content Enrollment Modal */}
       {isContentDetailOpen && selectedContent && (
         <ContentDetailModal
           content={selectedContent}
           onClose={() => { setIsContentDetailOpen(false); setSelectedContent(null); }}
-          onUnlock={(item) => {
+          onUnlock={async (item) => {
             setIsContentDetailOpen(false);
-            handleJoinContent(item);
+            // Direct enrollment - no extra confirm needed
+            const result = await apiService.joinContent(item.id, student.id, item.price > 0 ? 'paid' : 'free');
+            if (result.success) {
+              showToast(item.price > 0 ? 'Purchase successful! Content added to My Learning.' : 'Successfully joined!', 'success');
+              if (item.price > 0) {
+                setStats(prev => ({ ...prev, credits: prev.credits - item.price }));
+              }
+              fetchDashboardData(student.id);
+            } else {
+              showToast(result.message || 'Failed to enroll. Please try again.', 'error');
+            }
+            setSelectedContent(null);
           }}
           onMakeBid={(item) => {
             setIsContentDetailOpen(false);
             handleMakeBid(item);
+          }}
+          onAddCredits={() => {
+            setIsContentDetailOpen(false);
+            setIsCreditsModalOpen(true);
           }}
           userBalance={stats.credits}
           baseUrl={import.meta.env.VITE_API_URL?.replace('/api', '') || 'http://localhost:5000'}

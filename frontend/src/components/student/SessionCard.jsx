@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar, Clock, Video, Play, Gavel, CheckCircle, XCircle } from 'lucide-react';
+import { Calendar, Clock, Video, Play, Gavel, XCircle } from 'lucide-react';
 
 const SessionCard = ({ session, onEnroll, onMakeBid, onCancelBid, isEnrolled = false, hasPendingBid = false }) => {
   const isFree = !session.price || session.price === 0;
@@ -91,10 +91,6 @@ const SessionCard = ({ session, onEnroll, onMakeBid, onCancelBid, isEnrolled = f
               <Play size={16} />
               Rejoin Session
             </button>
-            <p className="session-footer-text-unified enrolled">
-              <CheckCircle size={14} />
-              YOU'RE ENROLLED
-            </p>
           </>
         ) : hasPendingBid ? (
           <>
