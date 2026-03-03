@@ -168,7 +168,6 @@
 /* Status Badge */
 .bid-status-pill {
     padding: 0.375rem 0.75rem;
-    /* Reduced from 0.5rem 1rem */
     border-radius: 6px;
     font-size: 0.625rem;
     font-weight: 800;
@@ -210,6 +209,29 @@
 
 .bid-status-pill.pending .dot {
     background-color: #d97706;
+}
+
+/* Status Text (below name, no background) */
+.bid-status-text {
+    font-size: 0.625rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 0.125rem;
+}
+
+.bid-status-text.accepted {
+    color: #16a34a;
+}
+
+.bid-status-text.rejected,
+.bid-status-text.cancelled {
+    color: #dc2626;
+}
+
+.bid-status-text.pending,
+.bid-status-text.countered {
+    color: #d97706;
 }
 
 /* Type and Title */

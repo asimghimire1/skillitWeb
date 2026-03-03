@@ -91,18 +91,15 @@ const MyBidsView = ({
               </div>
               <div className="author-meta">
                 <span className="author-name">{bid.teacherName}</span>
-                <span className="author-sub">{bid.teacherRole} • {new Date(bid.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                <span className={`bid-status-text ${bid.status}`}>{bid.status.toUpperCase()}</span>
               </div>
-            </div>
-
-            <div className={`bid-status-pill ${bid.status}`}>
-              <div className="dot" />
-              {bid.status.toUpperCase()}
             </div>
           </div>
 
           {/* Type and Title */}
-          <span className="bid-type-label">{bid.itemType}</span>
+          <span className="bid-type-label">
+            {bid.itemType} • {new Date(bid.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase()}
+          </span>
           <h3 className="bid-item-title-large">{bid.itemTitle}</h3>
 
           {/* Pricing Grid */}

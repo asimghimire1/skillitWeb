@@ -271,239 +271,80 @@
 
 .dashboard-banner-card {
   background-color: var(--primary-color);
-  border-radius: 1.5rem;
-  padding: 3rem 4rem;
+  border-radius: 1rem;
+  padding: 2rem 2.5rem;
   position: relative;
   overflow: hidden;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 20px 40px rgba(234, 42, 51, 0.15);
+  gap: 2rem;
   color: white;
 }
 
 .banner-content {
   position: relative;
   z-index: 10;
-  max-width: 60%;
+  flex: 1;
+  min-width: 0;
 }
 
 .banner-title {
-  font-size: 3rem;
+  font-size: 1.4rem;
   font-weight: 800;
-  line-height: 1.1;
-  margin-bottom: 1rem;
-  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.01em;
 }
 
 .banner-text {
-  font-size: 1.125rem;
-  opacity: 0.9;
-  line-height: 1.6;
-  margin-bottom: 2rem;
+  font-size: 0.85rem;
+  opacity: 0.85;
+  line-height: 1.5;
   font-weight: 400;
-  max-width: 550px;
+  max-width: 500px;
+  margin: 0;
 }
 
 .banner-btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.875rem 1.5rem;
-  background-color: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 9999px;
-  color: white;
-  font-weight: 600;
-  font-size: 0.938rem;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background-color: #fff;
+  border: none;
+  border-radius: 0.5rem;
+  color: var(--primary-color);
+  font-weight: 700;
+  font-size: 0.85rem;
   cursor: pointer;
   transition: all 0.2s ease;
-  backdrop-filter: blur(8px);
-}
-
-.banner-btn:hover {
-  background-color: rgba(255, 255, 255, 0.25);
-  transform: translateY(-2px);
-}
-
-/* Banner Skill Orbit */
-.banner-decoration {
-  position: relative;
-  width: min(360px, 45vw);
-  height: 320px;
+  white-space: nowrap;
   flex-shrink: 0;
 }
 
-.skill-orbit {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background: radial-gradient(circle at 50% 40%, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0));
-  animation: orbitPulse 10s ease-in-out infinite alternate;
-}
-
-.skill-spotlight {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 220px;
-  padding: 1.5rem;
-  border-radius: 1.75rem;
-  background: rgba(255, 255, 255, 0.18);
-  backdrop-filter: blur(18px);
-  text-align: center;
-  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.25);
-}
-
-.skill-spotlight-label {
-  font-size: 0.65rem;
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.7);
-  display: block;
-  margin-bottom: 0.75rem;
-}
-
-.skill-spotlight-icon {
-  width: 64px;
-  height: 64px;
-  margin: 0 auto 0.75rem;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.12);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.15);
-}
-
-.skill-spotlight h4 {
-  margin-bottom: 0.4rem;
-  font-size: 1.125rem;
-  font-weight: 800;
-}
-
-.skill-spotlight p {
-  font-size: 0.85rem;
-  line-height: 1.4;
-  color: rgba(255, 255, 255, 0.85);
-  margin-bottom: 1rem;
-}
-
-.skill-spotlight-cta {
-  width: 100%;
-  border: none;
-  border-radius: 999px;
-  background: #fff;
-  color: var(--primary-color);
-  font-weight: 700;
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  padding: 0.65rem 1rem;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.35rem;
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.skill-spotlight-cta:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 25px rgba(15, 23, 42, 0.25);
-}
-
-.skill-node {
-  position: absolute;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.55rem 0.85rem;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: transform 0.3s ease, background 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
-  animation: floatNode 7s ease-in-out infinite;
-}
-
-.skill-node svg {
-  color: var(--skill-accent, #fff);
-}
-
-.skill-node.active {
-  background: #fff;
-  color: var(--primary-color);
-  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.25);
-  transform: scale(1.08);
-}
-
-.skill-node.active svg {
-  color: var(--primary-color);
-}
-
-.skill-node:hover:not(.active) {
-  transform: translateY(-2px);
-  background: rgba(255, 255, 255, 0.2);
-}
-
-@keyframes orbitPulse {
-  0% {
-    transform: scale(0.96);
-  }
-  100% {
-    transform: scale(1.04);
-  }
-}
-
-@keyframes floatNode {
-  0% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-8px);
-  }
-  100% {
-    transform: translateY(0);
-  }
+.banner-btn:hover {
+  background-color: #f3f3f3;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 /* Mobile responsive */
 @media (max-width: 768px) {
   .dashboard-banner-card {
     flex-direction: column;
-    padding: 2rem;
+    padding: 1.5rem;
     text-align: center;
-  }
-
-  .banner-content {
-    max-width: 100%;
-    margin-bottom: 2rem;
+    align-items: stretch;
   }
 
   .banner-title {
-    font-size: 2rem;
+    font-size: 1.2rem;
   }
 
-  .banner-text {
-    margin: 0 auto 1.5rem;
-  }
-
-  .banner-decoration {
+  .banner-btn {
     width: 100%;
-    height: 260px;
-    margin-top: 1rem;
-  }
-
-  .skill-spotlight {
-    width: min(260px, 80%);
+    justify-content: center;
   }
 }
 
@@ -8726,6 +8567,8 @@
   border: 1px solid var(--border-color);
   padding: 1.25rem;
   transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
 }
 
 .student-container.dark .student-bid-card {
@@ -8742,6 +8585,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 0.75rem;
   margin-bottom: 0.875rem;
 }
 
@@ -8753,15 +8597,29 @@
   border-radius: 16px;
   font-size: 0.7rem;
   font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.student-bid-status svg {
+  flex-shrink: 0;
 }
 
 .student-bid-price {
-  font-size: 1.125rem;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--primary-color);
+  line-height: 1;
+  white-space: nowrap;
+  text-align: right;
 }
 
 .student-bid-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
   margin-bottom: 0.75rem;
 }
 
@@ -8773,7 +8631,11 @@
   color: var(--text-muted);
   text-transform: uppercase;
   font-weight: 600;
-  margin-bottom: 0.25rem;
+  line-height: 1;
+}
+
+.student-bid-type svg {
+  flex-shrink: 0;
 }
 
 .student-bid-title {
@@ -8784,6 +8646,8 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  max-width: 100%;
+  line-height: 1.3;
 }
 
 .student-container.dark .student-bid-title {
@@ -8798,14 +8662,17 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  line-height: 1.4;
 }
 
 .student-bid-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 0.5rem;
   padding-top: 0.75rem;
   border-top: 1px solid var(--border-color);
+  margin-top: auto;
 }
 
 .student-container.dark .student-bid-footer {
@@ -8815,6 +8682,7 @@
 .student-bid-date {
   font-size: 0.75rem;
   color: var(--text-muted);
+  line-height: 1;
 }
 
 .student-bid-counter {
@@ -8824,6 +8692,8 @@
   background: #dbeafe;
   padding: 0.25rem 0.5rem;
   border-radius: 6px;
+  line-height: 1;
+  white-space: nowrap;
 }
 
 /* =========================================

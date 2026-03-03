@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import StudentContentCard from './StudentContentCard';
 import SessionCard from './SessionCard';
 import {
@@ -12,75 +12,15 @@ import {
   BookOpen,
   Clock,
   Flame,
-  VideoIcon,
   ChevronUp,
   ChevronDown,
-  MapPin,
   Play,
   User,
   Gavel,
   CheckCircle,
   XCircle,
-  MessageSquare,
-  PenTool,
-  Cpu,
-  Camera,
-  Mic,
-  Palette
+  MessageSquare
 } from 'lucide-react';
-
-const FEATURED_SKILLS = [
-  {
-    id: 'design',
-    label: 'Product Design',
-    shortLabel: 'Design',
-    description: 'Ship beautiful UI systems and pixel-perfect prototypes.',
-    icon: PenTool,
-    accent: '#facc15',
-    position: { top: '8%', left: '6%' },
-    delay: '0s'
-  },
-  {
-    id: 'ai',
-    label: 'AI Systems',
-    shortLabel: 'AI',
-    description: 'Build end-to-end AI copilots and automation stacks.',
-    icon: Cpu,
-    accent: '#38bdf8',
-    position: { top: '5%', right: '6%' },
-    delay: '0.6s'
-  },
-  {
-    id: 'story',
-    label: 'Visual Storytelling',
-    shortLabel: 'Studio',
-    description: 'Master cinematic camera craft and motion edits.',
-    icon: Camera,
-    accent: '#f472b6',
-    position: { bottom: '10%', left: '4%' },
-    delay: '1.2s'
-  },
-  {
-    id: 'voice',
-    label: 'Public Speaking',
-    shortLabel: 'Voice',
-    description: 'Own any stage with magnetic storytelling and tone.',
-    icon: Mic,
-    accent: '#fb7185',
-    position: { bottom: '8%', right: '14%' },
-    delay: '1.8s'
-  },
-  {
-    id: 'color',
-    label: 'Creative Direction',
-    shortLabel: 'Color',
-    description: 'Develop bold palettes, typography, and campaign systems.',
-    icon: Palette,
-    accent: '#c084fc',
-    position: { top: '40%', right: '-4%' },
-    delay: '2.2s'
-  }
-];
 
 const DashboardView = ({
   stats,
@@ -134,19 +74,6 @@ const DashboardView = ({
     });
 
   const [selectedCategory, setSelectedCategory] = useState('All');
-  const [activeSkill, setActiveSkill] = useState(FEATURED_SKILLS[0]);
-
-  useEffect(() => {
-    const autoRotate = setInterval(() => {
-      setActiveSkill((prev) => {
-        const currentIndex = FEATURED_SKILLS.findIndex(skill => skill.id === prev.id);
-        const nextIndex = (currentIndex + 1) % FEATURED_SKILLS.length;
-        return FEATURED_SKILLS[nextIndex];
-      });
-    }, 4500);
-
-    return () => clearInterval(autoRotate);
-  }, []);
 
   // Compute unique categories excluding 'Announcements'
   const categories = ['All', ...new Set(safeContent
@@ -233,69 +160,23 @@ const DashboardView = ({
       profilePicture: null
     };
   };
-  const ActiveSkillIcon = activeSkill.icon;
 
   return (
     <>
-      {/* Banner Section */}
+      {/* Banner Section - Compact */}
       <div className="dashboard-banner-container">
         <div className="dashboard-banner-card">
           <div className="banner-content">
-            <h1 className="banner-title">
-              Ready to expand<br />your skills?
-            </h1>
+            <h1 className="banner-title">Ready to expand your skills?</h1>
             <p className="banner-text">
-              Explore our curated ecosystem of expert-led courses and <br />
-              1:1 mentorship designed for the next generation of <br />
-              creators.
+              Explore our vast library of courses, workshops, and 1:1 mentorship sessions
+              designed to take you to the next level.
             </p>
-            <button className="banner-btn" onClick={onFocusSearch}>
-              <Search size={16} strokeWidth={2.5} />
-              <span>Browse Content</span>
-            </button>
           </div>
-
-
-          {/* Decorative Elements */}
-          <div className="banner-decoration" aria-hidden="true">
-            <div className="skill-orbit">
-              <div className="skill-spotlight">
-                <span className="skill-spotlight-label">Trending Skill</span>
-                <div className="skill-spotlight-icon" style={{ color: activeSkill.accent }}>
-                  <ActiveSkillIcon size={36} strokeWidth={2.5} />
-                </div>
-                <h4>{activeSkill.label}</h4>
-                <p>{activeSkill.description}</p>
-                <button
-                  type="button"
-                  className="skill-spotlight-cta"
-                  onClick={() => onAction('explore')}
-                >
-                  Explore Skill 
-                  <ArrowRight size={14} />
-                </button>
-              </div>
-              {FEATURED_SKILLS.map((skill) => {
-                const Icon = skill.icon;
-                return (
-                  <button
-                    type="button"
-                    key={skill.id}
-                    className={`skill-node ${activeSkill.id === skill.id ? 'active' : ''}`}
-                    style={{ ...skill.position, animationDelay: skill.delay, '--skill-accent': skill.accent }}
-                    onMouseEnter={() => setActiveSkill(skill)}
-                    onFocus={() => setActiveSkill(skill)}
-                    onClick={() => setActiveSkill(skill)}
-                    aria-label={skill.label}
-                    aria-pressed={activeSkill.id === skill.id}
-                  >
-                    <Icon size={18} strokeWidth={2.5} />
-                    <span>{skill.shortLabel}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+          <button className="banner-btn" onClick={onFocusSearch}>
+            <Search size={16} strokeWidth={2.5} />
+            <span>Browse Content</span>
+          </button>
         </div>
       </div>
 
