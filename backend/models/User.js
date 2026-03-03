@@ -37,6 +37,8 @@ const User = sequelize.define('User', {
   },
   phone: DataTypes.STRING,
   location: DataTypes.STRING,
+  reset_token: DataTypes.STRING,
+  reset_token_expiry: DataTypes.DATE,
 }, {
   timestamps: true,
   createdAt: 'created_at',

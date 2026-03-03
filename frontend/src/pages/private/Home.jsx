@@ -69,8 +69,7 @@ const HomePage = () => {
           <div className="lg:col-span-6 reveal-on-scroll" id="hero-content">
             <span className="inline-flex items-center gap-3 px-5 py-2 mb-10 text-[10px] font-extrabold tracking-[0.2em] text-primary uppercase bg-white/50 backdrop-blur-sm border border-primary/10 rounded-full shadow-sm">
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                
               </span>
               The Future of Learning
             </span>
@@ -115,10 +114,10 @@ const HomePage = () => {
                 </div>
                 <div className="absolute -left-8 bottom-32 bg-white/90 backdrop-blur-xl p-4 rounded-2xl shadow-[0_20px_40px_-10px_rgba(0,0,0,0.1)] border border-white z-30 animate-float" style={{ animationDuration: '9s' }}>
                   <div className="flex items-center gap-3">
-                    <img alt="Mentor" className="w-10 h-10 rounded-full object-cover border border-white shadow-sm" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCKp3iEx7lanvdsfbrubnIXGVPibWotQZX4G9eAdYnboUb7R6WUzoZ7DgbNTeXY7SkOvaKYCbJzSZ3jUqFvRq8hgYt0XqlDxy2DMXsQHKGhDkHwkuAZrSkSdz16BbRIf9baGV83lnlx0oFsw9piQNkObZckQeMPBMuDo_gpYXDo8ddZcPTS6zojH4nH-B-dcvjt5FryePRNvb1v1-VMyp1TJIQQtJnKJlczRvkdpw56eukHdMR58G6TQHbvBdprJmQpHxE-XXNIMHg" />
+                    <img alt="Mentor" className="w-10 h-10 rounded-full object-cover border border-white shadow-sm" src="/asim.png" />
                     <div>
                       <div className="text-[10px] uppercase font-bold text-charcoal/40 tracking-wider">Top Mentor</div>
-                      <div className="text-sm font-bold text-charcoal">Sita Sharma</div>
+                      <div className="text-sm font-bold text-charcoal">Asim Ghimire</div>
                     </div>
                   </div>
                 </div>
@@ -134,12 +133,12 @@ const HomePage = () => {
       <section className="py-20 border-y border-black/5 bg-white overflow-hidden">
         <div className="relative flex overflow-x-hidden">
           <div className="flex animate-marquee whitespace-nowrap items-center gap-24 py-4 px-12">
-            {['Innovation', 'Growth', 'Expertise', 'Network', 'Creativity', 'Future', 'Value'].map((item) => (
+            {['Growth', 'Expertise', 'Network', 'Creativity', 'Future', 'Value'].map((item) => (
               <span key={item} className="text-4xl font-display font-black text-charcoal/10 tracking-tighter hover:text-charcoal/40 transition-colors cursor-default uppercase">{item}</span>
             ))}
           </div>
           <div className="flex absolute top-0 animate-marquee whitespace-nowrap items-center gap-24 py-4 px-12" style={{ left: '100%' }}>
-            {['Innovation', 'Growth', 'Expertise', 'Network', 'Creativity', 'Future', 'Value'].map((item) => (
+            {['Growth', 'Expertise', 'Network', 'Creativity', 'Future', 'Value'].map((item) => (
               <span key={item + '-dup'} className="text-4xl font-display font-black text-charcoal/10 tracking-tighter hover:text-charcoal/40 transition-colors cursor-default uppercase">{item}</span>
             ))}
           </div>
@@ -249,7 +248,7 @@ const HomePage = () => {
                 <div className="flex flex-col items-center text-center">
                   <div className="relative mb-8">
                     <div className="absolute inset-0 bg-primary/10 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    <img alt="Aarav Bhattarai" className="relative w-28 h-28 rounded-[2.5rem] object-cover ring-8 ring-soft-gray group-hover:scale-105 transition-transform duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCLxjZG4u8bFSrIhRdj1MtOgcFOmhnLRqn5uW2XUH866dFTb51JzrLmpsiNDrAyjnKvYKJQ2kl1HIssu3tBMqWjXJIfN31n74XiKla2AK30KPekazOxPGE4nxhczIWm_moI6IkMbhmsMTbbP7QYGsHaU11ssf6w5CLQIdVq7blzApYGCSjzOWnKv3wDkHqS8gsgp1U-Fs82ykO_fKAGopW2iF1zfQTkVBl2xNjULRn-M96-3qWysJ8cdFbq_ocHZiT11yr2PQ6F6A8" />
+                    <img alt="Asim Ghimire" className="relative w-28 h-28 rounded-[2.5rem] object-cover ring-8 ring-soft-gray group-hover:scale-105 transition-transform duration-700" src="/asim.png" />
                     <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-green-500 border-4 border-white rounded-full shadow-lg"></div>
                   </div>
                   <h4 className="text-xl font-bold mb-2 text-charcoal">Asim Ghimire</h4>

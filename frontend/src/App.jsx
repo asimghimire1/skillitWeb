@@ -10,6 +10,7 @@ const Teacher = lazy(() => import('./pages/private/Teacher.jsx'));
 const Student = lazy(() => import('./pages/private/Student.jsx'));
 const Login = lazy(() => import('./pages/public/Login.jsx'));
 const Register = lazy(() => import('./pages/public/Register.jsx'));
+const ForgotPassword = lazy(() => import('./pages/public/ForgotPassword.jsx'));
 
 import { ToastProvider } from './context/ToastContext';
 import { ConfirmProvider } from './context/ConfirmContext';
@@ -39,6 +40,7 @@ function App() {
                 <Route element={<PublicRoute />}>
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
                 </Route>
 
                 {/* Private Routes - Dynamic username-based URLs */}

@@ -75,6 +75,57 @@ export const apiService = {
     }
   },
 
+  // Forgot password - request OTP email
+  async forgotPassword(email) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+      return await response.json();
+    } catch (error) {
+      console.error('Forgot password error:', error);
+      return { success: false, message: 'Network error. Please try again.' };
+    }
+  },
+
+  // Verify OTP
+  async verifyOtp(email, otp) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/verify-otp`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, otp }),
+      });
+      return await response.json();
+    } catch (error) {
+      console.error('Verify OTP error:', error);
+      return { success: false, message: 'Network error. Please try again.' };
+    }
+  },
+
+  // Reset password with OTP
+  async resetPassword(email, otp, password) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/reset-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, otp, password }),
+      });
+      return await response.json();
+    } catch (error) {
+      console.error('Reset password error:', error);
+      return { success: false, message: 'Network error. Please try again.' };
+    }
+  },
+
   // Get current user info
   async getCurrentUser() {
     try {
