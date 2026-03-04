@@ -83,6 +83,12 @@ const MyLearningView = ({
   // Filter content by join type
   const filteredContent = useMemo(() => {
     if (contentFilter === 'all') return myContent;
+    if (contentFilter === 'free') {
+      return myContent.filter(c => c.joinType === 'free' || (!c.price || Number(c.price) === 0));
+    }
+    if (contentFilter === 'paid') {
+      return myContent.filter(c => c.joinType === 'paid' || (Number(c.price) > 0 && c.joinType !== 'bid' && c.joinType !== 'free'));
+    }
     return myContent.filter(c => c.joinType === contentFilter);
   }, [myContent, contentFilter]);
 

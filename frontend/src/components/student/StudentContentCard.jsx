@@ -26,8 +26,8 @@ const StudentContentCard = ({
 
   if (dismissed) return null;
 
-  const isFree = !content.price || content.price === 0;
-  const isPaid = content.price > 0;
+  const isFree = !content.price || Number(content.price) === 0;
+  const isPaid = Number(content.price) > 0;
 
   // Get thumbnail URL
   const getThumbnailUrl = () => {

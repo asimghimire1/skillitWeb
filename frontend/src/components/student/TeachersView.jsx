@@ -53,8 +53,6 @@ const TeachersView = ({
       filtered.sort((a, b) => (a.fullname || a.fullName || '').localeCompare(b.fullname || b.fullName || ''));
     } else if (sortBy === 'sessions') {
       filtered.sort((a, b) => (b.sessionCount || 0) - (a.sessionCount || 0));
-    } else if (sortBy === 'rating') {
-      filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
     }
 
     return filtered;
@@ -109,7 +107,6 @@ const TeachersView = ({
           >
             <option value="name">Sort by Name</option>
             <option value="sessions">Most Sessions</option>
-            <option value="rating">Highest Rated</option>
           </select>
         </div>
 
@@ -158,17 +155,6 @@ const TeachersView = ({
               {/* Info */}
               <div className="teacher-card-info">
                 <h3 className="teacher-card-name">{teacher.fullname || teacher.fullName}</h3>
-                
-                {/* Rating */}
-                {teacher.rating > 0 && (
-                  <div className="teacher-rating">
-                    <Star size={14} fill="#f59e0b" stroke="#f59e0b" />
-                    <span>{teacher.rating.toFixed(1)}</span>
-                    {teacher.reviewCount > 0 && (
-                      <span className="review-count">({teacher.reviewCount} reviews)</span>
-                    )}
-                  </div>
-                )}
 
                 {/* Bio */}
                 {teacher.bio && (

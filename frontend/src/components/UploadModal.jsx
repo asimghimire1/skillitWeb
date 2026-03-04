@@ -577,10 +577,6 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName, co
                 <div className="p-6 space-y-4">
                   <div className="flex justify-between items-start">
                     <div className="bg-primary/10 text-primary text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-wider">New Content</div>
-                    <div className="flex items-center gap-1 modal-text-secondary">
-                      <span className="material-symbols-outlined text-xs">star</span>
-                      <span className="text-[10px] font-black">4.9</span>
-                    </div>
                   </div>
                   <h4 className="upload-preview-title">{title || 'Your Content Title'}</h4>
                   <p className="upload-preview-description">

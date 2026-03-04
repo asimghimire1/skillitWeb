@@ -43,10 +43,6 @@ const ContentCard = ({ upload, teacher, onAction }) => {
                     <div className="content-category-badge">
                         {upload.category || 'New Content'}
                     </div>
-                    <div className="content-rating">
-                        <span className="material-symbols-outlined filled">star</span>
-                        <span>4.9</span>
-                    </div>
                 </div>
 
                 {/* Title & Description */}

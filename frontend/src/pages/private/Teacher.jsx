@@ -366,8 +366,6 @@ export default function Teacher() {
         showToast('Bid accepted! Student has been enrolled.', 'success');
       } else if (action === 'reject') {
         showToast('Bid declined.', 'info');
-      } else if (action === 'counter') {
-        showToast('Counter offer sent!', 'success');
       }
       fetchDashboardData(teacher.id);
     } else {

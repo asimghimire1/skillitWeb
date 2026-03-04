@@ -47,8 +47,7 @@ const ExploreTeachersView = ({
   const sortOptions = [
     { value: 'popular', label: 'Most Popular', icon: 'star' },
     { value: 'name', label: 'Name A-Z', icon: 'sort_by_alpha' },
-    { value: 'content', label: 'Most Content', icon: 'video_library' },
-    { value: 'rating', label: 'Highest Rated', icon: 'grade' }
+    { value: 'content', label: 'Most Content', icon: 'video_library' }
   ];
 
   // Get teacher's content
@@ -90,9 +89,6 @@ const ExploreTeachersView = ({
         break;
       case 'content':
         filtered.sort((a, b) => b.contentCount - a.contentCount);
-        break;
-      case 'rating':
-        filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
         break;
       case 'popular':
       default:
@@ -202,13 +198,6 @@ const ExploreTeachersView = ({
                 {/* Info */}
                 <div className="teacher-explore-info">
                   <h3 className="teacher-explore-name">{teacher.fullname || teacher.fullName}</h3>
-
-                  {/* Rating */}
-                  <div className="teacher-explore-rating">
-                    <Star size={14} fill="#f59e0b" stroke="#f59e0b" />
-                    <span>{(teacher.rating || 4.5).toFixed(1)}</span>
-                    <span className="rating-count">({teacher.reviewCount || 0} reviews)</span>
-                  </div>
 
                   {/* Bio */}
                   {teacher.bio && (

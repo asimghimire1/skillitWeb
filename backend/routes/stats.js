@@ -15,14 +15,34 @@ router.get('/teacher/:teacherId', async (req, res) => {
         const contents = await Content.findAll({ where: { teacherId } });
 
         // Calculate Stats
-        const totalStudents = new Set(sessions.map(s => s.learnerId)).size;
+        // Total unique students from both session enrollments and content purchases
+        const sessionEnrollments = await StudentEnrollment.findAll({
+            where: { sessionId: sessions.map(s => s.id) }
+        });
+        const contentPurchases = await StudentContent.findAll({
+            where: { contentId: contents.map(c => c.id) }
+        });
+        const allStudentIds = new Set([
+            ...sessionEnrollments.map(e => e.studentId),
+            ...contentPurchases.map(p => p.studentId)
+        ]);
+        const totalStudents = allStudentIds.size;
         const activeSessions = sessions.filter(s => ['scheduled', 'in-progress'].includes(s.status)).length;
         const totalUploads = contents.length;
 
-        // Calculate Earnings (Mock logic for now, assuming sessions have price and are completed)
-        // In real app, check payment status. Here assume completed sessions are paid.
-        const completedSessions = sessions.filter(s => s.status === 'completed');
-        const monthlyEarnings = completedSessions.reduce((acc, curr) => acc + (parseFloat(curr.price) || 0), 0);
+        // Calculate Monthly Earnings from both sessions and content
+        const now = new Date();
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        
+        const monthlySessionEarnings = sessionEnrollments
+            .filter(e => new Date(e.createdAt || e.created_at) >= startOfMonth)
+            .reduce((acc, e) => acc + (parseFloat(e.amountPaid) || 0), 0);
+        
+        const monthlyContentEarnings = contentPurchases
+            .filter(p => new Date(p.createdAt || p.created_at) >= startOfMonth)
+            .reduce((acc, p) => acc + (parseFloat(p.amountPaid) || 0), 0);
+        
+        const monthlyEarnings = monthlySessionEarnings + monthlyContentEarnings;
 
         res.json({
             totalStudents,

@@ -20,7 +20,6 @@ import {
     Clock,
     CheckCircle,
     XCircle,
-    MessageSquare,
     Gavel
 } from 'lucide-react';
 
@@ -83,7 +82,7 @@ const DashboardView = ({ stats, uploads, sessions, posts, quickActions, onAction
     }, [sessions, clickedSessions]);
 
     const statCards = [
-        { icon: <Users size={24} />, label: 'Total Students', value: 0, color: '#886364' },
+        { icon: <Users size={24} />, label: 'Total Students', value: stats.totalStudents || 0, color: '#886364' },
         { icon: <Video size={24} />, label: 'Active Sessions', value: stats.activeSessions || 0, color: '#886364' },
         { icon: <Wallet size={24} />, label: 'Monthly Earnings', value: `NPR ${(stats.monthlyEarnings || 0).toLocaleString()}`, color: '#ea2a33' },
     ];
@@ -123,9 +122,6 @@ const DashboardView = ({ stats, uploads, sessions, posts, quickActions, onAction
         switch (status) {
             case 'pending':
                 return { color: '#f59e0b', bg: '#fef3c7', icon: <Clock size={14} />, label: 'Pending' };
-            case 'counter':
-            case 'countered':
-                return { color: '#3b82f6', bg: '#dbeafe', icon: <MessageSquare size={14} />, label: 'Counter Sent' };
             case 'accepted':
                 return { color: '#22c55e', bg: '#dcfce7', icon: <CheckCircle size={14} />, label: 'Accepted' };
             case 'rejected':

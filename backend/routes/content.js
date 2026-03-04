@@ -181,7 +181,7 @@ router.post('/:id/unlock', async (req, res) => {
         }
 
         // Handle payment for paid content
-        const contentPrice = content.price || 0;
+        const contentPrice = parseFloat(content.price) || 0;
         const isFree = contentPrice === 0;
 
         if (!isFree && type !== 'bid') {

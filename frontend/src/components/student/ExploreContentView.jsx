@@ -144,8 +144,8 @@ const ExploreContentView = ({
 
       // Price filter
       let matchesPrice = true;
-      if (priceFilter === 'free') matchesPrice = !item.price || item.price === 0;
-      if (priceFilter === 'paid') matchesPrice = item.price > 0 && !item.allowBidding;
+      if (priceFilter === 'free') matchesPrice = !item.price || Number(item.price) === 0;
+      if (priceFilter === 'paid') matchesPrice = Number(item.price) > 0 && !item.allowBidding;
       if (priceFilter === 'bidding') matchesPrice = item.allowBidding === true;
 
       return matchesSearch && matchesCategory && matchesTeacher && matchesType && matchesPrice;
@@ -175,7 +175,7 @@ const ExploreContentView = ({
 
   // Get content type badge
   const getContentTypeBadge = (item) => {
-    if (!item.price || item.price === 0) {
+    if (!item.price || Number(item.price) === 0) {
       return { text: 'Free', className: 'badge-free', icon: <Sparkles size={12} /> };
     }
     if (item.allowBidding) {
@@ -186,7 +186,7 @@ const ExploreContentView = ({
 
   // Get action button text and handler
   const getActionButton = (item) => {
-    if (!item.price || item.price === 0) {
+    if (!item.price || Number(item.price) === 0) {
       return {
         text: 'Watch Now',
         className: 'btn-join-free',

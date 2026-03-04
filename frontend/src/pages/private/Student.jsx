@@ -624,15 +624,6 @@ export default function Student() {
 
               {isProfileDropdownOpen && (
                 <div className="user-profile-dropdown">
-                  <button className="dropdown-item" onClick={() => { setIsProfileDropdownOpen(false); handleTabChange('profile'); }}>
-                    <Users size={16} />
-                    <span>My Profile</span>
-                  </button>
-                  <button className="dropdown-item" onClick={() => { setIsProfileDropdownOpen(false); handleTabChange('settings'); }}>
-                    <Settings size={16} />
-                    <span>Settings</span>
-                  </button>
-                  <div className="dropdown-divider" />
                   <button className="dropdown-item logout" onClick={handleLogout}>
                     <LogOut size={16} />
                     <span>Logout</span>
@@ -806,6 +797,40 @@ export default function Student() {
                 setIsVideoPlayerOpen(true);
               }}
               onJoinSession={handleEnrollSession}
+              onEnrollAtPrice={async (itemData, itemType, originalPrice) => {
+                if (!itemData) {
+                  showToast('Item data not available', 'error');
+                  return;
+                }
+                const price = Number(originalPrice) || 0;
+                if (price > stats.credits) {
+                  showToast('Insufficient credits. Please add more credits.', 'error');
+                  return;
+                }
+                try {
+                  if (itemType === 'CONTENT') {
+                    const result = await apiService.joinContent(itemData.id, student.id, 'paid');
+                    if (result.success) {
+                      showToast('Content purchased successfully!', 'success');
+                      setStats(prev => ({ ...prev, credits: prev.credits - price }));
+                      fetchDashboardData(student.id);
+                    } else {
+                      showToast(result.message || 'Failed to enroll', 'error');
+                    }
+                  } else {
+                    const result = await apiService.enrollSession(itemData.id, student.id);
+                    if (result.success) {
+                      showToast('Session enrolled successfully!', 'success');
+                      setStats(prev => ({ ...prev, credits: prev.credits - price }));
+                      fetchDashboardData(student.id);
+                    } else {
+                      showToast(result.message || 'Failed to enroll', 'error');
+                    }
+                  }
+                } catch (err) {
+                  showToast('Something went wrong', 'error');
+                }
+              }}
             />
           )}
         </div>
@@ -833,7 +858,7 @@ export default function Student() {
           content={selectedContent}
           onClose={() => { setIsVideoPlayerOpen(false); setSelectedContent(null); }}
           suggestedContent={content
-            .filter(c => c.id !== selectedContent.id && c.teacherId === selectedContent.teacherId)
+            .filter(c => c.id !== selectedContent.id)
             .map(c => ({
               ...c,
               teacherName: c.teacherName || teachers.find(t => t.id === c.teacherId)?.fullname || 'Teacher',

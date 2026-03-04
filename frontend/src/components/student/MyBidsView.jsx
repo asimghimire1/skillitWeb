@@ -7,7 +7,8 @@ import {
   Play,
   Video,
   ChevronRight,
-  Lock
+  Lock,
+  ShoppingCart
 } from 'lucide-react';
 import '../../css/bid-new-design.css';
 
@@ -20,7 +21,8 @@ const MyBidsView = ({
   onRespondToCounter,
   onCancelBid,
   onWatchContent,
-  onJoinSession
+  onJoinSession,
+  onEnrollAtPrice
 }) => {
   const [currentFilter, setCurrentFilter] = useState('ALL'); // 'ALL', 'ACCEPTED', 'REJECTED'
 
@@ -139,10 +141,18 @@ const MyBidsView = ({
               {bid.itemType === 'CONTENT' ? 'WATCH NOW' : 'JOIN SESSION'}
             </button>
           ) : isRejected ? (
-            <button className="bid-action-btn-large unavailable" disabled>
-              <Lock size={16} />
-              UNAVAILABLE
-            </button>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', width: '100%' }}>
+              <div style={{ textAlign: 'center', color: '#dc2626', fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Bid Rejected
+              </div>
+              <button
+                className="bid-action-btn-large watch"
+                onClick={() => onEnrollAtPrice && onEnrollAtPrice(bid.itemData, bid.itemType, bid.originalPrice)}
+              >
+                <ShoppingCart size={16} />
+                ENROLL AT NPR {Number(bid.originalPrice)?.toLocaleString()}
+              </button>
+            </div>
           ) : (
             <button className="bid-action-btn-large pending" disabled>
               <Clock size={16} />

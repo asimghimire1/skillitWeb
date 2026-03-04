@@ -169,8 +169,6 @@ const HomePage = () => {
                 </div>
                 <div className="flex items-center gap-6">
                   <span className="text-sm font-bold text-white/60">From Rs. 2000/hr</span>
-                  <div className="h-1.5 w-1.5 rounded-full bg-primary"></div>
-                  <span className="text-sm font-bold text-white">4.9/5 Rating</span>
                 </div>
               </div>
             </div>

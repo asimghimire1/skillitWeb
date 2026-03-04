@@ -2,14 +2,12 @@ import React, { useState, useMemo } from 'react';
 import {
   CheckCircle,
   XCircle,
-  MessageSquare,
   Clock,
   RefreshCw,
   Lock,
   ChevronRight,
   Handshake
 } from 'lucide-react';
-import CounterOfferModal from './CounterOfferModal';
 import '../css/bid-new-design.css';
 
 const BidRequestsView = ({
@@ -21,8 +19,6 @@ const BidRequestsView = ({
   typeFilter = 'all' // Added this
 }) => {
   const [currentFilter, setCurrentFilter] = useState('ALL'); // 'ALL', 'ACCEPTED', 'REJECTED'
-  const [isCounterModalOpen, setIsCounterModalOpen] = useState(false);
-  const [selectedBid, setSelectedBid] = useState(null);
 
   const safeBids = Array.isArray(bids) ? bids : [];
   const safeSessions = Array.isArray(sessions) ? sessions : [];
@@ -73,21 +69,7 @@ const BidRequestsView = ({
     onRespondToBid && onRespondToBid(bid.id, 'reject');
   };
 
-  const handleCounter = (bid) => {
-    setSelectedBid(bid);
-    setIsCounterModalOpen(true);
-  };
 
-  const handleSendCounter = (counterData) => {
-    if (selectedBid && onRespondToBid) {
-      onRespondToBid(selectedBid.id, 'counter', {
-        counterPrice: counterData.counterPrice,
-        counterMessage: counterData.counterMessage
-      });
-    }
-    setIsCounterModalOpen(false);
-    setSelectedBid(null);
-  };
 
   const getInitials = (name) => {
     return name ? name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() : 'ST';
@@ -112,7 +94,7 @@ const BidRequestsView = ({
               </div>
               <div className="author-meta">
                 <span className="author-name">{bid.studentName || 'Student'}</span>
-                <span className="author-sub">{bid.studentEmail || 'Learner'} • {new Date(bid.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                <span className="author-sub">{new Date(bid.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
               </div>
             </div>
 
@@ -159,13 +141,6 @@ const BidRequestsView = ({
                 onClick={() => handleReject(bid)}
               >
                 DECLINE
-              </button>
-              <button
-                className="bid-action-btn-large"
-                style={{ backgroundColor: '#fff', color: '#111827', borderLeft: '1px solid #e2e8f0', flex: 1 }}
-                onClick={() => handleCounter(bid)}
-              >
-                COUNTER
               </button>
               <button
                 className="bid-action-btn-large watch"
@@ -237,12 +212,6 @@ const BidRequestsView = ({
         )}
       </div>
 
-      <CounterOfferModal
-        isOpen={isCounterModalOpen}
-        onClose={() => { setIsCounterModalOpen(false); setSelectedBid(null); }}
-        onSend={handleSendCounter}
-        bid={selectedBid}
-      />
     </div>
   );
 };
