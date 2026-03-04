@@ -146,6 +146,7 @@ export default function CreateSessionModal({ isOpen, onClose, onCreate, sessionT
                                                 { value: 'marketing', label: 'Marketing', icon: 'campaign' },
                                                 { value: 'music', label: 'Music', icon: 'music_note' },
                                                 { value: 'language', label: 'Language', icon: 'translate' },
+                                                { value: 'sports', label: 'Sports', icon: 'sports_soccer' },
                                                 { value: 'other', label: 'Other', icon: 'more_horiz' },
                                             ]}
                                             value={formData.category}

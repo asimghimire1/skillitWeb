@@ -1094,6 +1094,25 @@
   color: var(--primary);
 }
 
+.content-edit-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #f9fafb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.content-edit-btn:hover {
+  background-color: #e0f2fe;
+  color: #0284c7;
+}
+
 /* Post Card View Styles */
 .posts-grid {
   display: grid;

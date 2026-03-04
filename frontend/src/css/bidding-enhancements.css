@@ -12,12 +12,12 @@
 }
 
 .bid-modern-type-icon.content {
-    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    background: #8b5cf6;
     color: white;
 }
 
 .bid-modern-type-icon.session {
-    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    background: #3b82f6;
     color: white;
 }
 
@@ -64,7 +64,7 @@
     align-items: center;
     gap: 0.25rem;
     padding: 0.25rem 0.625rem;
-    background: linear-gradient(135deg, #10b981, #059669);
+    background: #10b981;
     color: white;
     border-radius: 9999px;
     font-size: 0.625rem;
@@ -109,12 +109,12 @@
 
 /* Content bid color accent */
 .bid-modern-card[data-type="content"]::before {
-    background: linear-gradient(180deg, #8b5cf6, #7c3aed);
+    background: #8b5cf6;
 }
 
 /* Session bid color accent */
 .bid-modern-card[data-type="session"]::before {
-    background: linear-gradient(180deg, #3b82f6, #2563eb);
+    background: #3b82f6;
 }
 
 /* Content Thumbnail in Bid Card */
@@ -153,7 +153,7 @@
 
 /* Bid Button Enhancements */
 .scc-btn.bid {
-    background: linear-gradient(135deg, #10b981, #059669);
+    background: #10b981;
     color: white;
     border: none;
     position: relative;

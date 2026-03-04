@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useToast } from '../context/ToastContext';
 import PremiumDropdown from './PremiumDropdown';
 import '../css/upload-modal.css';
 import '../css/teacher.css';
 
-export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) {
+export default function UploadModal({ isOpen, onClose, onUpload, teacherName, contentToEdit = null }) {
   const { showToast } = useToast();
   const [file, setFile] = useState(null);
   const [thumbnail, setThumbnail] = useState(null);
+  const [autoThumbnail, setAutoThumbnail] = useState(null); // Auto-generated from video
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('Technology');
@@ -21,12 +22,71 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
   const [paymentType, setPaymentType] = useState('free'); // 'free' or 'bid'
   const [price, setPrice] = useState(0);
 
-  const handleFileChange = (event) => {
+  // Populate form when editing
+  useEffect(() => {
+    if (contentToEdit) {
+      setTitle(contentToEdit.title || '');
+      setDescription(contentToEdit.description || '');
+      setCategory(contentToEdit.category || 'Technology');
+      setLevel(contentToEdit.level || 'Beginner');
+      const isFree = !contentToEdit.price || contentToEdit.price === 0;
+      setPaymentType(isFree ? 'free' : 'bid');
+      setPrice(contentToEdit.price || 0);
+    } else {
+      resetForm();
+    }
+  }, [contentToEdit, isOpen]);
+
+  // Generate thumbnail from video first frame
+  const generateThumbnailFromVideo = (videoFile) => {
+    return new Promise((resolve) => {
+      const video = document.createElement('video');
+      video.preload = 'metadata';
+      video.muted = true;
+      video.playsInline = true;
+      
+      video.onloadeddata = () => {
+        video.currentTime = 1; // Seek to 1 second for better frame
+      };
+      
+      video.onseeked = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const thumbnailFile = new File([blob], 'auto-thumbnail.jpg', { type: 'image/jpeg' });
+            resolve(thumbnailFile);
+          } else {
+            resolve(null);
+          }
+          URL.revokeObjectURL(video.src);
+        }, 'image/jpeg', 0.8);
+      };
+      
+      video.onerror = () => {
+        resolve(null);
+        URL.revokeObjectURL(video.src);
+      };
+      
+      video.src = URL.createObjectURL(videoFile);
+    });
+  };
+
+  const handleFileChange = async (event) => {
     const selectedFile = event.target.files?.[0];
     if (selectedFile && selectedFile.type.startsWith('video/')) {
       setFile(selectedFile);
       if (!title) {
         setTitle(selectedFile.name.replace(/\.[^/.]+$/, ''));
+      }
+      // Auto-generate thumbnail from video
+      const generatedThumb = await generateThumbnailFromVideo(selectedFile);
+      if (generatedThumb) {
+        setAutoThumbnail(generatedThumb);
       }
     } else if (selectedFile) {
       showToast('Please select a video file', 'error');
@@ -42,7 +102,7 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
     setIsDragging(false);
   };
 
-  const handleDrop = (e) => {
+  const handleDrop = async (e) => {
     e.preventDefault();
     setIsDragging(false);
     const droppedFile = e.dataTransfer.files?.[0];
@@ -50,6 +110,11 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
       setFile(droppedFile);
       if (!title) {
         setTitle(droppedFile.name.replace(/\.[^/.]+$/, ''));
+      }
+      // Auto-generate thumbnail from video
+      const generatedThumb = await generateThumbnailFromVideo(droppedFile);
+      if (generatedThumb) {
+        setAutoThumbnail(generatedThumb);
       }
     } else if (droppedFile) {
       showToast('Please select a video file', 'error');
@@ -110,8 +175,11 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
       if (file) {
         formData.append('file', file);
       }
+      // Use manual thumbnail if provided, otherwise use auto-generated thumbnail
       if (thumbnail) {
         formData.append('thumbnail', thumbnail);
+      } else if (autoThumbnail) {
+        formData.append('thumbnail', autoThumbnail);
       }
 
       // DEBUG: Log FormData
@@ -121,21 +189,22 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
 
       try {
         await onUpload(formData);
-        showToast('Content uploaded successfully', 'success');
+        showToast(contentToEdit ? 'Content updated successfully' : 'Content uploaded successfully', 'success');
       } catch (error) {
         console.error("Upload failed", error);
-        showToast("Upload failed. Please try again.", "error");
+        showToast(contentToEdit ? "Update failed. Please try again." : "Upload failed. Please try again.", "error");
       } finally {
         setIsUploading(false);
         onClose();
         resetForm();
       }
-    }, 3000); // Keep the simulated delay if desired, or remove it.
+    }, contentToEdit ? 1000 : 3000); // Faster for edit, normal for upload
   };
 
   const resetForm = () => {
     setFile(null);
     setThumbnail(null);
+    setAutoThumbnail(null);
     setTitle('');
     setDescription('');
     setCategory('Technology');
@@ -157,24 +226,29 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-md px-4" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div
-        className="bg-white w-full max-w-5xl rounded-3xl border border-[#e5dcdd] shadow-2xl animate-fade-in flex flex-col max-h-[90vh] overflow-hidden"
+        className={`bg-white w-full ${contentToEdit ? 'max-w-2xl' : 'max-w-5xl'} rounded-3xl border border-[#e5dcdd] shadow-2xl animate-fade-in flex flex-col max-h-[90vh] overflow-hidden`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header - Fixed */}
         <div className="p-8 border-b border-gray-100 flex items-center justify-between bg-white shrink-0">
           <div>
-            <h2 className="modal-title">Upload Content</h2>
-            <div className="flex items-center gap-4 mt-2">
-              <div className="flex items-center gap-2">
-                <div className="upload-step-indicator active">1</div>
-                <span className="upload-step-label active">Upload</span>
+            <h2 className="modal-title">{contentToEdit ? 'Edit Content' : 'Upload Content'}</h2>
+            {!contentToEdit && (
+              <div className="flex items-center gap-4 mt-2">
+                <div className="flex items-center gap-2">
+                  <div className="upload-step-indicator active">1</div>
+                  <span className="upload-step-label active">Upload</span>
+                </div>
+                <div className="w-8 h-px bg-gray-200"></div>
+                <div className="flex items-center gap-2">
+                  <div className={`upload-step-indicator ${file ? 'active' : 'inactive'}`}>2</div>
+                  <span className={`upload-step-label ${file ? 'active' : 'inactive'}`}>Details</span>
+                </div>
               </div>
-              <div className="w-8 h-px bg-gray-200"></div>
-              <div className="flex items-center gap-2">
-                <div className={`upload-step-indicator ${file ? 'active' : 'inactive'}`}>2</div>
-                <span className={`upload-step-label ${file ? 'active' : 'inactive'}`}>Details</span>
-              </div>
-            </div>
+            )}
+            {contentToEdit && (
+              <p className="text-sm text-gray-500 mt-1">Edit content details (video cannot be changed)</p>
+            )}
           </div>
           <button
             onClick={onClose}
@@ -186,8 +260,116 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
 
         {/* Scrollable Content Area */}
         <div className="flex-1 overflow-y-auto p-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            {/* Left: Upload Form */}
+          <div className={`grid ${contentToEdit ? 'grid-cols-1' : 'grid-cols-1 lg:grid-cols-2'} gap-12`}>
+            {/* Edit Mode: Only show details */}
+            {contentToEdit ? (
+            <div className="space-y-8">
+              {/* Details Section for Edit */}
+              <div className="space-y-6">
+                <h3 className="text-xs font-black uppercase tracking-widest text-primary flex items-center gap-2">
+                  <span className="material-symbols-outlined text-sm">edit_note</span>
+                  Edit Details
+                </h3>
+
+                <div className="space-y-2">
+                  <label className="modal-label">Content Title</label>
+                  <input
+                    type="text"
+                    className="modal-input"
+                    placeholder="e.g. Advanced Portrait Lighting Masterclass"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="modal-label">Description</label>
+                  <textarea
+                    className="modal-textarea"
+                    style={{ minHeight: '120px' }}
+                    placeholder="What will your students learn?"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                  ></textarea>
+                </div>
+
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="modal-label">Category</label>
+                    <PremiumDropdown
+                      options={[
+                        { value: 'Technology', label: 'Technology', icon: 'devices' },
+                        { value: 'Business', label: 'Business', icon: 'payments' },
+                        { value: 'Marketing', label: 'Marketing', icon: 'trending_up' },
+                        { value: 'Health & Fitness', label: 'Health & Fitness', icon: 'fitness_center' },
+                        { value: 'Design', label: 'Design', icon: 'palette' },
+                        { value: 'Culinary Arts', label: 'Culinary Arts', icon: 'restaurant' },
+                        { value: 'Music', label: 'Music', icon: 'music_note' },
+                        { value: 'Personal Development', label: 'Personal Development', icon: 'psychology' },
+                        { value: 'Sports', label: 'Sports', icon: 'sports_soccer' },
+                        { value: 'Other', label: 'Other', icon: 'more_horiz' },
+                      ]}
+                      value={category}
+                      onChange={setCategory}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="modal-label">Level</label>
+                    <PremiumDropdown
+                      options={[
+                        { value: 'Beginner', label: 'Beginner', icon: 'signal_cellular_1_bar' },
+                        { value: 'Intermediate', label: 'Intermediate', icon: 'signal_cellular_3_bar' },
+                        { value: 'Expert', label: 'Expert', icon: 'signal_cellular_4_bar' },
+                      ]}
+                      value={level}
+                      onChange={setLevel}
+                    />
+                  </div>
+                </div>
+
+                {/* Pricing Section */}
+                <div className="space-y-4">
+                  <label className="modal-label">Pricing Model</label>
+                  <div className="flex gap-4">
+                    <button
+                      type="button"
+                      onClick={() => { setPaymentType('free'); setPrice(0); }}
+                      className={`upload-pricing-btn ${paymentType === 'free' ? 'active' : 'inactive'}`}
+                    >
+                      <span className="material-symbols-outlined text-lg">volunteer_activism</span>
+                      Free
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPaymentType('bid')}
+                      className={`upload-pricing-btn ${paymentType === 'bid' ? 'active' : 'inactive'}`}
+                    >
+                      <span className="material-symbols-outlined text-lg">gavel</span>
+                      Bidding
+                    </button>
+                  </div>
+
+                  {paymentType === 'bid' && (
+                    <div className="space-y-2 animate-fade-in">
+                      <label className="modal-label">Starting Price (NPR)</label>
+                      <div className="upload-price-input-wrapper">
+                        <span className="absolute left-5 top-1/2 -translate-y-1/2 font-black text-gray-400">Rs.</span>
+                        <input
+                          className="upload-price-input"
+                          type="number"
+                          value={price}
+                          onChange={(e) => setPrice(e.target.value)}
+                          min="0"
+                          placeholder="0.00"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+            ) : (
+            /* Upload Mode: Full form */
             <div className="space-y-8">
               {/* Upload Zone */}
               <div className="space-y-3">
@@ -275,6 +457,7 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
                         { value: 'Culinary Arts', label: 'Culinary Arts', icon: 'restaurant' },
                         { value: 'Music', label: 'Music', icon: 'music_note' },
                         { value: 'Personal Development', label: 'Personal Development', icon: 'psychology' },
+                        { value: 'Sports', label: 'Sports', icon: 'sports_soccer' },
                         { value: 'Other', label: 'Other', icon: 'more_horiz' },
                       ]}
                       value={category}
@@ -366,8 +549,10 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
                 </div>
               </div>
             </div>
+            )}
 
-            {/* Right: Preview Area */}
+            {/* Right: Preview Area (only for upload mode) */}
+            {!contentToEdit && (
             <div className="upload-preview-section">
               <div className="upload-preview-card">
                 <div className="aspect-video bg-black relative group">
@@ -411,6 +596,7 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
                 This is a live preview of how your course will look to potential students.
               </p>
             </div>
+            )}
           </div>
         </div>
 
@@ -421,9 +607,10 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
               onClick={handleDiscard}
               className="upload-cancel-btn"
             >
-              Discard Changes
+              {contentToEdit ? 'Cancel' : 'Discard Changes'}
             </button>
             <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+              {!contentToEdit && (
               <button
                 type="button"
                 onClick={handleDiscard}
@@ -431,19 +618,20 @@ export default function UploadModal({ isOpen, onClose, onUpload, teacherName }) 
               >
                 Save Draft
               </button>
+              )}
               <button
                 onClick={handleUpload}
-                disabled={!file || !title || isUploading}
-                className={`btn-premium btn-primary py-4 px-12 min-w-[200px] ${(!file || !title || isUploading) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                disabled={(!contentToEdit && !file) || !title || isUploading}
+                className={`btn-premium btn-primary py-4 px-12 min-w-[200px] ${((!contentToEdit && !file) || !title || isUploading) ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
                 {isUploading ? (
                   <>
                     <span className="material-symbols-outlined animate-spin">sync</span>
-                    <span>Uploading {uploadProgress}%</span>
+                    <span>{contentToEdit ? 'Updating...' : `Uploading ${uploadProgress}%`}</span>
                   </>
                 ) : (
                   <>
-                    <span>Publish Content</span>
+                    <span>{contentToEdit ? 'Save Changes' : 'Publish Content'}</span>
                     <span className="material-symbols-outlined">arrow_forward</span>
                   </>
                 )}

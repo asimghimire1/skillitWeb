@@ -68,6 +68,7 @@ export default function Teacher() {
   const [isPostModalOpen, setIsPostModalOpen] = useState(false);
   const [sessionToEdit, setSessionToEdit] = useState(null);
   const [postToEdit, setPostToEdit] = useState(null);
+  const [contentToEdit, setContentToEdit] = useState(null);
 
   // Data States
   const [stats, setStats] = useState({
@@ -181,11 +182,31 @@ export default function Teacher() {
   };
 
   const handleUploadContent = async (uploadData) => {
-    // uploadData now contains FormData (or will be adapted)
-    const newContent = await apiService.uploadContent(uploadData);
-    if (newContent) {
-      setUploads(prev => [newContent, ...prev]);
-      fetchDashboardData(teacher.id);
+    // Check if we're editing existing content
+    if (contentToEdit) {
+      // For editing, we send JSON data (no file upload)
+      const updateData = {
+        title: uploadData.get('title'),
+        description: uploadData.get('description'),
+        category: uploadData.get('category'),
+        level: uploadData.get('level'),
+        paymentType: uploadData.get('paymentType'),
+        price: uploadData.get('price')
+      };
+      const updated = await apiService.updateContent(contentToEdit.id, updateData);
+      if (updated) {
+        showToast('Content updated successfully', 'success');
+        fetchDashboardData(teacher.id);
+      } else {
+        showToast('Failed to update content', 'error');
+      }
+    } else {
+      // uploadData now contains FormData (or will be adapted)
+      const newContent = await apiService.uploadContent(uploadData);
+      if (newContent) {
+        setUploads(prev => [newContent, ...prev]);
+        fetchDashboardData(teacher.id);
+      }
     }
   };
 
@@ -270,7 +291,26 @@ export default function Teacher() {
         showToast('Content deleted successfully', 'success');
         fetchDashboardData(teacher.id);
       }
+    } else if (actionType === 'editContent') {
+      // Check if content was created within 1 hour
+      const createdAt = new Date(data.created_at || data.createdAt);
+      const now = new Date();
+      const hourInMs = 60 * 60 * 1000;
+      if (now - createdAt > hourInMs) {
+        showToast('Content can only be edited within 1 hour of creation.', 'error');
+        return;
+      }
+      setContentToEdit(data);
+      setIsUploadModalOpen(true);
     } else if (actionType === 'editSession') {
+      // Check if session was created within 1 hour
+      const createdAt = new Date(data.created_at || data.createdAt);
+      const now = new Date();
+      const hourInMs = 60 * 60 * 1000;
+      if (now - createdAt > hourInMs) {
+        showToast('Session can only be edited within 1 hour of creation.', 'error');
+        return;
+      }
       setSessionToEdit(data);
       setIsSessionModalOpen(true);
     } else if (actionType === 'deleteSession') {
@@ -546,9 +586,13 @@ export default function Teacher() {
       {/* Modals */}
       <UploadModal
         isOpen={isUploadModalOpen}
-        onClose={() => setIsUploadModalOpen(false)}
+        onClose={() => {
+          setIsUploadModalOpen(false);
+          setContentToEdit(null);
+        }}
         onUpload={handleUploadContent}
         teacherName={teacher.fullname}
+        contentToEdit={contentToEdit}
       />
       <CreateSessionModal
         isOpen={isSessionModalOpen}

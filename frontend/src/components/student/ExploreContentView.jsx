@@ -188,9 +188,9 @@ const ExploreContentView = ({
   const getActionButton = (item) => {
     if (!item.price || item.price === 0) {
       return {
-        text: 'Join Free',
+        text: 'Watch Now',
         className: 'btn-join-free',
-        onClick: () => onJoinContent(item, 'free')
+        onClick: () => onWatchContent && onWatchContent(item)
       };
     }
     if (item.allowBidding) {

@@ -213,16 +213,13 @@ export default function Student() {
       return;
     }
 
-    // For free sessions, enroll and redirect to meeting link directly
+    // For free sessions, enroll and show success
     if (session.price === 0 || !session.price) {
       const result = await apiService.enrollSession(session.id, student.id);
       if (result.success) {
-        showToast('Successfully joined!', 'success');
+        showToast('Successfully joined! Click "Join Session" to enter.', 'success');
         fetchDashboardData(student.id);
-        // Redirect to meeting link if available
-        if (session.meetingLink) {
-          window.open(session.meetingLink, '_blank');
-        }
+        // Don't auto-open URL - let user click "Join Session" button
       } else {
         showToast(result.message || 'Failed to join. Please try again.', 'error');
       }
@@ -249,15 +246,12 @@ export default function Student() {
 
     const result = await apiService.enrollSession(selectedSession.id, student.id);
     if (result.success) {
-      showToast('Successfully enrolled!', 'success');
+      showToast('Successfully enrolled! Click "Join Session" to enter.', 'success');
       setStats(prev => ({ ...prev, credits: prev.credits - selectedSession.price }));
       fetchDashboardData(student.id);
       setIsEnrollModalOpen(false);
       setSelectedSession(null);
-      // Redirect to meeting link if available
-      if (selectedSession.meetingLink) {
-        window.open(selectedSession.meetingLink, '_blank');
-      }
+      // Don't auto-open URL - let user click "Join Session" button
     } else {
       showToast(result.message || 'Failed to enroll. Please try again.', 'error');
     }
@@ -839,7 +833,7 @@ export default function Student() {
           content={selectedContent}
           onClose={() => { setIsVideoPlayerOpen(false); setSelectedContent(null); }}
           suggestedContent={content
-            .filter(c => c.id !== selectedContent.id && unlockedContent.some(u => u.contentId === c.id || u.id === c.id))
+            .filter(c => c.id !== selectedContent.id && c.teacherId === selectedContent.teacherId)
             .map(c => ({
               ...c,
               teacherName: c.teacherName || teachers.find(t => t.id === c.teacherId)?.fullname || 'Teacher',

@@ -125,14 +125,15 @@ const StudentContentCard = ({
           </div>
         )}
 
-        {/* STATE 3: FREE CONTENT - Join Free */}
+        {/* STATE 3: FREE CONTENT - Watch Now */}
         {!isUnlocked && !hasPendingBid && isFree && (
           <div className="scc-actions">
             <button
               className="scc-btn enroll"
-              onClick={() => onJoinContent && onJoinContent(content, 'free')}
+              onClick={() => onWatchNow && onWatchNow(content)}
             >
-              Join Free
+              <Play size={16} />
+              Watch Now
             </button>
           </div>
         )}

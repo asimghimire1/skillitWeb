@@ -72,14 +72,23 @@ const ContentCard = ({ upload, teacher, onAction }) => {
                         </span>
                     </div>
 
-                    {onAction && (
-                        <button
-                            className="content-delete-btn"
-                            onClick={(e) => { e.stopPropagation(); onAction('deleteContent', upload.id); }}
-                            title="Delete content"
-                        >
-                            <span className="material-symbols-outlined" style={{ fontSize: '1.125rem' }}>delete</span>
-                        </button>
+                {onAction && (
+                        <div className="flex items-center gap-2">
+                            <button
+                                className="content-edit-btn"
+                                onClick={(e) => { e.stopPropagation(); onAction('editContent', upload); }}
+                                title="Edit content"
+                            >
+                                <span className="material-symbols-outlined" style={{ fontSize: '1.125rem' }}>edit</span>
+                            </button>
+                            <button
+                                className="content-delete-btn"
+                                onClick={(e) => { e.stopPropagation(); onAction('deleteContent', upload.id); }}
+                                title="Delete content"
+                            >
+                                <span className="material-symbols-outlined" style={{ fontSize: '1.125rem' }}>delete</span>
+                            </button>
+                        </div>
                     )}
                 </div>
             </div>
