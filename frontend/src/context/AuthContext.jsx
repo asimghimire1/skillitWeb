@@ -29,6 +29,9 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('userId');
     localStorage.removeItem('user');
     
+    // Clear session flags for dashboard reloads
+    sessionStorage.removeItem('teacherDashboardReloaded');
+    
     setUser(null);
     setIsAuthenticated(false);
     setIsLoading(false);

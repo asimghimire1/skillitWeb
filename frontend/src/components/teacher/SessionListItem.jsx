@@ -6,7 +6,7 @@ const SessionListItem = ({ session, onCreate, onAction }) => {
     const month = date.toLocaleDateString(undefined, { month: 'short' }).toUpperCase();
     const year = date.getFullYear();
 
-    // Determine status badge
+    // Determine status badge with real-time checking
     const getStatusBadge = () => {
         if (session.status === 'completed') {
             return { className: 'completed', text: '• Completed' };
@@ -14,6 +14,23 @@ const SessionListItem = ({ session, onCreate, onAction }) => {
         if (session.status === 'missed') {
             return { className: 'missed', text: '• Missed' };
         }
+        
+        // Real-time date checking
+        const now = new Date();
+        const sessionDateTime = new Date(`${session.scheduledDate}T${session.scheduledTime || '00:00'}`);
+        const timeDiff = now - sessionDateTime; // milliseconds
+        const hourInMs = 60 * 60 * 1000;
+        
+        // If more than 1 hour has passed, it's expired
+        if (timeDiff > hourInMs) {
+            return { className: 'expired', text: '• Expired', isRealTime: true };
+        }
+        
+        // If session time has started but less than 1 hour passed, it's ongoing
+        if (timeDiff >= 0 && timeDiff <= hourInMs) {
+            return { className: 'started', text: '• Started', isRealTime: true };
+        }
+        
         return { className: 'scheduled', text: '• Scheduled' };
     };
 
@@ -38,9 +55,15 @@ const SessionListItem = ({ session, onCreate, onAction }) => {
                         {session.scheduledTime}
                     </div>
                     <span className="session-dot-separator">•</span>
-                    <div className={`session-status-badge ${statusBadge.className}`}>
-                        {statusBadge.text}
-                    </div>
+                    {statusBadge.isRealTime ? (
+                        <span style={{ color: '#dc2626', fontSize: '0.40rem', fontWeight: 600 }}>
+                            {statusBadge.text}
+                        </span>
+                    ) : (
+                        <div className={`session-status-badge ${statusBadge.className}`}>
+                            {statusBadge.text}
+                        </div>
+                    )}
                 </div>
 
                 <h3 className="session-title-v2">{session.title}</h3>

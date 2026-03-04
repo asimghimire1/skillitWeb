@@ -103,6 +103,14 @@ export default function Teacher() {
       return;
     }
 
+    // One-time reload on first login to teacher dashboard
+    const hasReloaded = sessionStorage.getItem('teacherDashboardReloaded');
+    if (!hasReloaded) {
+      sessionStorage.setItem('teacherDashboardReloaded', 'true');
+      window.location.reload();
+      return;
+    }
+
     setTeacher(user);
 
     const darkMode = localStorage.getItem('darkMode') === 'true';

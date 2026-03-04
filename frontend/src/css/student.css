@@ -6423,9 +6423,10 @@
 }
 
 .scc-status-badge.purchased {
-  background: linear-gradient(135deg, #10b981, #059669);
+  background: #10b981;
   color: white;
   box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+  font-size: 0.40rem;
 }
 
 .scc-status-badge.requested {

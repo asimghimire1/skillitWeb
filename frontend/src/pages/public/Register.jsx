@@ -98,7 +98,7 @@ const Register = () => {
       </div>
 
       <div className="auth-content">
-        <button onClick={() => navigate('/')} className="back-btn">
+        <button onClick={() => { window.location.href = '/'; }} className="back-btn">
           <span className="material-symbols-outlined">arrow_back</span>
           Back to Home
         </button>

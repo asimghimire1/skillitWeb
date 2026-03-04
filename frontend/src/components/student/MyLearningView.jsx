@@ -38,16 +38,23 @@ const MyLearningView = ({
     ).map(session => {
       const sessionDateTime = new Date(`${session.scheduledDate}T${session.scheduledTime}`);
       const now = new Date();
-      const thirtyMinsAfter = new Date(sessionDateTime.getTime() + 30 * 60 * 1000);
+      const timeDiff = now - sessionDateTime; // milliseconds
+      const hourInMs = 60 * 60 * 1000;
       
       let status = 'upcoming';
-      if (now > thirtyMinsAfter) {
-        status = session.attended ? 'completed' : 'missed';
-      } else if (now >= sessionDateTime) {
-        status = 'live';
+      let isRealTime = false;
+      
+      // If more than 1 hour has passed, it's expired
+      if (timeDiff > hourInMs) {
+        status = session.attended ? 'completed' : 'expired';
+        isRealTime = status === 'expired';
+      } else if (timeDiff >= 0 && timeDiff <= hourInMs) {
+        // Session started but within 1 hour
+        status = 'started';
+        isRealTime = true;
       }
       
-      return { ...session, status };
+      return { ...session, status, isRealTime };
     });
   }, [safeSessions, safeEnrollments]);
 
@@ -216,11 +223,19 @@ const MyLearningView = ({
               {filteredSessions.map((session, idx) => (
                 <div key={session.id || idx} className="enrolled-session-card">
                   <div className="enrolled-session-status">
-                    <span 
-                      className="status-indicator"
-                      style={{ backgroundColor: getStatusColor(session.status) }}
-                    />
-                    <span className="status-text">{session.status}</span>
+                    {session.isRealTime ? (
+                      <span style={{ color: '#dc2626', fontSize: '0.40rem', fontWeight: 600 }}>
+                        • {session.status.charAt(0).toUpperCase() + session.status.slice(1)}
+                      </span>
+                    ) : (
+                      <>
+                        <span 
+                          className="status-indicator"
+                          style={{ backgroundColor: getStatusColor(session.status) }}
+                        />
+                        <span className="status-text">{session.status}</span>
+                      </>
+                    )}
                   </div>
 
                   <div className="enrolled-session-info">
@@ -235,7 +250,7 @@ const MyLearningView = ({
                   </div>
 
                   <div className="enrolled-session-actions">
-                    {session.status === 'live' && session.meetingLink && (
+                    {session.status === 'started' && session.meetingLink && (
                       <a 
                         href={session.meetingLink}
                         target="_blank"
@@ -258,9 +273,9 @@ const MyLearningView = ({
                         Completed
                       </span>
                     )}
-                    {session.status === 'missed' && (
-                      <span className="missed-badge">
-                        Missed
+                    {session.status === 'expired' && (
+                      <span style={{ color: '#dc2626', fontSize: '0.65rem', fontWeight: 500 }}>
+                        Expired
                       </span>
                     )}
                   </div>

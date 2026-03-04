@@ -98,7 +98,7 @@ function Home() {
 
         {/* Hero Section */}
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-8 lg:px-16">
-          <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center min-h-[calc(100vh-88px)] py-8 sm:py-16">
+          <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center min-h-[calc(100vh-88px)] py-4 sm:py-8">
             {/* Left Column - Content */}
             <div className="space-y-6 sm:space-y-8">
               <div className="space-y-4">
